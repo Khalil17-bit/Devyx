@@ -11,6 +11,8 @@ import { SocialHub } from "@/components/contact/social-hub";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, Terminal, MessageSquare, AlertCircle } from "lucide-react";
 
+import { LeadForm } from "@/components/contact/lead-form";
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -25,6 +27,7 @@ export default async function ContactPage({
   searchParams,
 }: ContactPageProps) {
   const { locale } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   setRequestLocale(locale);
 
   const [siteSettings, contactSection, storySection, socialLinks, services] =
@@ -104,96 +107,11 @@ export default async function ContactPage({
                 </p>
               </div>
 
-              {/* Form Input Fields (Interactive in Phase 6) */}
-              <form className="space-y-4 font-mono text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-text-muted uppercase text-[10px] block">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="full_name"
-                      required
-                      placeholder="e.g. Sarah Connor"
-                      className="w-full h-10 px-3 bg-bg-elevated border border-border-grid text-text-primary focus:border-accent-primary focus:outline-none"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-text-muted uppercase text-[10px] block">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      required
-                      placeholder="+213 555 0192"
-                      className="w-full h-10 px-3 bg-bg-elevated border border-border-grid text-text-primary focus:border-accent-primary focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-text-muted uppercase text-[10px] block">
-                      State / Province *
-                    </label>
-                    <input
-                      type="text"
-                      name="state_province"
-                      required
-                      placeholder="e.g. Algiers / Paris / Delaware"
-                      className="w-full h-10 px-3 bg-bg-elevated border border-border-grid text-text-primary focus:border-accent-primary focus:outline-none"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-text-muted uppercase text-[10px] block">
-                      Requested Service Type *
-                    </label>
-                    <select
-                      name="service_type"
-                      className="w-full h-10 px-3 bg-bg-elevated border border-border-grid text-text-primary focus:border-accent-primary focus:outline-none"
-                    >
-                      {services.map((s) => (
-                        <option key={s.id} value={s.slug}>
-                          {getLocalizedText(s.title, locale)}
-                        </option>
-                      ))}
-                      <option value="other">Custom System Architecture</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-text-muted uppercase text-[10px] block">
-                    System Requirements &amp; Project Details *
-                  </label>
-                  <textarea
-                    name="message"
-                    rows={5}
-                    required
-                    placeholder="Describe your current bottlenecks, target timeline, and operational objectives..."
-                    className="w-full p-3 bg-bg-elevated border border-border-grid text-text-primary focus:border-accent-primary focus:outline-none resize-none"
-                  />
-                </div>
-
-                {/* Honeypot anti-spam trap (invisible to human visitors) */}
-                <input
-                  type="text"
-                  name="honeypot"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  className="hidden"
-                  aria-hidden="true"
-                />
-
-                <button
-                  type="button"
-                  className="w-full btn-primary clip-chamfer h-12 bg-accent-primary text-bg-primary font-mono text-xs font-semibold uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform"
-                >
-                  Submit Architectural Ingest
-                </button>
-              </form>
+              {/* Lead Capture Form with Zod validation, honeypot & sliding-window rate limit */}
+              <LeadForm
+                services={services}
+                defaultService={resolvedSearchParams?.service}
+              />
             </div>
           ) : (
             /* Unmounted Form Notice (PRD Section 2.1 & 8) */
