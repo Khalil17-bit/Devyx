@@ -4,15 +4,60 @@
     "services": "الخدمات",
     "projects": "المشاريع",
     "contact": "اتصل بنا",
-    "admin": "لوحة التحكم"
+    "admin": "لوحة الإدارة",
+    "menu": "القائمة",
+    "close": "إغلاق"
   },
   "theme": {
-    "dark": "داكن",
-    "light": "فاتح"
+    "toggleLabel": "تبديل المظهر",
+    "dark": "DARK",
+    "light": "LIGHT"
+  },
+  "locale": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English",
+    "shortAr": "AR",
+    "shortFr": "FR",
+    "shortEn": "EN"
+  },
+  "cta": {
+    "initialize": "ابدأ استشارتك الآن",
+    "exploreProjects": "استعرض المشاريع",
+    "viewDetails": "معاينة المخطط التقني",
+    "visitLive": "زيارة المشروع الحي",
+    "contactUs": "تواصل مع الفريق الهندسي",
+    "openChat": "مساعد الذكاء الاصطناعي",
+    "sendMessage": "إرسال بيانات المشروع",
+    "sending": "جارٍ الإرسال...",
+    "retry": "إعادة المحاولة"
+  },
+  "categories": {
+    "all": "كافة الأنظمة",
+    "web_dev": "تطوير الويب",
+    "mobile_app": "تطبيقات الهاتف",
+    "automation": "أتمتة مسارات العمل"
+  },
+  "modal": {
+    "problem": "التحدي الهندسي والمعماري",
+    "solution": "الحل البرمجي المنفذ",
+    "results": "النتائج والأثر التشغيلي",
+    "techStack": "حزمة التقنيات المستخدمة",
+    "close": "إغلاق نافذة التفاصيل"
+  },
+  "footer": {
+    "sysRoot": "ديفيكس // العقدة_الرئيسية_للنظام",
+    "tagline": "هندسة برمجية دقيقة، منصات ويب فائقة السرعة، ومسارات أتمتة ذاتية التشغيل.",
+    "links": "روابط الانتقال",
+    "socials": "قنوات التواصل المباشر",
+    "contact": "التواصل الهندسي",
+    "allRightsReserved": "جميع الحقوق محفوظة. بنية برمجية دقيقة طورتها ديفيكس.",
+    "status": "يعمل بكفاءة"
   },
   "common": {
     "brandName": "Devyx",
-    "brandTagline": "تطوير الويب وأتمتة مسارات العمل",
-    "allRightsReserved": "جميع الحقوق محفوظة."
+    "brandSubtitle": "WEB & AUTOMATION",
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ"
   }
 }

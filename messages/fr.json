@@ -4,15 +4,60 @@
     "services": "Services",
     "projects": "Projets",
     "contact": "Contact",
-    "admin": "Admin"
+    "admin": "Admin",
+    "menu": "Menu",
+    "close": "Fermer"
   },
   "theme": {
-    "dark": "Sombre",
-    "light": "Clair"
+    "toggleLabel": "Changer de thème",
+    "dark": "DARK",
+    "light": "LIGHT"
+  },
+  "locale": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English",
+    "shortAr": "AR",
+    "shortFr": "FR",
+    "shortEn": "EN"
+  },
+  "cta": {
+    "initialize": "Lancer une Consultation",
+    "exploreProjects": "Explorer les Projets",
+    "viewDetails": "Inspecter le Projet",
+    "visitLive": "Visiter le Projet en Ligne",
+    "contactUs": "Contacter l'Ingénierie",
+    "openChat": "Ouvrir l'Assistant IA",
+    "sendMessage": "Transmettre la Demande",
+    "sending": "Transmission...",
+    "retry": "Réessayer la Connexion"
+  },
+  "categories": {
+    "all": "Tous les Systèmes",
+    "web_dev": "Développement Web",
+    "mobile_app": "Applications Mobiles",
+    "automation": "Automatisation des Workflows"
+  },
+  "modal": {
+    "problem": "Le Défi Architectural",
+    "solution": "Solution Déployée",
+    "results": "Impact Mesurable & Métriques",
+    "techStack": "Technologies Utilisées",
+    "close": "Fermer la Spécification"
+  },
+  "footer": {
+    "sysRoot": "DEVYX // NŒUD_RACINE_SYS",
+    "tagline": "Ingénierie Déterministe, Plateformes Web Haute Performance & Workflows Autonomes.",
+    "links": "Navigation",
+    "socials": "Communication Directe",
+    "contact": "Contact Technique",
+    "allRightsReserved": "Tous droits réservés. Architecture déterministe par Devyx.",
+    "status": "OPÉRATIONNEL"
   },
   "common": {
     "brandName": "Devyx",
-    "brandTagline": "Développement Web & Automatisation des Workflows",
-    "allRightsReserved": "Tous droits réservés."
+    "brandSubtitle": "WEB & AUTOMATION",
+    "loading": "Chargement...",
+    "error": "Erreur"
   }
 }

@@ -25,11 +25,7 @@ export interface LocalizedString {
   [key: string]: string | undefined;
 }
 
-export interface LocalizedFeatureItem {
-  en?: string;
-  fr?: string;
-  ar?: string;
-}
+export type LocalizedFeatureItem = LocalizedString;
 
 export interface MetadataItem {
   code?: string;

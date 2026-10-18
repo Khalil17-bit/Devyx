@@ -4,15 +4,60 @@
     "services": "Services",
     "projects": "Projects",
     "contact": "Contact",
-    "admin": "Admin"
+    "admin": "Admin",
+    "menu": "Menu",
+    "close": "Close"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light"
+    "toggleLabel": "Switch theme",
+    "dark": "DARK",
+    "light": "LIGHT"
+  },
+  "locale": {
+    "ar": "العربية",
+    "fr": "Français",
+    "en": "English",
+    "shortAr": "AR",
+    "shortFr": "FR",
+    "shortEn": "EN"
+  },
+  "cta": {
+    "initialize": "Initialize Consultation",
+    "exploreProjects": "Explore Projects",
+    "viewDetails": "Inspect Blueprint",
+    "visitLive": "Visit Live Project",
+    "contactUs": "Contact Engineering",
+    "openChat": "Open AI Assistant",
+    "sendMessage": "Submit Lead Ingest",
+    "sending": "Transmitting...",
+    "retry": "Retry Connection"
+  },
+  "categories": {
+    "all": "All Systems",
+    "web_dev": "Web Development",
+    "mobile_app": "Mobile Applications",
+    "automation": "Workflow Automation"
+  },
+  "modal": {
+    "problem": "The Architectural Challenge",
+    "solution": "Engineered Solution",
+    "results": "Measurable Impact & Metrics",
+    "techStack": "Technology Stack",
+    "close": "Close Specification"
+  },
+  "footer": {
+    "sysRoot": "DEVYX // SYS_ROOT_NODE",
+    "tagline": "Deterministic Engineering, High-Throughput Web Platforms & Autonomous Workflows.",
+    "links": "Navigation",
+    "socials": "Direct Communication",
+    "contact": "Technical Inquiries",
+    "allRightsReserved": "All rights reserved. Deterministic architecture by Devyx.",
+    "status": "OPERATIONAL"
   },
   "common": {
     "brandName": "Devyx",
-    "brandTagline": "Web Development & Workflow Automation",
-    "allRightsReserved": "All rights reserved."
+    "brandSubtitle": "WEB & AUTOMATION",
+    "loading": "Loading...",
+    "error": "Error"
   }
 }

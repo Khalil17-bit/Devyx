@@ -3,6 +3,8 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
 import {
   spaceGrotesk,
   plusJakartaSans,
@@ -45,7 +47,7 @@ export default async function LocaleLayout({
         ${jetbrainsMono.variable}
       `}
     >
-      <body className="min-h-screen bg-bg-primary text-text-primary antialiased selection:bg-accent-primary selection:text-bg-primary">
+      <body className="min-h-screen bg-bg-primary text-text-primary antialiased selection:bg-accent-primary selection:text-bg-primary flex flex-col justify-between">
         <ThemeProvider
           attribute="data-theme"
           defaultTheme="dark"
@@ -53,7 +55,11 @@ export default async function LocaleLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages} locale={locale}>
-            {children}
+            <Navbar />
+            <div className="flex-1 w-full">
+              {children}
+            </div>
+            <Footer locale={locale} />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
