@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "projects": "Projects",
+    "contact": "Contact",
+    "admin": "Admin"
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light"
+  },
+  "common": {
+    "brandName": "Devyx",
+    "brandTagline": "Web Development & Workflow Automation",
+    "allRightsReserved": "All rights reserved."
+  }
+}

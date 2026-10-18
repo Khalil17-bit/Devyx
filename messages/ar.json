@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "services": "الخدمات",
+    "projects": "المشاريع",
+    "contact": "اتصل بنا",
+    "admin": "لوحة التحكم"
+  },
+  "theme": {
+    "dark": "داكن",
+    "light": "فاتح"
+  },
+  "common": {
+    "brandName": "Devyx",
+    "brandTagline": "تطوير الويب وأتمتة مسارات العمل",
+    "allRightsReserved": "جميع الحقوق محفوظة."
+  }
+}

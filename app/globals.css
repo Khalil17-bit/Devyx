@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* LIGHT MODE — Matte Engineering Paper */
+    --bg-primary: #F4F6F9;        /* Main canvas background */
+    --bg-surface: #FFFFFF;        /* Card & module surface */
+    --bg-elevated: #E9EEF5;       /* Secondary interactive surface / code blocks */
+    
+    --text-primary: #0B101E;      /* Deep navy ink (matches logo wordmark in light mode) */
+    --text-secondary: #4A5568;    /* Muted slate (matches WEB & AUTOMATION subtitle) */
+    --text-muted: #718096;        /* Technical metadata & coordinates */
+    
+    --accent-primary: #1B3B9B;    /* Deep Cobalt for high-contrast primary actions & links */
+    --accent-secondary: #00B4D8;  /* Stepped-down Cyan for secondary highlights & active nodes */
+    --accent-signal: #00E0FF;     /* Pure Electric Cyan (used only inside dark badges or ribbon paths) */
+    
+    --border-grid: #CBD5E1;       /* Exposed 1px structural grid lines */
+    --border-focus: #1B3B9B;      /* Active card/input border */
+    
+    --status-operational: #10B981;
+    --status-warning: #F59E0B;
+    --status-error: #EF4444;
+
+    /* Default Font Mapping (LTR) */
+    --font-display: var(--font-space-grotesk), sans-serif;
+    --font-sans: var(--font-jakarta), sans-serif;
+    --font-mono: var(--font-mono), monospace;
+  }
+
+  .dark,
+  [data-theme="dark"] {
+    /* DARK MODE — Industrial Control Room (Default) */
+    --bg-primary: #0B101E;        /* Core obsidian navy from logo background */
+    --bg-surface: #11182B;        /* Card & module surface */
+    --bg-elevated: #172038;       /* Hover states & nested nodes */
+    
+    --text-primary: #F2F5F8;      /* Crisp glacial white (matches Devyx wordmark) */
+    --text-secondary: #8A94A6;    /* Muted steel blue (matches WEB & AUTOMATION subtitle) */
+    --text-muted: #5A657D;        /* Inactive labels & grid coordinates */
+    
+    --accent-primary: #00E0FF;    /* Electric Cyan from infinity ribbon apex */
+    --accent-secondary: #2541B2;  /* Royal Cobalt from ribbon base */
+    --accent-signal: #00E0FF;     /* Active data flow pulse */
+    
+    --border-grid: #1E2942;       /* Exposed 1px structural grid lines */
+    --border-focus: #00E0FF;      /* Active card/input border */
+
+    --status-operational: #10B981;
+    --status-warning: #F59E0B;
+    --status-error: #EF4444;
+  }
+
+  /* Arabic Font & Direction Mapping */
+  [dir="rtl"] {
+    --font-display: var(--font-ibm-arabic), sans-serif;
+    --font-sans: var(--font-ibm-arabic), sans-serif;
+  }
+
+  * {
+    border-color: var(--border-grid);
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  /* Accessible focus indicators */
+  :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* Selection styling */
+  ::selection {
+    background-color: var(--accent-primary);
+    color: var(--bg-primary);
+  }
+}
+
+@layer utilities {
+  /* 45-degree chamfered geometry for Devyx buttons */
+  .clip-chamfer {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  }
+
+  [dir="rtl"] .clip-chamfer {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+
+  /* Blueprint Grid Containers */
+  .blueprint-container {
+    max-width: 1360px;
+    margin-left: auto;
+    margin-right: auto;
+    border-left: 1px solid var(--border-grid);
+    border-right: 1px solid var(--border-grid);
+    position: relative;
+  }
+
+  /* Blueprint section horizontal divider */
+  .blueprint-divider {
+    width: 100%;
+    border-bottom: 1px solid var(--border-grid);
+    position: relative;
+  }
+
+  /* 8x8px Blueprint intersection crosshair marker */
+  .blueprint-crosshair {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
