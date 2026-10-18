@@ -40,8 +40,11 @@ export const leadSchema = z.object({
 
   locale: z.enum(["ar", "fr", "en"]).default("en"),
 
-  // Anti-spam honeypot field (must remain empty)
-  honeypot: z.string().optional(),
+  // Anti-spam honeypot field (must remain empty for human submissions)
+  honeypot: z
+    .string()
+    .max(0, { message: "Anti-spam verification triggered" })
+    .optional(),
 });
 
 export type LeadInput = z.infer<typeof leadSchema>;
