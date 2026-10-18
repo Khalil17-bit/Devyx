@@ -50,7 +50,7 @@ export default async function ContactPage({
   const isFormEnabled = siteSettings.enable_contact_form;
 
   return (
-    <div className="blueprint-container px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-16">
+    <div className="blueprint-container px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 sm:space-y-16">
       {/* Page Header */}
       <div className="max-w-3xl space-y-4 border-b border-border-grid pb-8">
         <span className="font-mono text-xs uppercase tracking-technical text-accent-signal block">
@@ -64,11 +64,11 @@ export default async function ContactPage({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         {/* Left Column (5 cols): Devyx Manifesto & Social Media Hub */}
-        <div className="lg:col-span-5 space-y-12">
+        <div className="lg:col-span-5 space-y-8 sm:space-y-12">
           {/* Engineering Story */}
-          <div className="p-6 bg-bg-surface border border-border-grid space-y-4">
+          <div className="p-4 sm:p-6 bg-bg-surface border border-border-grid space-y-4">
             <div className="flex items-center gap-2 font-mono text-xs text-accent-signal">
               <Terminal className="w-4 h-4" />
               <span className="uppercase tracking-wider font-semibold">
@@ -84,7 +84,7 @@ export default async function ContactPage({
           </div>
 
           {/* Social Media Hub */}
-          <div className="p-6 bg-bg-surface border border-border-grid">
+          <div className="p-4 sm:p-6 bg-bg-surface border border-border-grid">
             <SocialHub socialLinks={socialLinks} locale={locale} />
           </div>
         </div>
@@ -92,7 +92,7 @@ export default async function ContactPage({
         {/* Right Column (7 cols): Consultation Form (Toggleable Master Switch) */}
         <div className="lg:col-span-7">
           {isFormEnabled ? (
-            <div className="p-6 sm:p-8 bg-bg-surface border border-border-grid space-y-6">
+            <div className="p-4 sm:p-8 bg-bg-surface border border-border-grid space-y-6">
               <div className="border-b border-border-grid pb-4">
                 <div className="flex items-center justify-between font-mono text-xs mb-1">
                   <span className="font-bold text-text-primary uppercase tracking-wider">

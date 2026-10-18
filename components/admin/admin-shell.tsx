@@ -17,15 +17,26 @@ import {
   X,
   Terminal,
   Shield,
+  Users,
 } from "lucide-react";
+import { hasPermission, type RolePermissions, type AdminRole } from "@/lib/security/roles";
 
 interface AdminShellProps {
   children: React.ReactNode;
   userEmail: string;
+  userRole?: AdminRole | string | null;
   unreadLeadsCount?: number;
 }
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon: any;
+  badge: string | null;
+  permission?: keyof RolePermissions;
+}
+
+const NAV_ITEMS: NavItem[] = [
   {
     label: "Dashboard",
     href: "/admin/dashboard",
@@ -37,40 +48,60 @@ const NAV_ITEMS = [
     href: "/admin/content",
     icon: FileText,
     badge: null,
+    permission: "manageContent",
   },
   {
     label: "Services Catalog",
     href: "/admin/services",
     icon: Layers,
     badge: null,
+    permission: "manageServices",
   },
   {
     label: "Projects & Cases",
     href: "/admin/projects",
     icon: FolderGit2,
     badge: null,
+    permission: "manageProjects",
   },
   {
     label: "Social Hub",
     href: "/admin/socials",
     icon: Share2,
     badge: null,
+    permission: "manageSocials",
   },
   {
     label: "Leads CRM",
     href: "/admin/leads",
     icon: Inbox,
     badge: "unread",
+    permission: "manageLeads",
+  },
+  {
+    label: "Admin Accounts",
+    href: "/admin/users",
+    icon: Users,
+    badge: null,
+    permission: "manageUsers",
   },
 ];
 
 export function AdminShell({
   children,
   userEmail,
+  userRole,
   unreadLeadsCount = 0,
 }: AdminShellProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  const visibleNavItems = React.useMemo(() => {
+    return NAV_ITEMS.filter((item) => {
+      if (!item.permission) return true;
+      return hasPermission(userRole, item.permission);
+    });
+  }, [userRole]);
 
   // If viewing login page, render children without sidebar shell
   if (pathname === "/admin/login") {
@@ -112,9 +143,14 @@ export function AdminShell({
             <ExternalLink className="w-3 h-3" />
           </Link>
 
-          <div className="hidden sm:flex items-center gap-1.5 text-text-muted text-[11px]">
-            <Shield className="w-3 h-3 text-accent-signal" />
+          <div className="hidden sm:flex items-center gap-2 text-text-muted text-[11px]">
+            <Shield className="w-3.5 h-3.5 text-accent-signal" />
             <span>{userEmail}</span>
+            {userRole && (
+              <span className="px-1.5 py-0.5 bg-accent-primary/10 border border-accent-primary/30 text-accent-primary font-mono text-[9px] uppercase tracking-wider">
+                {userRole}
+              </span>
+            )}
           </div>
 
           <form action={adminLogout}>
@@ -138,7 +174,7 @@ export function AdminShell({
               // CMS_NAVIGATION
             </span>
             <nav className="space-y-1 font-mono text-xs">
-              {NAV_ITEMS.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
                 return (
@@ -183,7 +219,7 @@ export function AdminShell({
         {mobileMenuOpen && (
           <div className="lg:hidden fixed inset-0 z-40 bg-bg-primary/95 backdrop-blur-md pt-16 p-6 flex flex-col select-none">
             <nav className="space-y-2 font-mono text-sm">
-              {NAV_ITEMS.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
                 return (

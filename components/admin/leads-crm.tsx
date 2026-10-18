@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { updateLeadStatus } from "@/actions/admin-cms";
+import { formatDateSafe, formatDateTimeSafe } from "@/lib/utils/format-date";
 import {
   Inbox,
   Search,
@@ -273,8 +274,8 @@ export function LeadsCrm({ initialLeads }: LeadsCrmProps) {
                       {lead.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-text-muted text-[10px]">
-                    {new Date(lead.created_at).toLocaleDateString()}
+                  <td className="py-3 px-4 text-text-muted text-[10px]" suppressHydrationWarning>
+                    {formatDateSafe(lead.created_at)}
                   </td>
                   <td className="py-3 px-4 text-end">
                     <button
@@ -340,7 +341,7 @@ export function LeadsCrm({ initialLeads }: LeadsCrmProps) {
                 </div>
                 <div>
                   <span className="text-text-muted text-[10px] block">TIMESTAMP:</span>
-                  <span className="text-text-primary">{new Date(selectedLead.created_at).toLocaleString()}</span>
+                  <span className="text-text-primary" suppressHydrationWarning>{formatDateTimeSafe(selectedLead.created_at)}</span>
                 </div>
                 <div>
                   <span className="text-text-muted text-[10px] block">IP HASH:</span>

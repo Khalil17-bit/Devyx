@@ -28,6 +28,29 @@ export function Navbar({ primaryCtaAction = "open_chat" }: NavbarProps) {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Lock body scroll when mobile menu is open
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  // Close on Escape key
+  React.useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { href: "/", label: t("home") },
     { href: "/services", label: t("services") },
@@ -97,13 +120,17 @@ export function Navbar({ primaryCtaAction = "open_chat" }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Mobile Menu Trigger */}
+          {/* Mobile Menu Trigger & Controls */}
           <div className="flex items-center gap-2 lg:hidden">
-            <ThemeToggle />
+            {/* Theme toggle visible on tablet/larger mobile */}
+            <div className="hidden sm:inline-flex">
+              <ThemeToggle />
+            </div>
+
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 border border-border-grid bg-bg-surface text-text-primary hover:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              className="min-h-[44px] min-w-[44px] p-2.5 border border-border-grid bg-bg-surface text-text-primary hover:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary flex items-center justify-center transition-colors"
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? t("close") : t("menu")}
             >
@@ -119,40 +146,69 @@ export function Navbar({ primaryCtaAction = "open_chat" }: NavbarProps) {
 
       {/* Accessible Mobile Drawer Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-16 md:top-20 z-50 bg-bg-primary border-b border-border-grid shadow-2xl transition-all">
-          <div className="blueprint-container px-4 py-6 space-y-6">
-            <nav className="flex flex-col space-y-2">
-              {navLinks.map((link) => {
-                const active = isActive(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center justify-between p-3 border font-mono text-sm uppercase tracking-wider transition-colors ${
-                      active
-                        ? "border-accent-primary bg-bg-surface text-accent-primary font-bold"
-                        : "border-border-grid text-text-primary hover:bg-bg-elevated"
-                    }`}
-                  >
-                    <span>{link.label}</span>
-                    <span className="text-text-muted text-xs">// 0{navLinks.indexOf(link) + 1}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+        <>
+          {/* Backdrop Blur Scrim */}
+          <div
+            className="lg:hidden fixed inset-0 top-16 md:top-20 z-40 bg-black/70 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
 
-            <div className="pt-4 border-t border-border-grid flex flex-wrap items-center justify-between gap-4">
-              <LocaleSwitcher />
-              <Link
-                href="/contact"
-                className="w-full btn-primary clip-chamfer flex items-center justify-center gap-2 py-3 bg-accent-primary text-bg-primary font-mono text-xs font-semibold uppercase tracking-wider text-center"
-              >
-                <span>{tCta("initialize")}</span>
-                <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-              </Link>
+          {/* Drawer Surface */}
+          <div
+            className="lg:hidden fixed inset-x-0 top-16 md:top-20 z-50 bg-bg-surface border-b border-border-grid shadow-2xl max-h-[calc(100dvh-4rem)] md:max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain transition-all"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation Menu"
+          >
+            <div className="blueprint-container px-4 py-6 space-y-5">
+              <nav className="flex flex-col space-y-2">
+                {navLinks.map((link, idx) => {
+                  const active = isActive(link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center justify-between min-h-[48px] px-4 py-3 border font-mono text-sm uppercase tracking-wider transition-colors ${
+                        active
+                          ? "border-accent-primary bg-bg-elevated text-accent-primary font-bold"
+                          : "border-border-grid text-text-primary hover:bg-bg-elevated"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      <span className="text-text-muted text-xs">// 0{idx + 1}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Mobile System Settings (Theme & Locale) */}
+              <div className="p-3.5 bg-bg-elevated/60 border border-border-grid space-y-3 font-mono">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-text-muted text-[11px] uppercase tracking-wider">// THEME</span>
+                  <ThemeToggle />
+                </div>
+                <div className="flex items-center justify-between gap-2 pt-2.5 border-t border-border-grid/60">
+                  <span className="text-text-muted text-[11px] uppercase tracking-wider">// LANGUAGE</span>
+                  <LocaleSwitcher />
+                </div>
+              </div>
+
+              {/* Full Width Primary CTA */}
+              <div className="pt-2">
+                <Link
+                  href="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full btn-primary clip-chamfer min-h-[48px] flex items-center justify-center gap-2 py-3.5 bg-accent-primary text-bg-primary font-mono text-xs font-semibold uppercase tracking-wider text-center transition-transform active:scale-[0.98]"
+                >
+                  <span>{tCta("initialize")}</span>
+                  <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );

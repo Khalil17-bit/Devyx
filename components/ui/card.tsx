@@ -39,23 +39,23 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
       >
         {/* Technical Header Bar */}
         {(code || metric || showIndicator) && (
-          <div className="h-9 px-4 flex items-center justify-between border-b border-border-grid bg-bg-elevated/40 font-mono text-[11px] text-text-muted transition-colors group-hover:bg-bg-elevated/80">
-            <div className="flex items-center gap-2.5">
+          <div className="h-9 px-3 sm:px-4 flex items-center justify-between border-b border-border-grid bg-bg-elevated/40 font-mono text-[10px] sm:text-[11px] text-text-muted transition-colors group-hover:bg-bg-elevated/80">
+            <div className="flex items-center gap-2 sm:gap-2.5">
               {showIndicator && (
                 <span
-                  className="w-1.5 h-1.5 rounded-none bg-text-muted/50 group-hover:bg-accent-signal transition-colors duration-150"
+                  className="w-1.5 h-1.5 rounded-none bg-text-muted/50 group-hover:bg-accent-signal transition-colors duration-150 flex-shrink-0"
                   aria-hidden="true"
                 />
               )}
               {code && (
-                <span className="font-semibold uppercase tracking-wider text-text-secondary group-hover:text-text-primary">
+                <span className="font-semibold uppercase tracking-wider text-text-secondary group-hover:text-text-primary truncate max-w-[180px] sm:max-w-none">
                   {code}
                 </span>
               )}
             </div>
 
             {metric && (
-              <span className="px-2 py-0.5 bg-bg-surface border border-border-grid text-accent-primary font-bold text-[10px] tracking-wider uppercase group-hover:border-accent-primary">
+              <span className="px-1.5 sm:px-2 py-0.5 bg-bg-surface border border-border-grid text-accent-primary font-bold text-[9px] sm:text-[10px] tracking-wider uppercase group-hover:border-accent-primary flex-shrink-0">
                 {metric}
               </span>
             )}
@@ -63,7 +63,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         )}
 
         {/* Card Content Area */}
-        <div className="p-6 flex-1 flex flex-col">{children}</div>
+        <div className="p-4 sm:p-6 flex-1 flex flex-col">{children}</div>
       </div>
     );
   }

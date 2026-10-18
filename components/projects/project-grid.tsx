@@ -64,7 +64,7 @@ export function ProjectGrid({
         <div
           role="tablist"
           aria-label="Project categories"
-          className="flex flex-wrap items-center gap-2 border-b border-border-grid pb-4 font-mono text-xs select-none"
+          className="flex items-center gap-2 border-b border-border-grid pb-4 font-mono text-xs select-none overflow-x-auto sm:flex-wrap"
         >
           {categories.map((cat) => {
             const isActive = selectedCategory === cat.key;
@@ -74,7 +74,7 @@ export function ProjectGrid({
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setSelectedCategory(cat.key)}
-                className={`px-3.5 py-1.5 border font-semibold uppercase tracking-wider transition-all duration-150 ${
+                className={`min-h-[40px] px-3.5 py-2 border font-semibold uppercase tracking-wider whitespace-nowrap transition-all duration-150 flex-shrink-0 ${
                   isActive
                     ? "bg-accent-primary text-bg-primary border-accent-primary"
                     : "bg-bg-surface border-border-grid text-text-secondary hover:text-text-primary hover:border-text-muted"

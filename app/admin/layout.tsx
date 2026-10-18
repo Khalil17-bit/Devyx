@@ -1,4 +1,5 @@
 import * as React from "react";
+import "@/app/globals.css";
 import { getAdminSession } from "@/actions/admin-auth";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -57,6 +58,7 @@ export default async function AdminLayout({
       <body className="min-h-screen bg-bg-primary text-text-primary antialiased font-sans">
         <AdminShell
           userEmail={session.email || "admin@devyx.com"}
+          userRole={session.role}
           unreadLeadsCount={unreadCount}
         >
           {children}

@@ -55,7 +55,7 @@ export function Lightbox({ images, title = "System Architecture", className = ""
           <button
             type="button"
             onClick={() => setIsZoomed(!isZoomed)}
-            className="p-1.5 bg-bg-surface/90 border border-border-grid text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors font-mono text-[10px] flex items-center gap-1"
+            className="min-h-[32px] px-2.5 py-1.5 bg-bg-surface/90 border border-border-grid text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors font-mono text-[10px] flex items-center gap-1"
             aria-label={isZoomed ? "Zoom out" : "Zoom in"}
           >
             {isZoomed ? (
@@ -121,26 +121,26 @@ export function Lightbox({ images, title = "System Architecture", className = ""
             <button
               type="button"
               onClick={isRtl ? handleNext : handlePrev}
-              className="absolute start-3 top-1/2 -translate-y-1/2 z-20 p-2 bg-bg-surface/90 border border-border-grid text-text-primary hover:border-accent-primary transition-colors focus:outline-none"
+              className="absolute start-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-bg-surface/90 border border-border-grid text-text-primary hover:border-accent-primary transition-colors focus:outline-none"
               aria-label="Previous image"
             >
               {isRtl ? (
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-5 h-5" />
               ) : (
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
               )}
             </button>
 
             <button
               type="button"
               onClick={isRtl ? handlePrev : handleNext}
-              className="absolute end-3 top-1/2 -translate-y-1/2 z-20 p-2 bg-bg-surface/90 border border-border-grid text-text-primary hover:border-accent-primary transition-colors focus:outline-none"
+              className="absolute end-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center bg-bg-surface/90 border border-border-grid text-text-primary hover:border-accent-primary transition-colors focus:outline-none"
               aria-label="Next image"
             >
               {isRtl ? (
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
               ) : (
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-5 h-5" />
               )}
             </button>
           </>

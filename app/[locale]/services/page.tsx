@@ -30,7 +30,7 @@ export default async function ServicesPage({ params }: ServicesPageProps) {
   const automationServices = services.filter((s) => s.category === "automation");
 
   return (
-    <div className="blueprint-container px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-16">
+    <div className="blueprint-container px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 sm:space-y-16">
       {/* Page Header */}
       <div className="max-w-3xl space-y-4 border-b border-border-grid pb-8">
         <span className="font-mono text-xs uppercase tracking-technical text-accent-signal block">

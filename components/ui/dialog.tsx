@@ -60,32 +60,32 @@ export function Dialog({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6"
     >
       {/* Architectural Solid Scrim Overlay */}
       <div
         onClick={() => onOpenChange(false)}
-        className="fixed inset-0 bg-black/80 transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
         aria-hidden="true"
       />
 
       {/* Dialog Surface Container */}
       <div
         className={cn(
-          "relative w-full z-10 bg-bg-surface border border-border-grid shadow-2xl flex flex-col max-h-[90vh] overflow-hidden select-text",
+          "relative w-full z-10 bg-bg-surface border border-border-grid shadow-2xl flex flex-col max-h-[92dvh] sm:max-h-[90vh] overflow-hidden select-text",
           maxWidth,
           className
         )}
       >
         {/* Technical Header Bar */}
-        <div className="h-10 px-4 flex items-center justify-between border-b border-border-grid bg-bg-elevated font-mono text-xs flex-shrink-0">
-          <div className="flex items-center gap-2 text-text-secondary">
-            <span className="w-1.5 h-1.5 rounded-none bg-accent-signal inline-block" />
-            <span className="font-semibold uppercase tracking-wider">{code}</span>
+        <div className="h-11 px-3 sm:px-4 flex items-center justify-between border-b border-border-grid bg-bg-elevated font-mono text-xs flex-shrink-0">
+          <div className="flex items-center gap-2 text-text-secondary min-w-0">
+            <span className="w-1.5 h-1.5 rounded-none bg-accent-signal inline-block flex-shrink-0" />
+            <span className="font-semibold uppercase tracking-wider flex-shrink-0 text-[11px] sm:text-xs">{code}</span>
             {title && (
               <>
-                <span className="text-border-grid">//</span>
-                <span className="text-text-primary font-bold truncate max-w-xs sm:max-w-md">
+                <span className="text-border-grid flex-shrink-0">//</span>
+                <span className="text-text-primary font-bold truncate max-w-[140px] sm:max-w-md">
                   {title}
                 </span>
               </>
@@ -95,7 +95,7 @@ export function Dialog({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="p-1 text-text-muted hover:text-text-primary hover:bg-bg-surface border border-transparent hover:border-border-grid transition-colors"
+            className="min-h-[44px] min-w-[44px] -me-2 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-surface transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-4 h-4" />
@@ -103,7 +103,7 @@ export function Dialog({
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-6 overflow-y-auto flex-1">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto overscroll-contain flex-1">{children}</div>
       </div>
     </div>
   );

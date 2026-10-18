@@ -1,5 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getAdminSession } from "@/actions/admin-auth";
+import { hasPermission } from "@/lib/security/roles";
 import { getCachedSiteSettings } from "@/lib/data/cached-queries";
+import { formatDateSafe } from "@/lib/utils/format-date";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createStaticClient } from "@/lib/supabase/server";
 import { MasterToggles } from "@/components/admin/master-toggles";
@@ -15,7 +19,13 @@ import {
 } from "lucide-react";
 
 export default async function AdminDashboardPage() {
+  const session = await getAdminSession();
+  if (!session.authenticated) {
+    redirect("/admin/login");
+  }
+
   const siteSettings = await getCachedSiteSettings();
+  const canManageSettings = hasPermission(session.role, "manageSettings");
 
   let client;
   try {
@@ -138,6 +148,7 @@ export default async function AdminDashboardPage() {
         initialContactFormEnabled={siteSettings.enable_contact_form}
         initialChatbotEnabled={siteSettings.chatbot_enabled}
         initialPrimaryCtaAction={siteSettings.primary_cta_action}
+        readOnly={!canManageSettings}
       />
 
       {/* Recent Consultation Leads Table */}
@@ -197,8 +208,8 @@ export default async function AdminDashboardPage() {
                         {lead.status}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-text-muted text-[10px]">
-                      {new Date(lead.created_at).toLocaleDateString()}
+                    <td className="py-3 px-3 text-text-muted text-[10px]" suppressHydrationWarning>
+                      {formatDateSafe(lead.created_at)}
                     </td>
                     <td className="py-3 px-3 text-end">
                       <a

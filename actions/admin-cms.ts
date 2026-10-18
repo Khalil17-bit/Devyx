@@ -4,6 +4,7 @@ import { revalidateTag, revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createStaticClient } from "@/lib/supabase/server";
 import { getAdminSession } from "./admin-auth";
+import { hasPermission, type RolePermissions } from "@/lib/security/roles";
 
 function getClient() {
   try {
@@ -14,13 +15,19 @@ function getClient() {
 }
 
 /**
- * Ensure the caller is an authenticated administrator
+ * Ensure caller is authenticated and possesses the required role permission
  */
-async function assertAdmin() {
+async function assertPermission(permission: keyof RolePermissions) {
   const session = await getAdminSession();
   if (!session.authenticated) {
-    throw new Error("Unauthorized: Administrative privileges required.");
+    throw new Error("Unauthorized: Administrative session required.");
   }
+  if (!hasPermission(session.role, permission)) {
+    throw new Error(
+      `Access Denied: '${session.role || "Unknown"}' role lacks '${permission}' permission.`
+    );
+  }
+  return session;
 }
 
 // ==============================================================================
@@ -31,7 +38,7 @@ export async function toggleSetting(
   key: "enable_contact_form" | "chatbot_enabled",
   value: boolean
 ) {
-  await assertAdmin();
+  await assertPermission("manageSettings");
   const client = getClient();
 
   const { error } = await client
@@ -49,7 +56,7 @@ export async function toggleSetting(
 }
 
 export async function updatePrimaryCta(action: "open_chat" | "navigate_contact") {
-  await assertAdmin();
+  await assertPermission("manageSettings");
   const client = getClient();
 
   const { error } = await client
@@ -82,7 +89,7 @@ export async function updatePageSection(
     metadata_items?: Array<{ label: string; value: string }>;
   }
 ) {
-  await assertAdmin();
+  await assertPermission("manageContent");
   const client = getClient();
 
   const { error } = await client
@@ -121,7 +128,7 @@ export async function saveService(serviceData: {
   cta_label: { en: string; fr: string; ar: string };
   features: Array<{ en: string; fr: string; ar: string }>;
 }) {
-  await assertAdmin();
+  await assertPermission("manageServices");
   const client = getClient();
 
   const record = {
@@ -144,7 +151,7 @@ export async function saveService(serviceData: {
 }
 
 export async function deleteService(id: string) {
-  await assertAdmin();
+  await assertPermission("manageServices");
   const client = getClient();
 
   const { error } = await client.from("services").delete().eq("id", id);
@@ -180,7 +187,7 @@ export async function saveProject(projectData: {
   solution_provided: { en: string; fr: string; ar: string };
   results_achieved: { en: string; fr: string; ar: string };
 }) {
-  await assertAdmin();
+  await assertPermission("manageProjects");
   const client = getClient();
 
   const record = {
@@ -203,7 +210,7 @@ export async function saveProject(projectData: {
 }
 
 export async function deleteProject(id: string, imagePathsToDelete?: string[]) {
-  await assertAdmin();
+  await assertPermission("manageProjects");
   const client = getClient();
 
   // Storage hygiene: clean up image files from Supabase Storage
@@ -249,7 +256,7 @@ export async function updateSocialLink(
     display_order: number;
   }
 ) {
-  await assertAdmin();
+  await assertPermission("manageSocials");
   const client = getClient();
 
   const { error } = await client
@@ -275,7 +282,7 @@ export async function updateLeadStatus(
   status: "new" | "contacted" | "qualified" | "closed" | "spam",
   adminNotes?: string
 ) {
-  await assertAdmin();
+  await assertPermission("manageLeads");
   const client = getClient();
 
   const updatePayload: Record<string, any> = {

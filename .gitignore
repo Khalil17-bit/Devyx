@@ -30,3 +30,9 @@ Thumbs.db
 # TypeScript build
 *.tsbuildinfo
 next-env.d.ts
+
+# Agent tooling & temporary files
+.ua/
+.agents/packages/
+.agents/node_modules/
+supabase/.temp/

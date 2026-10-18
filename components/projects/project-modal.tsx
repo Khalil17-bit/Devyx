@@ -72,13 +72,13 @@ export function ProjectModal({ project, open, onOpenChange }: ProjectModalProps)
               href={project.live_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-accent-primary text-bg-primary font-mono text-xs font-semibold uppercase tracking-wider clip-chamfer hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform flex-shrink-0"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 px-5 bg-accent-primary text-bg-primary font-mono text-xs font-semibold uppercase tracking-wider clip-chamfer hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform flex-shrink-0 text-center"
             >
               <span>{tCta("visitLive")}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           ) : (
-            <div className="font-mono text-xs text-text-muted px-3 py-1.5 border border-border-grid bg-bg-elevated flex-shrink-0">
+            <div className="w-full sm:w-auto text-center font-mono text-xs text-text-muted px-3 py-2 border border-border-grid bg-bg-elevated flex-shrink-0">
               [ PRIVATE_INFRASTRUCTURE // NO_PUBLIC_URL ]
             </div>
           )}

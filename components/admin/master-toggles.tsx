@@ -8,12 +8,14 @@ interface MasterTogglesProps {
   initialContactFormEnabled: boolean;
   initialChatbotEnabled: boolean;
   initialPrimaryCtaAction: "open_chat" | "navigate_contact";
+  readOnly?: boolean;
 }
 
 export function MasterToggles({
   initialContactFormEnabled,
   initialChatbotEnabled,
   initialPrimaryCtaAction,
+  readOnly = false,
 }: MasterTogglesProps) {
   const [formEnabled, setFormEnabled] = React.useState(initialContactFormEnabled);
   const [chatEnabled, setChatEnabled] = React.useState(initialChatbotEnabled);
@@ -24,6 +26,7 @@ export function MasterToggles({
   const [isUpdatingCta, setIsUpdatingCta] = React.useState(false);
 
   async function handleToggleForm() {
+    if (readOnly) return;
     setIsUpdatingForm(true);
     const nextVal = !formEnabled;
     setFormEnabled(nextVal);
@@ -32,6 +35,7 @@ export function MasterToggles({
   }
 
   async function handleToggleChat() {
+    if (readOnly) return;
     setIsUpdatingChat(true);
     const nextVal = !chatEnabled;
     setChatEnabled(nextVal);
@@ -40,6 +44,7 @@ export function MasterToggles({
   }
 
   async function handleCtaChange(action: "open_chat" | "navigate_contact") {
+    if (readOnly) return;
     setIsUpdatingCta(true);
     setPrimaryCta(action);
     await updatePrimaryCta(action);
@@ -57,9 +62,16 @@ export function MasterToggles({
             Master Infrastructure Switches
           </h2>
         </div>
-        <span className="font-mono text-[10px] text-text-muted">
-          INSTANT_CACHE_REVALIDATION
-        </span>
+        <div className="flex items-center gap-2">
+          {readOnly && (
+            <span className="font-mono text-[10px] text-accent-signal bg-accent-signal/10 border border-accent-signal/30 px-2 py-0.5">
+              READ_ONLY (ADMIN_REQUIRED)
+            </span>
+          )}
+          <span className="font-mono text-[10px] text-text-muted">
+            INSTANT_CACHE_REVALIDATION
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

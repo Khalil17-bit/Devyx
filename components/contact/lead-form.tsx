@@ -108,7 +108,7 @@ export function LeadForm({ services, defaultService }: LeadFormProps) {
               name="full_name"
               required
               placeholder="e.g. Sarah Connor"
-              className={`w-full h-11 px-3 bg-bg-elevated border text-text-primary focus:outline-none transition-colors ${
+              className={`w-full h-11 px-3 bg-bg-elevated border text-text-primary text-base sm:text-xs focus:outline-none transition-colors ${
                 fieldErrors.full_name
                   ? "border-status-error focus:border-status-error"
                   : "border-border-grid focus:border-accent-primary"
@@ -131,7 +131,7 @@ export function LeadForm({ services, defaultService }: LeadFormProps) {
               name="phone"
               required
               placeholder="+213 555 0192"
-              className={`w-full h-11 px-3 bg-bg-elevated border text-text-primary focus:outline-none transition-colors ${
+              className={`w-full h-11 px-3 bg-bg-elevated border text-text-primary text-base sm:text-xs focus:outline-none transition-colors ${
                 fieldErrors.phone
                   ? "border-status-error focus:border-status-error"
                   : "border-border-grid focus:border-accent-primary"
@@ -157,7 +157,7 @@ export function LeadForm({ services, defaultService }: LeadFormProps) {
               name="state_province"
               required
               placeholder="e.g. Algiers / Paris / Delaware"
-              className={`w-full h-11 px-3 bg-bg-elevated border text-text-primary focus:outline-none transition-colors ${
+              className={`w-full h-11 px-3 bg-bg-elevated border text-text-primary text-base sm:text-xs focus:outline-none transition-colors ${
                 fieldErrors.state_province
                   ? "border-status-error focus:border-status-error"
                   : "border-border-grid focus:border-accent-primary"
@@ -178,7 +178,7 @@ export function LeadForm({ services, defaultService }: LeadFormProps) {
               id="service_type"
               name="service_type"
               defaultValue={defaultService || services[0]?.slug || "web-platform-architecture"}
-              className="w-full h-11 px-3 bg-bg-elevated border border-border-grid text-text-primary focus:border-accent-primary focus:outline-none"
+              className="w-full h-11 px-3 bg-bg-elevated border border-border-grid text-text-primary text-base sm:text-xs focus:border-accent-primary focus:outline-none"
             >
               {services.map((s) => (
                 <option key={s.id} value={s.slug}>
@@ -201,7 +201,7 @@ export function LeadForm({ services, defaultService }: LeadFormProps) {
             rows={5}
             required
             placeholder="Describe your current bottlenecks, target timeline, technical integrations, and expected throughput..."
-            className={`w-full p-3 bg-bg-elevated border text-text-primary focus:outline-none resize-none transition-colors ${
+            className={`w-full p-3 bg-bg-elevated border text-text-primary text-base sm:text-xs focus:outline-none resize-none transition-colors ${
               fieldErrors.message
                 ? "border-status-error focus:border-status-error"
                 : "border-border-grid focus:border-accent-primary"

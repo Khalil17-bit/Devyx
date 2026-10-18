@@ -83,7 +83,7 @@ export function ServiceCard({ service, index }: ServiceCardProps) {
       <CardFooter className="p-0 pt-6 border-t border-border-grid">
         <Link
           href={`/contact?service=${encodeURIComponent(service.slug)}`}
-          className="w-full inline-flex items-center justify-between px-4 py-2.5 bg-bg-elevated border border-border-grid text-text-primary font-mono text-xs uppercase tracking-wider group-hover:border-accent-primary group-hover:bg-accent-primary group-hover:text-bg-primary transition-all"
+          className="w-full inline-flex items-center justify-between min-h-[44px] px-4 py-2.5 bg-bg-elevated border border-border-grid text-text-primary font-mono text-xs uppercase tracking-wider group-hover:border-accent-primary group-hover:bg-accent-primary group-hover:text-bg-primary transition-all"
         >
           <span>{ctaLabel}</span>
           <ArrowUpRight className="w-4 h-4" />

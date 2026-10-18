@@ -17,7 +17,7 @@ export function HeroPrimaryCta({ action, label }: HeroPrimaryCtaProps) {
         onClick={() => {
           window.dispatchEvent(new CustomEvent("devyx:open-chat"));
         }}
-        className="btn-primary clip-chamfer inline-flex items-center gap-2 px-7 py-3.5 bg-accent-primary text-bg-primary font-mono text-sm font-semibold uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform"
+        className="btn-primary clip-chamfer inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px] px-7 py-3.5 bg-accent-primary text-bg-primary font-mono text-sm font-semibold uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform"
       >
         <span>{label}</span>
         <MessageSquare className="w-4 h-4" />
@@ -28,7 +28,7 @@ export function HeroPrimaryCta({ action, label }: HeroPrimaryCtaProps) {
   return (
     <Link
       href="/contact"
-      className="btn-primary clip-chamfer inline-flex items-center gap-2 px-7 py-3.5 bg-accent-primary text-bg-primary font-mono text-sm font-semibold uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform"
+      className="btn-primary clip-chamfer inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[44px] px-7 py-3.5 bg-accent-primary text-bg-primary font-mono text-sm font-semibold uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform"
     >
       <span>{label}</span>
       <ArrowUpRight className="w-4 h-4" />

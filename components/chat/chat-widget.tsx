@@ -342,13 +342,13 @@ export function ChatWidget() {
   const starters = STARTER_PROMPTS[locale] || STARTER_PROMPTS.en;
 
   return (
-    <div className="fixed bottom-6 end-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-3 end-3 sm:bottom-6 sm:end-6 z-50 flex flex-col items-end max-w-[calc(100vw-1.5rem)]">
       {/* Expanded Chat Window */}
       {isOpen && (
         <div
           role="dialog"
           aria-label="Devyx AI Qualification Assistant"
-          className="mb-3 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[82vh] bg-bg-surface border border-border-grid shadow-2xl clip-chamfer flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-text"
+          className="mb-3 w-[calc(100vw-1.5rem)] sm:w-[420px] h-[520px] sm:h-[580px] max-h-[84dvh] bg-bg-surface border border-border-grid shadow-2xl clip-chamfer flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-text"
         >
           {/* Blueprint Terminal Header */}
           <div className="px-4 py-3 bg-bg-elevated border-b border-border-grid flex items-center justify-between select-none">
@@ -499,13 +499,13 @@ export function ChatWidget() {
                 }
                 maxLength={1500}
                 disabled={isLoading}
-                className="flex-1 h-10 px-3 bg-bg-surface border border-border-grid text-text-primary font-mono text-xs focus:border-accent-primary focus:outline-none disabled:opacity-50"
+                className="flex-1 h-10 px-3 bg-bg-surface border border-border-grid text-text-primary font-mono text-base sm:text-xs focus:border-accent-primary focus:outline-none disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || isLoading}
                 aria-label="Send message"
-                className="w-10 h-10 bg-accent-primary text-bg-primary clip-chamfer flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform disabled:opacity-50 disabled:pointer-events-none"
+                className="w-10 h-10 bg-accent-primary text-bg-primary clip-chamfer flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform disabled:opacity-50 disabled:pointer-events-none flex-shrink-0"
               >
                 <Send className="w-4 h-4 rtl:rotate-180" />
               </button>
@@ -513,10 +513,10 @@ export function ChatWidget() {
 
             <div className="flex items-center justify-between text-[9px] font-mono text-text-muted px-1">
               <div className="flex items-center gap-1">
-                <Shield className="w-2.5 h-2.5 text-accent-signal" />
-                <span>CONFIDENTIAL // 0 LLM TRAINING ON CLIENT DATA</span>
+                <Shield className="w-2.5 h-2.5 text-accent-signal flex-shrink-0" />
+                <span className="truncate">CONFIDENTIAL // 0 LLM TRAINING</span>
               </div>
-              <span>{inputMessage.length}/1500</span>
+              <span className="flex-shrink-0">{inputMessage.length}/1500</span>
             </div>
           </form>
         </div>
@@ -527,14 +527,14 @@ export function ChatWidget() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle Devyx AI Engineering Assistant"
-        className="h-13 px-4 bg-bg-surface border border-border-grid text-text-primary clip-chamfer shadow-xl hover:border-accent-primary transition-all flex items-center gap-3 group relative select-none hover:-translate-y-0.5"
+        className="min-h-[44px] sm:h-13 px-3 sm:px-4 py-2 bg-bg-surface border border-border-grid text-text-primary clip-chamfer shadow-xl hover:border-accent-primary transition-all flex items-center gap-2 sm:gap-3 group relative select-none hover:-translate-y-0.5 active:scale-95"
       >
         <span className="w-2.5 h-2.5 bg-status-operational rounded-full animate-pulse flex-shrink-0" />
         <div className="flex flex-col text-start leading-tight">
-          <span className="font-mono text-[10px] text-accent-signal uppercase tracking-wider font-bold">
+          <span className="font-mono text-[9px] sm:text-[10px] text-accent-signal uppercase tracking-wider font-bold">
             DEVYX // AI ENGINEER
           </span>
-          <span className="font-sans text-xs text-text-secondary group-hover:text-text-primary transition-colors">
+          <span className="font-sans text-[11px] sm:text-xs text-text-secondary group-hover:text-text-primary transition-colors">
             {locale === "ar"
               ? "استشر الذكاء الاصطناعي"
               : locale === "fr"
@@ -542,8 +542,8 @@ export function ChatWidget() {
               : "Technical Consultation"}
           </span>
         </div>
-        <div className="w-8 h-8 bg-bg-elevated border border-border-grid flex items-center justify-center text-accent-primary group-hover:bg-accent-primary group-hover:text-bg-primary transition-colors">
-          {isOpen ? <X className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
+        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-bg-elevated border border-border-grid flex items-center justify-center text-accent-primary group-hover:bg-accent-primary group-hover:text-bg-primary transition-colors flex-shrink-0">
+          {isOpen ? <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
         </div>
       </button>
     </div>

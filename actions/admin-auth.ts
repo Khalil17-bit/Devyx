@@ -3,11 +3,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerAuthClient } from "@/lib/supabase/server";
-
-export interface AdminAuthResult {
-  success: boolean;
-  message?: string;
-}
+import type { AdminRole } from "@/lib/security/roles";
+import type { AdminAuthResult, AdminSession } from "@/types/admin";
+export type { AdminAuthResult, AdminSession };
 
 /**
  * Server Action: Authenticate Admin via Supabase Auth
@@ -104,7 +102,7 @@ export async function adminLogout() {
 /**
  * Helper to verify current admin session
  */
-export async function getAdminSession() {
+export async function getAdminSession(): Promise<AdminSession> {
   const cookieStore = await cookies();
   const devSession = cookieStore.get("devyx_dev_admin_session")?.value;
 
@@ -115,10 +113,16 @@ export async function getAdminSession() {
     } = await supabase.auth.getUser();
 
     if (user) {
+      const role =
+        (user.app_metadata?.role as AdminRole) ||
+        (user.user_metadata?.role as AdminRole) ||
+        "Super Admin";
+
       return {
         authenticated: true,
         email: user.email || "admin@devyx.com",
         id: user.id,
+        role,
       };
     }
   } catch {
@@ -130,6 +134,7 @@ export async function getAdminSession() {
       authenticated: true,
       email: "admin@devyx.com",
       id: "dev-admin-id",
+      role: "Super Admin",
     };
   }
 
@@ -137,5 +142,6 @@ export async function getAdminSession() {
     authenticated: false,
     email: null,
     id: null,
+    role: null,
   };
 }

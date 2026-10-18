@@ -7,7 +7,6 @@ import {
   getCachedProjects,
 } from "@/lib/data/cached-queries";
 import { getLocalizedText } from "@/lib/i18n/localize";
-import { AutomationPipelineVisualizer } from "@/components/ui/automation-pipeline";
 import { ServiceCard } from "@/components/services/service-card";
 import { ProjectGrid } from "@/components/projects/project-grid";
 import { HeroPrimaryCta } from "@/components/home/hero-primary-cta";
@@ -45,25 +44,23 @@ export default async function HomePage({ params }: HomePageProps) {
   const featuredProjects = projects.filter((p) => p.is_featured);
 
   return (
-    <div className="space-y-24">
+    <div className="space-y-16 sm:space-y-24">
       {/* =====================================================================
           1. HERO SECTION (Strictly Asymmetric 12-Column Split: 7 cols / 5 cols)
           ===================================================================== */}
-      <section className="blueprint-container pt-8 sm:pt-14 pb-16 px-4 sm:px-6 lg:px-8 border-b border-border-grid relative">
+      <section className="blueprint-container pt-6 sm:pt-14 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 border-b border-border-grid relative">
         <span className="blueprint-crosshair top-0 left-0 hidden md:flex">+</span>
         <span className="blueprint-crosshair top-0 right-0 hidden md:flex">+</span>
         <span className="blueprint-crosshair bottom-0 left-0 hidden md:flex">+</span>
         <span className="blueprint-crosshair bottom-0 right-0 hidden md:flex">+</span>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column (7 cols): Proposition, Metrics, CTAs */}
-          <div className="lg:col-span-7 space-y-6 text-start">
+        <div className="max-w-4xl space-y-6 text-start">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-bg-surface border border-border-grid font-mono text-[11px] text-accent-signal uppercase tracking-technical select-none">
               <span className="w-1.5 h-1.5 bg-accent-signal inline-block animate-pulse-signal" />
               <span>{heroBadge || "SYS_ONLINE // ARCHITECTURE"}</span>
             </div>
 
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text-primary leading-[1.08]">
+            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text-primary leading-[1.08]">
               {heroHeadline}
             </h1>
 
@@ -72,7 +69,7 @@ export default async function HomePage({ params }: HomePageProps) {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
               <HeroPrimaryCta
                 action={siteSettings.primary_cta_action}
                 label={heroPrimaryCta || "Initialize Consultation"}
@@ -80,7 +77,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
               <Link
                 href="/projects"
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-bg-surface border border-border-grid text-text-primary font-mono text-sm font-semibold uppercase tracking-wider hover:border-accent-primary transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 bg-bg-surface border border-border-grid text-text-primary font-mono text-xs sm:text-sm font-semibold uppercase tracking-wider hover:border-accent-primary transition-colors text-center"
               >
                 <span>{heroSecondaryCta || "Explore System Blueprints"}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -89,13 +86,13 @@ export default async function HomePage({ params }: HomePageProps) {
 
             {/* Quantitative Impact Metrics Bar */}
             {heroSection.metadata_items && heroSection.metadata_items.length > 0 && (
-              <div className="pt-8 border-t border-border-grid grid grid-cols-3 gap-4 font-mono select-none">
+              <div className="pt-6 sm:pt-8 border-t border-border-grid grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 font-mono select-none">
                 {heroSection.metadata_items.map((item, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <span className="text-[10px] text-text-muted block uppercase tracking-wider">
+                  <div key={idx} className="space-y-1 p-2.5 sm:p-0 bg-bg-surface/50 sm:bg-transparent border sm:border-0 border-border-grid">
+                    <span className="text-[9px] sm:text-[10px] text-text-muted block uppercase tracking-wider">
                       {item.label}
                     </span>
-                    <span className="text-lg sm:text-2xl font-bold text-accent-primary block">
+                    <span className="text-base sm:text-2xl font-bold text-accent-primary block">
                       {item.value}
                     </span>
                   </div>
@@ -103,12 +100,6 @@ export default async function HomePage({ params }: HomePageProps) {
               </div>
             )}
           </div>
-
-          {/* Right Column (5 cols): Signature Automation Pipeline Visualizer */}
-          <div className="lg:col-span-5 w-full">
-            <AutomationPipelineVisualizer />
-          </div>
-        </div>
       </section>
 
       {/* =====================================================================
@@ -171,7 +162,7 @@ export default async function HomePage({ params }: HomePageProps) {
           4. VALUE PROPOSITION / WHY US (Differentiators & Quantitative Metrics)
           ===================================================================== */}
       <section className="blueprint-container px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="p-8 sm:p-12 bg-bg-surface border border-border-grid space-y-8">
+        <div className="p-5 sm:p-8 lg:p-12 bg-bg-surface border border-border-grid space-y-6 sm:space-y-8">
           <div className="max-w-3xl space-y-3">
             <span className="font-mono text-xs uppercase tracking-technical text-accent-signal block">
               // {whyUsBadge || "ENGINEERING PRINCIPLES"}

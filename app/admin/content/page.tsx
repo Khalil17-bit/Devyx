@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { getAdminSession } from "@/actions/admin-auth";
+import { hasPermission } from "@/lib/security/roles";
 import { getCachedPageSection } from "@/lib/data/cached-queries";
 import { ContentEditor } from "@/components/admin/content-editor";
 
@@ -11,6 +14,14 @@ const SECTION_KEYS = [
 ];
 
 export default async function AdminContentPage() {
+  const session = await getAdminSession();
+  if (!session.authenticated) {
+    redirect("/admin/login");
+  }
+  if (!hasPermission(session.role, "manageContent")) {
+    redirect("/admin/dashboard");
+  }
+
   const sectionsArray = await Promise.all(
     SECTION_KEYS.map(async (key) => {
       const section = await getCachedPageSection(key);

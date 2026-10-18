@@ -4,6 +4,7 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   images: {
     remotePatterns: [
       {
