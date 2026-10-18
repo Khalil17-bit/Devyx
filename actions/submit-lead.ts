@@ -1,21 +1,10 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createHash } from "crypto";
 import { leadSchema, type LeadSubmissionResult } from "@/lib/validation/lead";
+import { hashClientIp } from "@/lib/security/ip-hash";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createStaticClient } from "@/lib/supabase/server";
-
-/**
- * Computes a secure SHA-256 hash of the client's IP address with a secret salt
- * to comply with GDPR/privacy standards while preventing rate-limit evasion.
- */
-function hashClientIp(ip: string): string {
-  const salt = process.env.RATE_LIMIT_SALT || "devyx_default_rate_limit_salt_2026";
-  return createHash("sha256")
-    .update(`${salt}:${ip}`)
-    .digest("hex");
-}
 
 /**
  * Server Action: Submit Consultation Lead

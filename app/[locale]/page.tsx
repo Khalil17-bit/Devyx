@@ -10,6 +10,7 @@ import { getLocalizedText } from "@/lib/i18n/localize";
 import { AutomationPipelineVisualizer } from "@/components/ui/automation-pipeline";
 import { ServiceCard } from "@/components/services/service-card";
 import { ProjectGrid } from "@/components/projects/project-grid";
+import { HeroPrimaryCta } from "@/components/home/hero-primary-cta";
 import { ArrowUpRight, ArrowRight, ShieldCheck, Zap, Layers } from "lucide-react";
 
 interface HomePageProps {
@@ -72,13 +73,10 @@ export default async function HomePage({ params }: HomePageProps) {
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link
-                href="/contact"
-                className="btn-primary clip-chamfer inline-flex items-center gap-2 px-7 py-3.5 bg-accent-primary text-bg-primary font-mono text-sm font-semibold uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 transition-transform"
-              >
-                <span>{heroPrimaryCta || "Initialize Consultation"}</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
+              <HeroPrimaryCta
+                action={siteSettings.primary_cta_action}
+                label={heroPrimaryCta || "Initialize Consultation"}
+              />
 
               <Link
                 href="/projects"

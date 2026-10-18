@@ -5,6 +5,8 @@ import { routing, type Locale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { ChatWidget } from "@/components/chat/chat-widget";
+import { getCachedSiteSettings } from "@/lib/data/cached-queries";
 import {
   spaceGrotesk,
   plusJakartaSans,
@@ -32,7 +34,10 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
-  const messages = await getMessages();
+  const [messages, siteSettings] = await Promise.all([
+    getMessages(),
+    getCachedSiteSettings(),
+  ]);
   const direction = locale === "ar" ? "rtl" : "ltr";
 
   return (
@@ -60,6 +65,7 @@ export default async function LocaleLayout({
               {children}
             </div>
             <Footer locale={locale} />
+            {siteSettings.chatbot_enabled && <ChatWidget />}
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
