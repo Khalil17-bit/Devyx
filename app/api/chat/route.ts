@@ -52,6 +52,17 @@ const FALLBACK_RESPONSES: Record<string, string> = {
 };
 
 /**
+ * Safely escapes HTML special characters to prevent Telegram HTML parse errors and HTML injection
+ */
+function escapeTelegramHtml(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
  * Dispatches a formatted Human Handoff alert to the team's Telegram Channel/Group
  */
 async function sendTelegramAlert(data: {
@@ -128,38 +139,48 @@ async function sendTelegramAlert(data: {
   if (data.history && data.history.length > 0) {
     const turns = data.history.slice(-5).map((h) => {
       const speaker = h.role === "user" ? "👤 Client" : "🤖 Assistant";
-      const cleanContent = h.content
-        .replace(/<[^>]*>/g, "")
-        .replace(/\[ACTION:[^\]]+\]/g, "")
-        .trim()
-        .slice(0, 160);
+      const cleanContent = escapeTelegramHtml(
+        h.content
+          .replace(/<[^>]*>/g, "")
+          .replace(/\[ACTION:[^\]]+\]/g, "")
+          .trim()
+          .slice(0, 160)
+      );
       return `<b>${speaker}:</b> <i>"${cleanContent}"</i>`;
     }).join("\n");
     recapBlock = `\n━━━━━━━━━━━━━━━━━━━━━\n💬 <b>Conversation Context:</b>\n${turns}\n`;
   }
 
+  const safeClientName = escapeTelegramHtml(data.clientName || "Direct Website Visitor");
+  const safeCurrentPage = escapeTelegramHtml(data.currentPage);
+  const safeRecentQuery = escapeTelegramHtml(data.recentQuery);
+  const safeSummary = escapeTelegramHtml(
+    data.summary || "Client requested direct communication with a technical specialist."
+  );
+  const safeBudget = data.budget ? escapeTelegramHtml(data.budget) : "";
+
   const contactDisplay = detectedPhone
-    ? `<code>${detectedPhone}</code> (WhatsApp / Tel)`
+    ? `<code>${escapeTelegramHtml(detectedPhone)}</code> (WhatsApp / Tel)`
     : detectedEmail
-    ? `<code>${detectedEmail}</code> (Email)`
+    ? `<code>${escapeTelegramHtml(detectedEmail)}</code> (Email)`
     : data.contact && data.contact !== "Requesting Callback"
-    ? `<code>${data.contact}</code>`
+    ? `<code>${escapeTelegramHtml(data.contact)}</code>`
     : `⚠️ <i>Pending visitor input (Active on site)</i>`;
 
   const text =
     `🚨 <b>DEVYX SPECIALIST ALERT: Human Handoff Request</b>\n` +
     `━━━━━━━━━━━━━━━━━━━━━\n` +
-    `👤 <b>Client:</b> ${data.clientName || "Direct Website Visitor"}\n` +
+    `👤 <b>Client:</b> ${safeClientName}\n` +
     `📱 <b>Contact:</b> ${contactDisplay}\n` +
-    `🌐 <b>Language:</b> ${data.language.toUpperCase()}\n` +
-    `📍 <b>Origin Page:</b> <code>${data.currentPage}</code>\n` +
-    (data.budget ? `💰 <b>Budget/Scope:</b> ${data.budget}\n` : "") +
+    `🌐 <b>Language:</b> ${escapeTelegramHtml(data.language.toUpperCase())}\n` +
+    `📍 <b>Origin Page:</b> <code>${safeCurrentPage}</code>\n` +
+    (safeBudget ? `💰 <b>Budget/Scope:</b> ${safeBudget}\n` : "") +
     `━━━━━━━━━━━━━━━━━━━━━\n` +
     `📋 <b>Executive Summary:</b>\n` +
-    `${data.summary || "Client requested direct communication with a technical specialist."}\n` +
+    `${safeSummary}\n` +
     recapBlock +
     `━━━━━━━━━━━━━━━━━━━━━\n` +
-    `💬 <b>Client Message:</b>\n<i>"${data.recentQuery}"</i>\n` +
+    `💬 <b>Client Message:</b>\n<i>"${safeRecentQuery}"</i>\n` +
     `━━━━━━━━━━━━━━━━━━━━━\n` +
     `⚡ <i>Dispatched by Devyx Autonomous AI Terminal</i>`;
 
@@ -282,6 +303,44 @@ function parseActionTags(raw: string): { cleanedText: string; actions: JarvisAct
   return { cleanedText: cleaned, actions };
 }
 
+/**
+ * Strict origin hostname verification to prevent cross-origin AI token abuse.
+ * Strictly prevents substring bypasses like `devyx.com.attacker.com`.
+ */
+function isAllowedOrigin(originHeader: string | null, siteUrlEnv?: string): boolean {
+  if (!originHeader) {
+    return true;
+  }
+
+  try {
+    const originHost = new URL(originHeader).hostname.toLowerCase();
+    const allowedHosts = new Set<string>(["localhost", "127.0.0.1"]);
+
+    if (siteUrlEnv) {
+      try {
+        const siteHost = new URL(siteUrlEnv).hostname.toLowerCase();
+        allowedHosts.add(siteHost);
+        if (siteHost.startsWith("www.")) {
+          allowedHosts.add(siteHost.slice(4));
+        } else {
+          allowedHosts.add(`www.${siteHost}`);
+        }
+      } catch {}
+    }
+
+    if (process.env.VERCEL_URL) {
+      try {
+        const vercelHost = new URL(`https://${process.env.VERCEL_URL}`).hostname.toLowerCase();
+        allowedHosts.add(vercelHost);
+      } catch {}
+    }
+
+    return allowedHosts.has(originHost);
+  } catch {
+    return false;
+  }
+}
+
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
@@ -294,19 +353,13 @@ export async function POST(req: NextRequest) {
   let slotAcquired = false;
 
   try {
-    // 1. Origin header security validation
+    // 1. Strict origin hostname validation
     const origin = req.headers.get("origin");
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
-    if (
-      process.env.NODE_ENV === "production" &&
-      origin &&
-      siteUrl &&
-      !origin.includes(new URL(siteUrl).host) &&
-      !origin.includes("localhost")
-    ) {
+    if (process.env.NODE_ENV === "production" && !isAllowedOrigin(origin, siteUrl)) {
       return NextResponse.json(
-        { error: "Forbidden cross-origin request" },
+        { error: "Forbidden cross-origin request: unauthorized origin host" },
         { status: 403, headers: CORS_HEADERS }
       );
     }

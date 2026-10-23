@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerAuthClient } from "@/lib/supabase/server";
-import type { AdminRole } from "@/lib/security/roles";
+import { ADMIN_ROLES, type AdminRole } from "@/lib/security/roles";
 import type { AdminAuthResult, AdminSession } from "@/types/admin";
 export type { AdminAuthResult, AdminSession };
 
@@ -59,6 +59,19 @@ export async function adminLogin(formData: FormData): Promise<AdminAuthResult> {
       return {
         success: false,
         message: "No user account returned from authentication provider.",
+      };
+    }
+
+    // Verify authorized administrative role directly in app_metadata
+    const roleClaim = data.user.app_metadata?.role;
+    const hasAdminRole =
+      typeof roleClaim === "string" && ADMIN_ROLES.includes(roleClaim as AdminRole);
+
+    if (!hasAdminRole) {
+      await supabase.auth.signOut().catch(() => {});
+      return {
+        success: false,
+        message: "Access denied: Account lacks verified administrative privileges.",
       };
     }
 
@@ -118,16 +131,25 @@ export async function getAdminSession(): Promise<AdminSession> {
     } = await supabase.auth.getUser();
 
     if (user) {
-      const role =
-        (user.app_metadata?.role as AdminRole) ||
-        (user.user_metadata?.role as AdminRole) ||
-        "Super Admin";
+      const roleClaim = user.app_metadata?.role;
+      const isValidRole =
+        typeof roleClaim === "string" && ADMIN_ROLES.includes(roleClaim as AdminRole);
 
+      if (isValidRole) {
+        return {
+          authenticated: true,
+          email: user.email || "admin@devyx.com",
+          id: user.id,
+          role: roleClaim as AdminRole,
+        };
+      }
+
+      // Explicitly reject if user is authenticated but not an admin
       return {
-        authenticated: true,
-        email: user.email || "admin@devyx.com",
+        authenticated: false,
+        email: user.email || null,
         id: user.id,
-        role,
+        role: null,
       };
     }
   } catch {
