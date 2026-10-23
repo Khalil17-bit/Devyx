@@ -19,8 +19,8 @@ import { getRedisClient } from "@/lib/redis/client";
 
 const GLOBAL_QUEUE_KEY = "devyx:chat:global_queue";
 const IN_FLIGHT_KEY = "devyx:chat:inflight";
-const MAX_GLOBAL_CONCURRENT = 5; // Max simultaneous AI requests
-const AVG_REQUEST_MS = 8_000; // Average request latency for wait estimation
+const MAX_GLOBAL_CONCURRENT = 4; // Max simultaneous AI requests to preserve rate limits
+const AVG_REQUEST_MS = 1_200; // Realistic request latency for sub-second LPU responses
 
 // In-memory fallback
 const memInFlight = new Set<string>();
@@ -34,34 +34,50 @@ export interface QueueState {
 }
 
 /**
- * Attempts to acquire a "slot" for this session.
- * If global concurrency is at max, returns queued state.
+ * Attempts to acquire an execution slot for this session.
+ * Features an internal micro-wait (up to 350ms) to absorb momentary concurrency spikes
+ * before returning a queued state to the client.
  */
 export async function acquireChatSlot(sessionId: string): Promise<QueueState> {
   try {
     const redis = await getRedisClient();
 
     if (redis) {
-      // Check current global concurrent count
-      const currentConcurrent = parseInt(await redis.get(IN_FLIGHT_KEY) || "0");
+      // 1. Initial concurrency check
+      let currentConcurrent = parseInt((await redis.get(IN_FLIGHT_KEY)) || "0");
 
+      // 2. Micro-wait: if briefly at cap, wait up to 350ms (2x 175ms) for an in-flight turn to finish
       if (currentConcurrent >= MAX_GLOBAL_CONCURRENT) {
-        // Add to queue if not already there
+        await new Promise((r) => setTimeout(r, 175));
+        currentConcurrent = parseInt((await redis.get(IN_FLIGHT_KEY)) || "0");
+        if (currentConcurrent >= MAX_GLOBAL_CONCURRENT) {
+          await new Promise((r) => setTimeout(r, 175));
+          currentConcurrent = parseInt((await redis.get(IN_FLIGHT_KEY)) || "0");
+        }
+      }
+
+      // 3. If still at max capacity, register in global sorted queue
+      if (currentConcurrent >= MAX_GLOBAL_CONCURRENT) {
         const score = Date.now();
         await redis.zadd(GLOBAL_QUEUE_KEY, score, sessionId);
 
-        // Calculate position
         const rank = await redis.zrank(GLOBAL_QUEUE_KEY, sessionId);
         const position = (rank ?? 0) + 1;
-        const waitMs = position * AVG_REQUEST_MS;
+        const waitMs = Math.max(1200, position * AVG_REQUEST_MS);
 
-        return { status: "queued", position, estimatedWaitMs: waitMs, globalConcurrent: currentConcurrent };
+        return {
+          status: "queued",
+          position,
+          estimatedWaitMs: waitMs,
+          globalConcurrent: currentConcurrent,
+        };
       }
 
-      // Increment in-flight counter and remove from queue if present
-      await redis.pipeline()
+      // 4. Increment in-flight counter and remove from queue if present
+      await redis
+        .pipeline()
         .incr(IN_FLIGHT_KEY)
-        .expire(IN_FLIGHT_KEY, 120) // safety: reset after 2 min if server crashes
+        .expire(IN_FLIGHT_KEY, 120) // Safety TTL: 2 minutes
         .zrem(GLOBAL_QUEUE_KEY, sessionId)
         .exec();
 
@@ -71,9 +87,17 @@ export async function acquireChatSlot(sessionId: string): Promise<QueueState> {
     // Fall through to memory fallback
   }
 
-  // In-memory fallback
+  // In-memory fallback with micro-wait
   if (memGlobalConcurrent >= MAX_GLOBAL_CONCURRENT) {
-    return { status: "queued", position: 1, estimatedWaitMs: AVG_REQUEST_MS, globalConcurrent: memGlobalConcurrent };
+    await new Promise((r) => setTimeout(r, 200));
+    if (memGlobalConcurrent >= MAX_GLOBAL_CONCURRENT) {
+      return {
+        status: "queued",
+        position: 1,
+        estimatedWaitMs: AVG_REQUEST_MS,
+        globalConcurrent: memGlobalConcurrent,
+      };
+    }
   }
 
   memGlobalConcurrent++;

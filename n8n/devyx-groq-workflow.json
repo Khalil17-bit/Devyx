@@ -1,0 +1,309 @@
+{
+  "name": "Devyx - AI Assistant & Perfect Darija Translator (Groq Powered)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Webhook (Devyx Chat Ingest)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        300
+      ],
+      "webhookId": "devyx-chat-agent-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ingest payload from Devyx website /api/chat\nconst body = $input.first().json.body || $input.first().json;\n\nconst sessionId = body.sessionId || `session_${Date.now()}`;\nconst userMessage = (body.message || '').trim();\nlet language = (body.language || 'auto').toLowerCase();\nconst currentPage = body.currentPage || '/';\n\n// Darija patterns (Arabizi digits/vocabulary or Arabic script dialect)\nconst arabiziPattern = /\\b(bghit|khoya|kidayr|chhal|ch7al|salam|fin|3afak|dyal|doka|dorka|lazem|saguem|khedma|wach|chno|fash|krite|tomobil|sachi|trisiti|bezzaf|kayen|chta|we9t|9bel|9alli|chouf|hada|hadi|mzyan|mli7|chwiya|3afak|t3ich|n9der|kifech|kifach|rani|rakom)\\b/i;\nconst arabiziDigits = /\\b[a-zA-Z]*[23579][a-zA-Z]*\\b/;\nconst arabicDarijaPattern = /(باش|ديال|بغيت|شنو|واش|شحال|فين|عافاك|زوين|بزاف|مزيان|دابا|كاين|كنديرو|كنقدرو|سوءال|ساهل|خدمة|دارجة|حنا|نتوما|هاد|دير)/;\n\nconst isDarija = language === 'darija' || language === 'ar-ma' || arabiziPattern.test(userMessage) || arabiziDigits.test(userMessage) || arabicDarijaPattern.test(userMessage);\n\n// If language was \"auto\", detect effectively\nif (language === 'auto') {\n  if (isDarija) {\n    language = 'darija';\n  } else if (/[\\u0600-\\u06FF]/.test(userMessage)) {\n    language = 'ar';\n  } else if (/[éèêëàâôûùçîï]/i.test(userMessage) || /\\b(bonjour|salut|combien|coute|coûte|prix|projet|site|vous|nous|pour|faire|créer)\\b/i.test(userMessage)) {\n    language = 'fr';\n  } else {\n    language = 'en';\n  }\n}\n\nreturn {\n  json: {\n    sessionId,\n    userMessage,\n    language,\n    currentPage,\n    isDarija,\n    // Context passed to Stage 1 Devyx Technical Assistant\n    assistantInputText: userMessage\n  }\n};"
+      },
+      "id": "b1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Context & Language Detector",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Visitor Target Language: {{ $json.language }}\nPage Location: {{ $json.currentPage }}\nVisitor Inquiry: \"{{ $json.userMessage }}\"",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "SystemMessagePromptTemplate",
+              "message": "You are the Senior Technical AI Consultant for Devyx (ديفيكس), an elite software engineering agency specializing in:\n1. Web Platform Architecture: Ultra-fast Next.js 15 App Router, TypeScript, Tailwind CSS, ISR edge caching, and PostgreSQL (guaranteed sub-0.8s LCP, trilingual RTL/LTR).\n2. Cross-Platform Mobile Engineering: Unified iOS & Android apps (Flutter / React Native), offline-first SQLite sync, biometric authentication, and push alerts.\n3. Autonomous n8n Workflow Automation: Self-hosted n8n pipelines, webhook triggers, CRM/ERP synchronization, and billing workflows with ZERO per-task SaaS fees.\n4. Autonomous AI Qualification Agents: Smart conversational assistants powered by Gemini AI & Groq, CRM integrations, and automatic meeting bookings.\n\nCRITICAL SCOPE BOUNDARY (HARD CONSTRAINT):\n- You answer ONLY questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, AI systems, Devyx services, and pricing estimates.\n- You are STRICTLY FORBIDDEN from answering any out-of-context questions (cooking recipes, trivia, sports, poetry, jokes, homework, history, celebrities, etc.).\n- If an out-of-scope question is asked, DO NOT answer it. Politely refuse in 1-2 sentences in the visitor's language, state your role at Devyx, and ask what digital project they want to engineer.\n\nYOUR MISSION:\n- Analyze the visitor's request and provide a clear, brief, technical, and welcoming consultation answer (1-3 sentences maximum).\n- If the visitor speaks French, English, or Standard Arabic, answer in that language with clean formatting.\n- If the visitor communicates in Darija, formulate your core advice in clear, natural language so our downstream Darija Translator node renders it into authentic Arabizi.\n- Direct qualified leads to WhatsApp (https://wa.me/213000000000) or Contact (/contact)."
+            }
+          ]
+        }
+      },
+      "id": "b1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Devyx Assistant Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3.8-27b",
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 2048
+        }
+      },
+      "id": "b1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Groq Chat Model (Devyx Assistant)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        280,
+        480
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "groqApiAccount",
+          "name": "Groq API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $('Context & Language Detector').item.json.isDarija }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b1b2c3d4-0005-4000-8000-000000000005",
+      "name": "Is Darija?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "SystemMessagePromptTemplate",
+              "message": "=== STRICT NATIVE ALGÉROIS (ALGIERS DIALECT) TRANSLATION MANDATES ===\nYou are an expert native Algerian translator born and raised in Algiers (Algérois dialect).\nYour mission is to translate English/French text into natural, idiomatic, flowing Algerian Darija written EXCLUSIVELY in Latin Arabizi.\nTranslate the TRUE COMMUNICATIVE MEANING with ease and cultural authenticity, NOT literal word-for-word phrasing.\n\nCRITICAL HARD RULES:\n1. ABSOLUTE BAN ON LETTER 'q' FOR ARABIZI WORDS (USE '9' FOR QAF): '9bel', '9alli', '9rib', 'we9t', 'l9dim', 'd9i9a'.\n2. 100% LATIN ARABIZI ONLY (ZERO Arabic script characters).\n3. Keep responses brief, friendly, and authentic.\n4. Output ONLY the translated text in Latin Arabizi."
+            }
+          ]
+        }
+      },
+      "id": "b1b2c3d4-0006-4000-8000-000000000006",
+      "name": "Basic LLM Chain - Perfect Darija Translator",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        800,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3.8-27b",
+        "options": {
+          "temperature": 0.1,
+          "maxTokens": 2048
+        }
+      },
+      "id": "b1b2c3d4-0007-4000-8000-000000000007",
+      "name": "Groq (Darija Translator Model)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        800,
+        360
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "groqApiAccount",
+          "name": "Groq API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sanitize Output Node (Exact Perfected Regex from Darija Benchmark Suite)\nfor (const item of $input.all()) {\n    if (item.json && typeof item.json.text === 'string') {\n        let t = item.json.text;\n\n        // 1. Script purity: Eliminate any hybrid or stray Arabic characters\n        t = t.replace(/nرحب\\s*بيك/gi, 'nre7eb bik');\n        t = t.replace(/رحب\\s*بيك/gi, 're7eb bik');\n        t = t.replace(/[\\u0600-\\u06FF]/g, '');\n\n        // 2. Strict '9' for Qaf\n        t = t.replace(/\\bqbel\\b/gi, '9bel');\n        t = t.replace(/\\bqalli\\b/gi, '9alli');\n        t = t.replace(/\\bqrib\\b/gi, '9rib');\n        t = t.replace(/\\bwaqt\\b/gi, 'we9t');\n        t = t.replace(/\\blwaqt\\b/gi, 'lwe9t');\n        t = t.replace(/\\byetqta3\\b/gi, 'yet9ta3');\n        t = t.replace(/\\btqta3et\\b/gi, 't9at3et');\n        t = t.replace(/\\bdeqiq[ae]\\b/gi, 'd9i9a');\n        t = t.replace(/\\bdqiq[ae]\\b/gi, 'd9i9a');\n\n        // 3. Dialect leaks purge\n        t = t.replace(/\\b7it\\b/gi, '3la khater');\n        t = t.replace(/\\bdaba\\b/gi, 'doka');\n        t = t.replace(/\\bghadi\\b/gi, 'ra7');\n        t = t.replace(/\\bdyalna\\b/gi, 'ta3na');\n        t = t.replace(/\\bdyal\\b/gi, 'ta3');\n\n        item.json.sanitizedText = t.trim();\n        item.json.text = t.trim();\n    }\n}\nreturn $input.all();"
+      },
+      "id": "b1b2c3d4-0008-4000-8000-000000000008",
+      "name": "Sanitize Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare final payload for website HTTP response\nconst prepContext = $('Context & Language Detector').first().json;\nconst isDarija = prepContext.isDarija;\n\nlet finalReply = '';\n\nif (isDarija) {\n  const sanitizeNode = $('Sanitize Output').first();\n  finalReply = sanitizeNode?.json?.text || sanitizeNode?.json?.sanitizedText || '';\n} else {\n  const assistantNode = $('Devyx Assistant Agent').first();\n  finalReply = assistantNode?.json?.text || assistantNode?.json?.response || '';\n}\n\nif (!finalReply || finalReply.trim() === '') {\n  finalReply = isDarija\n    ? \"Salam! Rani hna bach n3awnek f kol ma ykhess les projets ta3 web, mobile w automations n8n f Devyx. T9der tcontactina direct f [WhatsApp](https://wa.me/213000000000) wela f [Page Contact](/contact).\"\n    : \"Welcome to Devyx! Our engineering team specializes in high-throughput web platforms, cross-platform mobile apps, and self-hosted n8n automation pipelines. Connect with our engineering director directly via [WhatsApp](https://wa.me/213000000000) or our [Contact Page](/contact).\";\n}\n\nreturn {\n  json: {\n    reply: finalReply,\n    sessionId: prepContext.sessionId,\n    language: isDarija ? 'darija' : prepContext.language,\n    translated: isDarija,\n    status: 'success'\n  }\n};"
+      },
+      "id": "b1b2c3d4-0009-4000-8000-000000000009",
+      "name": "Format Final Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ reply: $json.reply, sessionId: $json.sessionId, language: $json.language, translated: $json.translated }) }}",
+        "options": {}
+      },
+      "id": "b1b2c3d4-0010-4000-8000-000000000010",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook (Devyx Chat Ingest)": {
+      "main": [
+        [
+          {
+            "node": "Context & Language Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Context & Language Detector": {
+      "main": [
+        [
+          {
+            "node": "Devyx Assistant Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model (Devyx Assistant)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Devyx Assistant Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Devyx Assistant Agent": {
+      "main": [
+        [
+          {
+            "node": "Is Darija?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Darija?": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain - Perfect Darija Translator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq (Darija Translator Model)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain - Perfect Darija Translator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain - Perfect Darija Translator": {
+      "main": [
+        [
+          {
+            "node": "Sanitize Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize Output": {
+      "main": [
+        [
+          {
+            "node": "Format Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -15,25 +15,22 @@ export const maxDuration = 30;
  */
 async function handleKeepAlive(req: NextRequest) {
   try {
-    // 1. Authorization Verification
+    // 1. Authorization Verification (Strict fail-closed enforcement)
     const cronSecret = process.env.CRON_SECRET;
     const authHeader = req.headers.get("authorization");
     const customCronHeader = req.headers.get("x-cron-secret");
 
-    // Enforce authorization if CRON_SECRET is configured
-    if (cronSecret && cronSecret.trim() !== "") {
-      const isBearerValid = authHeader === `Bearer ${cronSecret}`;
-      const isCustomHeaderValid = customCronHeader === cronSecret;
+    const isBearerValid = !!cronSecret && authHeader === `Bearer ${cronSecret}`;
+    const isCustomHeaderValid = !!cronSecret && customCronHeader === cronSecret;
 
-      if (!isBearerValid && !isCustomHeaderValid) {
-        return NextResponse.json(
-          {
-            error: "UNAUTHORIZED",
-            message: "Missing or invalid cron authorization secret",
-          },
-          { status: 401 }
-        );
-      }
+    if (!cronSecret || cronSecret.trim() === "" || (!isBearerValid && !isCustomHeaderValid)) {
+      return NextResponse.json(
+        {
+          error: "UNAUTHORIZED",
+          message: "Missing or invalid cron authorization secret",
+        },
+        { status: 401 }
+      );
     }
 
     // 2. Resolve database client (Prefer Admin Service Role, fallback to Static Client)

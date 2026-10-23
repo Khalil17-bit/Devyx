@@ -149,6 +149,173 @@
   }
 }
 
+/* ─── Futuristic Jarvis HUD Opening Animations ──────────────────────────────── */
+
+@keyframes hud-panel-deploy {
+  0% {
+    opacity: 0;
+    transform: perspective(1200px) translateY(28px) scale(0.92) rotateX(6deg);
+    filter: blur(6px) brightness(1.5);
+    box-shadow: 0 0 0px var(--accent-signal);
+  }
+  50% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(-3px) scale(1.01) rotateX(-1deg);
+    filter: blur(0px) brightness(1.15);
+    box-shadow: 0 0 35px rgba(0, 224, 255, 0.4), inset 0 0 20px rgba(0, 224, 255, 0.12);
+  }
+  75% {
+    transform: perspective(1200px) translateY(1px) scale(0.998) rotateX(0.5deg);
+    filter: blur(0px) brightness(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(0) scale(1) rotateX(0deg);
+    filter: blur(0px) brightness(1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes hud-laser-scan {
+  0% {
+    top: -5%;
+    opacity: 0;
+    transform: scaleX(0.15);
+  }
+  15% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  85% {
+    opacity: 0.95;
+    transform: scaleX(1);
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+    transform: scaleX(0.7);
+  }
+}
+
+@keyframes hud-corner-tl {
+  0% {
+    transform: translate(25px, 25px) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hud-corner-tr {
+  0% {
+    transform: translate(-25px, 25px) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hud-corner-bl {
+  0% {
+    transform: translate(25px, -25px) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hud-corner-br {
+  0% {
+    transform: translate(-25px, -25px) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hud-boot-ticker {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  70% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes hud-telemetry-flash {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+  }
+}
+
+.animate-hud-deploy {
+  animation: hud-panel-deploy 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: bottom right;
+}
+
+[dir="rtl"] .animate-hud-deploy {
+  transform-origin: bottom left;
+}
+
+.animate-hud-laser {
+  animation: hud-laser-scan 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-hud-corner-tl {
+  animation: hud-corner-tl 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-hud-corner-tr {
+  animation: hud-corner-tr 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-hud-corner-bl {
+  animation: hud-corner-bl 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-hud-corner-br {
+  animation: hud-corner-br 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-hud-ticker {
+  animation: hud-boot-ticker 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-hud-telemetry {
+  animation: hud-telemetry-flash 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,

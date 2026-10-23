@@ -18,11 +18,20 @@ This directory contains the production-ready n8n workflow implementing the **2-S
 
 ## 1. Quick Start: Importing into n8n
 
-1. Open your n8n dashboard (e.g. `https://n8n.your-domain.com`).
-2. Go to **Workflows** → Click **Add Workflow** (or `+`).
-3. In the top-right menu (`...`), select **Import from File...** and choose `n8n/devyx-gemini-darija-workflow.json`.
-4. The workflow already references your Google Gemini / PaLM credentials (`4ifvA2ET1NbduXfK`), or you can assign your preferred Gemini / OpenAI / Groq model.
-5. Save and toggle the workflow to **Active**.
+### Option A: Groq-Powered Workflow (Recommended — Fast & Reliable)
+1. Open your n8n dashboard ([http://localhost:5678](http://localhost:5678)).
+2. Open your workflow (or create a new one). Select all (`Ctrl + A`) and delete (`Delete`) to clear broken nodes.
+3. In the top-right menu (`...`), select **Import from File...** and choose [`n8n/devyx-groq-workflow.json`](file:///d:/antigravity/devyx/n8n/devyx-groq-workflow.json) (or copy and paste the JSON directly onto the canvas with `Ctrl + V`).
+4. In **Credentials** → **Groq API**, connect your Groq API key:
+   - Primary: `your-groq-api-key` (from Groq Console)
+5. Click **Save** and toggle the workflow to **Active**.
+
+### Option B: Google Gemini Workflow (Updated for n8n 1.77)
+1. In the top-right menu (`...`), select **Import from File...** and choose [`n8n/devyx-gemini-darija-workflow.json`](file:///d:/antigravity/devyx/n8n/devyx-gemini-darija-workflow.json).
+2. Uses the officially supported model: **`models/gemini-1.5-flash-latest`** (fixes the `models/gemini-2.5-flash is not supported` error).
+3. In **Credentials** → **Google Gemini(PaLM) Api account**, update your key to your active key:
+   - `your-gemini-api-key` (from Google AI Studio).
+4. Save and toggle **Active**.
 
 ---
 

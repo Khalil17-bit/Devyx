@@ -223,24 +223,64 @@ export function sanitizeDarijaText(text: string): string {
 /**
  * System prompt generator for upstream Stage 1 Devyx Assistant Agent.
  */
-export function buildGeminiSystemPrompt(targetLanguage: string = "darija"): string {
-  const langInstructions: Record<string, string> = {
-    darija:
-      "You MUST respond EXCLUSIVELY in Algerian/Moroccan Darija (دارجة). Use Arabic script. Never switch to French or English unless the user writes in that language. Use '9' for the Qaf sound in romanized words when mixing Darija with French loanwords.",
-    "ar-MA":
-      "You MUST respond EXCLUSIVELY in Moroccan Darija (دارجة مغربية). Use Arabic script. Stay in dialect — do not switch to Modern Standard Arabic.",
-    ar: "You MUST respond EXCLUSIVELY in Modern Standard Arabic (الفصحى). Use formal Arabic throughout. Never mix in French, English, or dialect.",
-    fr: "You MUST respond EXCLUSIVELY in French. Professional, structured, and concise. Never mix in Arabic or English unless quoting technical terms.",
-    en: "You MUST respond EXCLUSIVELY in English. Professional, structured, and technical. Do NOT mix in Arabic, French, or Darija under any circumstances.",
-  };
+export function buildGeminiSystemPrompt(targetLanguage: string = "auto"): string {
+  let languageDirective = "";
+  let greetingTemplate = "";
+  let refusalTemplate = "";
 
-  const langRule = langInstructions[targetLanguage] || langInstructions.en;
+  if (targetLanguage === "en") {
+    languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
+The visitor has explicitly selected: ENGLISH MODE.
+You MUST write 100% of your response in ENGLISH.
+- EVEN IF the visitor writes in Darija, Arabic, or French (such as "salam hada test bark", "bonjour", "kifach"), DO NOT REPLY IN DARIJA, ARABIC, OR FRENCH.
+- You are STRICTLY FORBIDDEN from answering in Darija or Arabic when English mode is active. Answer ONLY in English.`;
+    greetingTemplate = `Greeting template: "Hello! Welcome to Devyx 👋 How can I assist with your software project today?"`;
+    refusalTemplate = `Out-of-scope refusal: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"`;
+  } else if (targetLanguage === "fr") {
+    languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
+The visitor has explicitly selected: FRENCH MODE.
+You MUST write 100% of your response in FRENCH.
+- EVEN IF the visitor writes in English, Arabic, or Darija, DO NOT REPLY IN THOSE LANGUAGES. Reply ONLY in French.`;
+    greetingTemplate = `Greeting template: "Bonjour et bienvenue chez Devyx 👋 Comment puis-je vous accompagner sur votre projet aujourd'hui ?"`;
+    refusalTemplate = `Out-of-scope refusal: "Je suis l'assistant technique IA de Devyx. Je réponds exclusivement aux questions relatives à l'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n et IA). Comment puis-je vous accompagner sur votre projet digital ?"`;
+  } else if (targetLanguage === "ar") {
+    languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
+The visitor has explicitly selected: ARABIC MODE (الفصحى).
+You MUST write 100% of your response in MODERN STANDARD ARABIC.`;
+    greetingTemplate = `Greeting template: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك البرمجي اليوم؟"`;
+    refusalTemplate = `Out-of-scope refusal: "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"`;
+  } else if (targetLanguage === "darija" || targetLanguage === "ar-MA") {
+    languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
+The visitor has explicitly selected: ALGERIAN DARIJA MODE (Latin Arabizi).
+You MUST write 100% of your response in ALGERIAN DARIJA ARABIZI.`;
+    greetingTemplate = `Greeting template: "Salam! Mar7ba bik f Devyx 👋 Kifech n9der n3awnek f l'projet ta3ek lyoum?"`;
+    refusalTemplate = `Out-of-scope refusal: "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"`;
+  } else {
+    languageDirective = `### ⚠️ DYNAMIC LANGUAGE REFLECTION (AUTO MODE):
+Detect the visitor's language dynamically and respond EXCLUSIVELY in that exact same language:
+- If the visitor writes in English, reply in English.
+- If the visitor writes in French, reply in French.
+- If the visitor writes in Arabic script, reply in Arabic.
+- If the visitor writes in Darija / Arabizi, reply in authentic Algerian Darija Arabizi.`;
+    greetingTemplate = `Greeting templates:
+- English: "Hello! Welcome to Devyx 👋 How can I assist with your software project today?"
+- French: "Bonjour et bienvenue chez Devyx 👋 Comment puis-je vous accompagner sur votre projet aujourd'hui ?"
+- Darija: "Salam! Mar7ba bik f Devyx 👋 Kifech n9der n3awnek f l'projet ta3ek lyoum?"
+- Arabic: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك البرمجي اليوم؟"`;
+    refusalTemplate = `Out-of-scope refusals:
+- English: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"
+- French: "Je suis l'assistant technique IA de Devyx. Je réponds exclusivement aux questions relatives à l'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n et IA). Comment puis-je vous accompagner sur votre projet digital ?"
+- Darija: "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"
+- Arabic: "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"`;
+  }
 
-  return `You are the Lead Technical AI Consultant for **Devyx**, a premium software engineering agency specializing in high-performance web platforms (Next.js 15), cross-platform mobile apps, self-hosted n8n workflow automations, and autonomous Gemini AI agents.
+  return `You are the Lead Technical AI Assistant for **Devyx**, a premium software engineering agency specializing in high-performance web platforms (Next.js 15), cross-platform mobile apps, self-hosted n8n workflow automations, and autonomous AI agents.
 
-### ⚠️ LANGUAGE RULE — TOP PRIORITY:
-${langRule}
-This is a hard constraint. The user has explicitly selected language: "${targetLanguage}". Respond ONLY in that language regardless of how the user writes.
+${languageDirective}
+
+### 🛑 IDENTITY DIRECTIVE (CRITICAL HARD MANDATE):
+- DO NOT say "I am Jarvis" or refer to yourself as "Jarvis" under ANY circumstance.
+- You are simply "Devyx AI Assistant" or "an AI assistant for Devyx".
 
 ### YOUR ROLE & MISSION:
 1. Greet visitors warmly and act as an expert technical consultant.
@@ -249,20 +289,55 @@ This is a hard constraint. The user has explicitly selected language: "${targetL
 4. Direct qualified leads to schedule a discovery meeting or reach the engineering team directly via WhatsApp (${DEVYX_AGENCY_CONTEXT.contact.whatsappUrl}) or the Contact page (/contact).
 5. Communicate with high clarity, professionalism, and structured Markdown (bullet points, bold text). Keep responses concise and action-oriented.
 
-### DEVYX CORE SERVICES OVERVIEW:
-1. **Web Platform Architecture**:
-   - Next.js 15 App Router, TypeScript, Tailwind CSS, PostgreSQL, edge ISR caching.
-   - Sub-0.8s LCP guaranteed, trilingual RTL/LTR mirroring.
-2. **Cross-Platform Mobile Engineering**:
-   - Flutter / React Native, offline-first SQLite cache, biometric login, push alerts.
-3. **Autonomous n8n Workflow Automation**:
-   - Self-hosted n8n instances, zero per-task SaaS tax, ERP/CRM/Payment integrations, auto-recovery.
-4. **Autonomous AI Agents (Gemini-Powered)**:
-   - 24/7 intelligent qualification, fluent in Darija, Arabic, French, and English, CRM connection.
+### 🛑 CRITICAL BEHAVIORAL MANDATES:
+1. **STRICT SCOPE BOUNDARY (HARD CONSTRAINT — ZERO OUT-OF-DOMAIN ANSWERS)**:
+   - You are EXCLUSIVELY Devyx's Lead Technical AI Engineering Consultant.
+   - You are PERMITTED to answer ONLY questions within Devyx's engineering field:
+     * Web platform development & architecture (Next.js 15, React, Tailwind CSS, TypeScript, performance, sub-0.8s LCP, SEO, trilingual RTL/LTR).
+     * Cross-platform mobile applications (Flutter, React Native, iOS, Android, offline caching).
+     * Autonomous workflow automation & backend integrations (self-hosted n8n, webhooks, REST APIs, CRM/WhatsApp sync).
+     * AI agents & LLM integrations (Gemini, Groq, custom autonomous agents, multi-modal vision, voice transcription).
+     * Databases & infrastructure (PostgreSQL, Supabase, Redis, Docker, Cloudflare, security/RLS).
+     * Devyx services, portfolio showcase, project scoping, preliminary pricing estimates, delivery timelines, and contact options (/contact, WhatsApp).
+     * Basic friendly greetings ("salam", "hello", "bonjour") and platform controls (switching theme, navigating pages, switching language mode to French, Darija, English, Arabic).
+   - You are STRICTLY FORBIDDEN from answering any questions outside this software engineering field. This includes but is not limited to:
+     * Cooking recipes, food, baking, nutrition, or restaurants.
+     * General trivia, history, geography, celebrities, movies, pop culture, or sports (e.g. World Cup, football, etc.).
+     * Buying shoes, clothes, consumer goods, e-commerce products outside Devyx software development.
+     * Creative fiction, poetry, storytelling, jokes, or non-technical creative writing.
+     * Academic homework, math, physics, biology, literature essays.
+     * Medical, legal, or non-software financial advice.
+   - **OUT-OF-SCOPE REFUSAL MANDATE**: If the visitor asks ANYTHING outside Devyx's software engineering scope, DO NOT answer their question. Politely refuse in 1-2 sentences using:
+${refusalTemplate}
+
+2. **CONCISENESS (1-3 SENTENCES MAX)**: Keep answers punchy, helpful, and conversational. NEVER lecture the visitor with huge technical manuals, internal agent protocols, or developer handover guides.
+3. **GREETINGS**: When the visitor sends a greeting (like "salam", "hello", "hi", "bonjour", "salut"), reply with a friendly 1-2 sentence greeting:
+${greetingTemplate}
+4. **DEVYX AGENCY SCOPE**: Devyx builds Next.js 15 web platforms, mobile apps (Flutter/React Native), self-hosted n8n automations, and AI agents.
+5. **AUTONOMOUS PLATFORM ACTIONS, LANGUAGE SWITCHING & MEMORY (MANDATORY)**:
+   You have executive platform control to navigate pages, change themes, or SWITCH THE CHAT LANGUAGE MODE.
+   - **Language Switching Requests**: When the visitor asks to switch language, speak in a specific language, or switch language mode (e.g. "switch language mode in this chat to french", "speak in french", "parle en français", "ahdar bel darija", "speak in arabic", "switch to english"):
+     * THIS IS ALWAYS 100% IN-SCOPE. NEVER REFUSE A LANGUAGE SWITCH REQUEST.
+     * Reply directly in the requested language (1-2 sentences warmly confirming the language switch).
+     * ALWAYS append the matching autonomous action tag at the very end of your response:
+       - [ACTION:SET_LOCALE:fr] -> Switches chat language mode to French.
+       - [ACTION:SET_LOCALE:darija] -> Switches chat language mode to Algerian Darija.
+       - [ACTION:SET_LOCALE:en] -> Switches chat language mode to English.
+       - [ACTION:SET_LOCALE:ar] -> Switches chat language mode to Arabic.
+   - **Page Navigation & Memory**: When the visitor asks to navigate, visit, or see a page (e.g. "open the page of projects", "see projects", "show me services", "contact page", "take me home"), OR when the visitor refers back to an earlier discussed page (e.g. "navigate to the page i told you about earlier", "open the page we discussed", "take me to that page"):
+     * Inspect the recent conversation history to identify what was discussed.
+     * NEVER say "I don't have access to our previous conversation history" or "I cannot recall". You have full multi-turn conversation memory.
+     * ALWAYS append the appropriate action tag at the very end of your response:
+       * [ACTION:NAVIGATE:/projects] -> Opens Projects / Portfolio showcase.
+       * [ACTION:NAVIGATE:/services] -> Opens Services matrix.
+       * [ACTION:NAVIGATE:/contact] -> Opens Contact page.
+       * [ACTION:NAVIGATE:/] -> Opens Home page.
+       * [ACTION:THEME:dark] -> Toggles Dark Mode.
+       * [ACTION:THEME:light] -> Toggles Light Mode.
 
 ### CURRENT CONTEXT:
 - Selected Language: ${targetLanguage}
-- Format: Clean Markdown with bold highlights and bullet points. Always offer direct WhatsApp or Contact page links.`;
+- Format: Clean, brief Markdown. Always offer direct WhatsApp or Contact page links.`;
 }
 
 export class SimulationResultWrapper implements DevSimulationResult {
@@ -292,11 +367,77 @@ export class SimulationResultWrapper implements DevSimulationResult {
 }
 
 /**
+ * Detect language from text content:
+ * - "darija": Algérois/Moroccan Darija keywords in Arabic script or Arabizi
+ * - "ar": Modern Standard Arabic
+ * - "fr": French (accents, common pronouns, interrogatives)
+ * - "en": English (common keywords, pronouns, interrogatives)
+ */
+export function detectLanguage(text: string, fallback: string = "en"): "darija" | "ar" | "fr" | "en" {
+  const query = (text || "").toLowerCase().trim();
+  if (!query) {
+    if (fallback === "fr" || fallback === "ar" || fallback === "darija") return fallback as any;
+    return "en";
+  }
+
+  // 1. Darija keywords in Arabic script
+  if (/(ديال|باش|بغيت|شنو|واش|شحال|فين|عافاك|زوين|بزاف|مزيان|دابا|كاين|كنديرو|كنقدرو|نقدر|راك|واخا|ساهل|خدمة|دارجة|حنا|نتوما|هاد|هادي|هادو|دير|نديرو|عاود|شوف|كاينين|عطيني|شكون|كاش|واش كاين)/.test(query)) {
+    return "darija";
+  }
+
+  // 2. Darija Arabizi (Latin script with dialect vocabulary or digit substitutions)
+  const isDarijaArabizi =
+    /\b(salam|bghit|khoya|kidayr|chhal|ch7al|fin|3afak|dyal|doka|dorka|lazem|saguem|khedma|wach|chno|fash|krite|tomobil|sachi|trisiti|bezzaf|kayen|chta|we9t|9bel|9alli|chouf|hada|hadi|mzyan|mli7|chwiya|t3ich|choufi|khdma|rak|ntaya|ntina|hder|kalam|walo|walou|rani|rakom|choufou|sa7a|m3ak|n9der|kifech|kifach|3la|fih|fiha|nta|nti|hadak|hadik)\b/i.test(query) ||
+    /\b[a-zA-Z]*[23579][a-zA-Z]*\b/.test(query);
+
+  if (isDarijaArabizi) {
+    return "darija";
+  }
+
+  // 3. Arabic script (Modern Standard Arabic)
+  if (/[\u0600-\u06FF]/.test(query)) {
+    return "ar";
+  }
+
+  // 4. French (common French terms, pronouns, questions, or accents)
+  if (
+    /[éèêëàâôûùçîï]/i.test(query) ||
+    /\b(bonjour|salut|merci|combien|coute|coûte|prix|projet|site|application|devis|pouvez|vous|nous|pour|avec|dans|faire|créer|je|veux|est|sont|mon|une|les|des|cette|notre|votre|tarif|contacter|qui|qu'est|comment|aide|besoin|plateforme|développement|fonctionne)\b/i.test(query)
+  ) {
+    return "fr";
+  }
+
+  // 5. English (common English words)
+  if (
+    /\b(hello|hey|hi|how|much|cost|price|website|app|build|can|you|what|is|the|we|need|want|help|project|estimate|dark|mode|service|stack|who|are|tell|me|about|work|features|pricing|platform|why|working|start)\b/i.test(query)
+  ) {
+    return "en";
+  }
+
+  // 6. Fallback based on locale if set
+  if (fallback === "fr" || fallback === "ar" || fallback === "darija") {
+    return fallback as any;
+  }
+
+  return "en";
+}
+
+/**
  * Intelligent simulation engine implementing the 2-stage architecture locally
  * with full autonomous "Jarvis" UI action dispatching and Telegram handoff detection.
  */
-export function generateDevSimulationResponse(message: string, language: string = "darija"): SimulationResultWrapper {
+export function generateDevSimulationResponse(
+  message: string,
+  language: string = "auto",
+  history?: Array<{ role: string; content: string }>
+): SimulationResultWrapper {
   const query = message.toLowerCase().trim();
+  const effectiveLang: "darija" | "ar" | "fr" | "en" =
+    language === "auto" || !language
+      ? detectLanguage(message, "en")
+      : language === "ar-MA"
+      ? "darija"
+      : (language as any);
   const actions: JarvisAction[] = [];
   let handoff: HandoffData | undefined;
   let estimate: EstimateData | undefined;
@@ -305,45 +446,59 @@ export function generateDevSimulationResponse(message: string, language: string 
   const phoneMatch = message.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{2,4}[-.\s]?\d{2,6}/);
   const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
 
-  // 2. Action Detection: Theme Switching
-  if (
+  // 2. Action Detection: Theme Switching (Seamless Autonomous Control)
+  const isDarkRequest =
+    /\b(dark\s*mode|mode\s*sombre|k7el|ke7el|layla|layl|ليل|الوضع\s*الداكن|داكن|dark\s*mod|black\s*mod|black\s*mode|noir|nocturne|night\s*mode|night)\b/i.test(query) ||
     query.includes("dark mode") ||
+    query.includes("dark mod") ||
     query.includes("mode sombre") ||
-    query.includes("k7el") ||
-    query.includes("layla") ||
-    query.includes("ليل") ||
-    query.includes("الوضع الداكن") ||
-    query.includes("داكن")
-  ) {
+    query.includes("black mode") ||
+    query.includes("black mod") ||
+    query.includes("night mode") ||
+    (query.includes("dark") && !query.includes("light") && !query.includes("white") && !query.includes("whiet")) ||
+    (query.includes("sombre") && !query.includes("clair")) ||
+    (query.includes("black") && !query.includes("white") && !query.includes("whiet"));
+
+  if (isDarkRequest) {
     actions.push({ type: "SET_THEME", payload: "dark" });
     const reply =
-      language === "darija"
-        ? sanitizeDarijaText("Safy! Badaltlek l'mode l **Dark Mode** 🌙. Kifech tbanlek l'interface doka?")
-        : language === "fr"
-        ? "J'ai basculé l'interface en **Dark Mode** 🌙. Le contraste monochrome technique est désormais actif."
-        : language === "ar"
+      effectiveLang === "darija"
+        ? "Safy! Badaltlek l'mode l **Dark Mode** 🌙."
+        : effectiveLang === "fr"
+        ? "J'ai basculé l'interface en **Dark Mode** 🌙."
+        : effectiveLang === "ar"
         ? "تم تحويل واجهة المنصة إلى **الوضع الداكن** 🌙 بنجاح."
-        : "Activated **Dark Mode** 🌙 across the platform viewport.";
+        : "Switched to **Dark Mode** 🌙!";
     return new SimulationResultWrapper({ reply, actions });
   }
 
-  if (
+  const isLightRequest =
+    /\b(light\s*mode|light\s*mod|mode\s*clair|byad|byed|abyad|نهار|الوضع\s*الفاتح|فاتح|white\s*mod|whiet\s*mod|white\s*mode|whiet\s*mode|day\s*mode|day\s*mod|clair|blanc|soleil|sun\s*mode)\b/i.test(query) ||
     query.includes("light mode") ||
+    query.includes("light mod") ||
+    query.includes("white mode") ||
+    query.includes("white mod") ||
+    query.includes("whiet mode") ||
+    query.includes("whiet mod") ||
     query.includes("mode clair") ||
-    query.includes("byad") ||
-    query.includes("نهار") ||
-    query.includes("الوضع الفاتح") ||
-    query.includes("فاتح")
-  ) {
+    query.includes("day mode") ||
+    query.includes("day mod") ||
+    query.includes("whiet") ||
+    (query.includes("white") && !query.includes("dark") && !query.includes("black")) ||
+    (query.includes("light") && !query.includes("dark") && !query.includes("black")) ||
+    (query.includes("clair") && !query.includes("sombre")) ||
+    query.includes("blanc");
+
+  if (isLightRequest) {
     actions.push({ type: "SET_THEME", payload: "light" });
     const reply =
-      language === "darija"
-        ? sanitizeDarijaText("Safy! Badaltlek l'mode l **Light Mode** ☀️. L'interface doka f l'mode clair.")
-        : language === "fr"
-        ? "J'ai activé le **Light Mode** ☀️. L'affichage haute clarté est désormais en place."
-        : language === "ar"
+      effectiveLang === "darija"
+        ? "Safy! Badaltlek l'mode l **Light Mode** ☀️."
+        : effectiveLang === "fr"
+        ? "J'ai basculé l'interface en **Light Mode** ☀️."
+        : effectiveLang === "ar"
         ? "تم تحويل واجهة المنصة إلى **الوضع الفاتح** ☀️ بنجاح."
-        : "Switched platform interface to **Light Mode** ☀️.";
+        : "Switched to **Light Mode** ☀️!";
     return new SimulationResultWrapper({ reply, actions });
   }
 
@@ -360,12 +515,12 @@ export function generateDevSimulationResponse(message: string, language: string 
     actions.push({ type: "NAVIGATE", payload: "/projects" });
     const reply =
       language === "darija"
-        ? sanitizeDarijaText("Rani fté7tlek **la page des projets** 📁! Chouf les réalisations Next.js w les plateformes SaaS li khedmnahom.")
+        ? "Rani ditek l [Page Projets](/projects) 📁 bach tchouf khdemtna."
         : language === "fr"
-        ? "Je vous redirige vers la page **Projets** 📁 pour explorer nos architectures web et cas d'usage récents."
+        ? "Je vous redirige vers la page [Projets](/fr/projects) 📁."
         : language === "ar"
-        ? "تم توجيهك إلى صفحة **المشاريع** 📁 لاستعراض سابقة أعمالنا في النظم الرقمية."
-        : "Navigated to **Projects** 📁 showcase so you can review our production architectures.";
+        ? "تم توجيهك إلى صفحة [المشاريع](/ar/projects) 📁 لاستعراض سابقة الأعمال."
+        : "Navigated to [Projects](/en/projects) 📁 showcase.";
     return new SimulationResultWrapper({ reply, actions });
   }
 
@@ -376,46 +531,156 @@ export function generateDevSimulationResponse(message: string, language: string 
     query.includes("solutions")
   ) {
     actions.push({ type: "NAVIGATE", payload: "/services" });
-    actions.push({ type: "SHOW_SERVICES", payload: DEVYX_AGENCY_CONTEXT.services.map(s => s.name) });
+    actions.push({ type: "SHOW_SERVICES", payload: DEVYX_AGENCY_CONTEXT.services.map((s) => s.name) });
     const reply =
       language === "darija"
-        ? sanitizeDarijaText("Rani fté7tlek **la page des services** ⚙️! Chouf les options lte7t (Next.js, Mobile, n8n, AI Agents) w goulli wach li yhemmek.")
+        ? "Rani fté7tlek [Page Services](/services) ⚙️ (Web, Mobile, n8n, AI Agents). Chnou li yhemmek?"
         : language === "fr"
-        ? "Voici notre catalogue d'ingénierie sur la page **Services** ⚙️ (Web, Mobile, n8n, Agents IA)."
+        ? "Voici notre catalogue sur la page [Services](/fr/services) ⚙️ (Web, Mobile, n8n, IA). Quel domaine vous intéresse ?"
         : language === "ar"
-        ? "تم فتح صفحة **الخدمات** ⚙️ لاختيار التخصص المناسب لمشروعك (ويب، تطبيقات، أتمتة n8n، وكلاء الذكاء الاصطناعي)."
-        : "Navigated to **Services** ⚙️ matrix overview. Which architecture does your roadmap require?";
+        ? "تم فتح صفحة [الخدمات](/ar/services) ⚙️ (ويب، تطبيقات، أتمتة n8n، وكلاء الذكاء الاصطناعي)."
+        : "Navigated to [Services](/en/services) ⚙️ matrix (Web, Mobile, n8n, AI Agents). What are you building?";
     return new SimulationResultWrapper({ reply, actions });
   }
 
+  const isContactPageNav =
+    (query.includes("contact") || query.includes("اتصال") || query.includes("تواصل")) &&
+    (/\b(page|aller|open|show|ouvre|dini|affich|voir|صفحة|وريني|افتح|take me)\b/i.test(query) ||
+      query === "contact" ||
+      query === "contact us" ||
+      query === "contactez-nous" ||
+      query === "تواصل معنا");
+
+  if (isContactPageNav && !phoneMatch && !emailMatch && !query.includes("contact me") && !query.includes("contactez-moi")) {
+    actions.push({ type: "NAVIGATE", payload: "/contact" });
+    const reply =
+      language === "darija"
+        ? "Rani ditek l [Page Contact](/contact) 📬 bach t'contacti l'équipe direct."
+        : language === "fr"
+        ? "Je vous redirige vers la page [Contact](/fr/contact) 📬."
+        : language === "ar"
+        ? "تم توجيهك إلى صفحة [التواصل](/ar/contact) 📬 لمراسلة فريق الهندسة مباشرة."
+        : "Navigated to [Contact](/en/contact) 📬 page to connect with our engineering team.";
+    return new SimulationResultWrapper({ reply, actions });
+  }
+
+  // Contextual reference to previous page from history
+  const isContextualNav =
+    /\b(earlier|previous|told you|discussed|last page|before|défini|précédent|9otlek|hderna|déjà)\b/i.test(query) &&
+    /\b(page|navigate|open|take me|dini|edi|odi|aller|retour)\b/i.test(query);
+
+  if (isContextualNav && history && history.length > 0) {
+    const historyText = history.map((h) => h.content).join(" ").toLowerCase();
+    if (historyText.includes("project") || historyText.includes("portfolio") || historyText.includes("مشاريع")) {
+      actions.push({ type: "NAVIGATE", payload: "/projects" });
+      const reply =
+        effectiveLang === "darija"
+          ? "Rani 3awedt ditek l [Page Projets](/projects) 📁 li hderna 3liha."
+          : effectiveLang === "fr"
+          ? "Je vous ramène sur la page [Projets](/fr/projects) 📁 dont nous parlions."
+          : effectiveLang === "ar"
+          ? "تمت إعادتك إلى صفحة [المشاريع](/ar/projects) 📁 التي تحدثنا عنها سابقاً."
+          : "Navigated back to [Projects](/en/projects) 📁 showcase as discussed earlier.";
+      return new SimulationResultWrapper({ reply, actions });
+    }
+    if (historyText.includes("service") || historyText.includes("خدمات")) {
+      actions.push({ type: "NAVIGATE", payload: "/services" });
+      const reply =
+        effectiveLang === "darija"
+          ? "Rani 3awedt ditek l [Page Services](/services) ⚙️ li hderna 3liha."
+          : effectiveLang === "fr"
+          ? "Je vous ramène sur la page [Services](/fr/services) ⚙️ dont nous parlions."
+          : effectiveLang === "ar"
+          ? "تمت إعادتك إلى صفحة [الخدمات](/ar/services) ⚙️ التي تحدثنا عنها سابقاً."
+          : "Navigated back to [Services](/en/services) ⚙️ matrix as discussed earlier.";
+      return new SimulationResultWrapper({ reply, actions });
+    }
+    if (historyText.includes("contact") || historyText.includes("تواصل")) {
+      actions.push({ type: "NAVIGATE", payload: "/contact" });
+      const reply =
+        effectiveLang === "darija"
+          ? "Rani 3awedt ditek l [Page Contact](/contact) 📬."
+          : effectiveLang === "fr"
+          ? "Je vous ramène sur la page [Contact](/fr/contact) 📬."
+          : effectiveLang === "ar"
+          ? "تمت إعادتك إلى صفحة [التواصل](/ar/contact) 📬."
+          : "Navigated back to [Contact](/en/contact) 📬 page.";
+      return new SimulationResultWrapper({ reply, actions });
+    }
+  }
+
   // 4. Action Detection: Language Switching Request
-  if (query.includes("parle français") || query.includes("en français") || query.includes("francais") || query.includes("français")) {
+  // French
+  if (
+    query.includes("french") ||
+    query.includes("français") ||
+    query.includes("francais") ||
+    /\b(parle|speak|switch|change|passer).*(français|francais|french)/i.test(query)
+  ) {
     actions.push({ type: "SET_LOCALE", payload: "fr" });
     return new SimulationResultWrapper({
-      reply: "Parfait ! J'ai basculé la langue d'affichage du site en français 🇫🇷. Comment puis-je vous accompagner sur votre projet ?",
+      reply: "Parfait ! J'ai basculé le mode de discussion en français 🇫🇷. Comment puis-je vous accompagner sur votre projet technique ?",
       actions,
     });
   }
 
-  if (query.includes("speak english") || query.includes("in english") || query.includes("anglais") || query.includes("english")) {
+  // Darija
+  if (
+    query.includes("darija") ||
+    query.includes("darja") ||
+    query.includes("derja") ||
+    query.includes("الدارجة") ||
+    query.includes("دارجة") ||
+    /\b(ahdar|hder|hdr|kellem|ehki|speak|switch).*(darija|darja|algerian|dzair)/i.test(query) ||
+    /\b(bel darija|b darija|b ed-darija)\b/i.test(query)
+  ) {
+    actions.push({ type: "SET_LOCALE", payload: "darija" });
+    return new SimulationResultWrapper({
+      reply: "Salam ! Beddelt l-mode ta3 l-chat l ed-Darija 🇩🇿. Kifech n9der n3awnek f l'projet tech dyalek lyoum?",
+      actions,
+    });
+  }
+
+  // English
+  if (
+    query.includes("speak english") ||
+    query.includes("in english") ||
+    query.includes("to english") ||
+    query.includes("switch to english") ||
+    query.includes("english") ||
+    query.includes("anglais") ||
+    /\b(parle|speak|switch|change).*(english|anglais)/i.test(query)
+  ) {
     actions.push({ type: "SET_LOCALE", payload: "en" });
     return new SimulationResultWrapper({
-      reply: "Affirmative! Switched the platform display language to English 🇬🇧. What technical architecture are you planning?",
+      reply: "Affirmative! Switched the chat language mode to English 🇬🇧. What technical architecture or software project are you planning?",
       actions,
     });
   }
 
-  if (query.includes("بالعربية") || query.includes("عربية") || query.includes("arabe") || query.includes("arabic")) {
+  // Arabic
+  if (
+    query.includes("بالعربية") ||
+    query.includes("عربية") ||
+    query.includes("arabe") ||
+    query.includes("arabic") ||
+    query.includes("بالفصحى") ||
+    /\b(speak|switch|change|t7aded).*(arabic|arabe|عربية)/i.test(query)
+  ) {
     actions.push({ type: "SET_LOCALE", payload: "ar" });
     return new SimulationResultWrapper({
-      reply: "تم تحويل لغة عرض الموقع إلى العربية 🇸🇦. كيف يمكننا خدمة مشروعكم اليوم؟",
+      reply: "تم تحويل لغة المحادثة إلى العربية 🇸🇦. كيف يمكننا خدمة مشروعكم التقني اليوم؟",
       actions,
     });
   }
 
   // 5. Action Detection: Human Specialist & Telegram Escalation
-  if (
+  const isHumanEscalation =
     query.includes("nahder m3a") ||
+    query.includes("nahdar m3a") ||
+    query.includes("hder m3a") ||
+    query.includes("hdar m3a") ||
+    query.includes("ihder m3a") ||
     query.includes("humain") ||
     query.includes("human") ||
     query.includes("شخص") ||
@@ -425,30 +690,63 @@ export function generateDevSimulationResponse(message: string, language: string 
     query.includes("directeur") ||
     query.includes("call me") ||
     query.includes("اتصل") ||
+    query.includes("عیطلی") ||
+    query.includes("عيطلي") ||
+    query.includes("تحدث مع") ||
+    query.includes("مسؤول") ||
+    query.includes("responsable") ||
+    query.includes("developpeur") ||
+    query.includes("developer") ||
+    query.includes("talk to someone") ||
+    query.includes("speak to someone") ||
+    query.includes("speak with") ||
+    query.includes("talk with") ||
     phoneMatch ||
-    emailMatch
-  ) {
+    emailMatch;
+
+  if (isHumanEscalation) {
     const contactInfo = phoneMatch ? phoneMatch[0] : emailMatch ? emailMatch[0] : "Requesting Callback";
+    const hasContact = contactInfo !== "Requesting Callback";
+
+    // Build context summary from history if available
+    let topicSummary = "General technical inquiry";
+    if (history && history.length > 0) {
+      const historyStr = history.map((h) => h.content).join(" ").toLowerCase();
+      if (historyStr.includes("web") || historyStr.includes("next.js") || historyStr.includes("platform")) {
+        topicSummary = "Next.js 15 Web Platform Architecture";
+      } else if (historyStr.includes("mobile") || historyStr.includes("app") || historyStr.includes("flutter")) {
+        topicSummary = "Cross-Platform Mobile App (iOS / Android)";
+      } else if (historyStr.includes("n8n") || historyStr.includes("automation") || historyStr.includes("workflow")) {
+        topicSummary = "n8n Autonomous Workflow Automation";
+      } else if (historyStr.includes("ai") || historyStr.includes("gemini") || historyStr.includes("agent")) {
+        topicSummary = "Autonomous AI Agents & Multi-Modal Systems";
+      }
+    }
+
     handoff = {
       requested: true,
       clientName: "Prospective Client",
       contact: contactInfo,
-      summary: `Client requested direct technical consultant contact. Query: "${message}"`,
+      summary: `Client requested lead technical consultant contact. Topic: "${topicSummary}". Query: "${message}"`,
       urgency: "HIGH",
     };
     actions.push({ type: "TELEGRAM_HANDOFF", payload: handoff });
 
-    const reply =
-      language === "darija"
-        ? sanitizeDarijaText(
-            `Wakha 3la rasna w 3inna! Sayeft une alerte directe l'groupe Telegram ta3 l'équipe d'ingénierie ta3na 🚨.\n\n` +
-            `Dossier ta3ek ra7 ychoufou un directeur technique f lwe9t. T9der tani tcontactih direct f [WhatsApp](https://wa.me/213000000000) wela [Telegram](https://t.me/devyx_official)!`
-          )
-        : language === "fr"
-        ? "Demande transmise avec succès ! Une alerte prioritaire a été envoyée sur le canal Telegram de notre direction technique 🚨. Un ingénieur senior prendra contact avec vous très rapidement."
-        : language === "ar"
-        ? "تم إرسال إشعار فوري إلى فريق الإدارة الهندسية عبر Telegram 🚨. سيتواصل معك أحد مسؤولينا التقنيين مباشرة."
-        : "Priority dispatch logged! An executive notification has been routed to our lead engineering Telegram channel 🚨. A technical lead will connect with you shortly.";
+    const reply = hasContact
+      ? effectiveLang === "darija"
+        ? `Sayeft les coordonnées dyalek (${contactInfo}) l'équipe technique f Telegram 🚨. غادي يتواصل معاك مسؤول تقني فالحين!`
+        : effectiveLang === "fr"
+        ? `Vos coordonnées (${contactInfo}) ont été transmises à notre équipe technique sur Telegram 🚨. Un responsable va vous recontacter rapidement.`
+        : effectiveLang === "ar"
+        ? `تم إرسال بياناتكم (${contactInfo}) إلى فريق الإدارة الهندسية عبر تيليجرام 🚨. سيتواصل معكم مسؤول تقني في أقرب وقت.`
+        : `Your contact info (${contactInfo}) has been dispatched to our engineering team on Telegram 🚨. A lead specialist will reach out shortly.`
+      : effectiveLang === "darija"
+        ? "Sayeft alerte l'équipe technique f Telegram 🚨. 3tina noumrou WhatsApp dyalek wela email باش يتواصلو معاك فالحين، ولا تواصل ديريكت عبر [WhatsApp](https://wa.me/213000000000)."
+        : effectiveLang === "fr"
+        ? "Alerte transmise en direct à l'équipe technique sur Telegram 🚨. Laissez-nous votre WhatsApp ou email pour vous recontacter immédiatement, ou écrivez-nous sur [WhatsApp](https://wa.me/213000000000)."
+        : effectiveLang === "ar"
+        ? "تم إرسال إشعار فوري إلى فريق الإدارة الهندسية عبر تيليجرام 🚨. يُرجى تزويدنا برقم واتساب أو بريدك الإلكتروني لنتواصل معك فوراً، أو تفضل بمراسلتنا عبر [واتساب](https://wa.me/213000000000)."
+        : "Priority alert dispatched to our lead engineering team on Telegram 🚨. Please provide your WhatsApp number or email so an engineer can reach you immediately, or connect via [WhatsApp](https://wa.me/213000000000).";
 
     return new SimulationResultWrapper({ reply, actions, handoff });
   }
@@ -513,120 +811,140 @@ export function generateDevSimulationResponse(message: string, language: string 
     actions.push({ type: "ESTIMATE_CARD", payload: estimate });
 
     const reply =
-      language === "darija"
-        ? sanitizeDarijaText(
-            `Dertlek estimation technique instantanée l'projet ta3ek f la carte lte7t 💰!\n\n` +
-            `T9der tchouf l'budget prévisionnel (${cost}), l'délai (${timeline}), w les technologies. ` +
-            `Bach n'fixiw le devis définitif, hder direct f [WhatsApp](https://wa.me/213000000000) wela t'demandi consultation f [Page Contact](/contact)!`
-          )
-        : language === "fr"
-        ? `Voici notre estimation technique instantanée pour votre projet (${cost} | ${timeline}) affichée ci-dessous 💰. Souhaitez-vous planifier un cadrage d'architecture ?`
-        : language === "ar"
-        ? `تم إنشاء تقدير أولي لتكلفة وجدول المشروع (${cost} | ${timeline}) في البطاقة أدناه 💰. يمكنك حجز استشارة فنية للمعاينة التفصيلية.`
-        : `Generated an instant engineering estimate for your system below (${cost} | ${timeline}) 💰. Ready to review specific architecture specifications?`;
+      effectiveLang === "darija"
+        ? `Dertlek estimation technique instantanée (${cost} | ${timeline}) lte7t 💰. T9der t'valider f [WhatsApp](https://wa.me/213000000000) wela [Page Contact](/contact)!`
+        : effectiveLang === "fr"
+        ? `Voici l'estimation technique (${cost} | ${timeline}) affichée ci-dessous 💰. Échangeons sur [WhatsApp](https://wa.me/213000000000) ou via la [Page Contact](/fr/contact).`
+        : effectiveLang === "ar"
+        ? `تم إعداد تقدير أولي (${cost} | ${timeline}) في البطاقة أدناه 💰. يمكنك اعتماده عبر [واتساب](https://wa.me/213000000000) أو [صفحة التواصل](/ar/contact).`
+        : `Generated instant engineering estimate below (${cost} | ${timeline}) 💰. Ready to review on [WhatsApp](https://wa.me/213000000000) or our [Contact Page](/en/contact)?`;
 
     return new SimulationResultWrapper({ reply, actions, estimate });
   }
 
-  // 7. General Service Qualifications (Web, Mobile, Automation)
-  // Detect Darija or Arabizi patterns ONLY when language is not explicitly set to en/fr/ar
-  const isDarijaOrArabizi =
-    language === "darija" ||
-    language === "ar-MA" ||
-    // Only auto-detect Darija when no explicit non-Darija language is selected
-    (language !== "en" && language !== "fr" && language !== "ar" &&
-      (/\b(bghit|khoya|kidayr|chhal|salam|fin|3afak|dyal|doka|dorka|lazem|saguem|khedma|wach|chno|fash|krite|tomobil|sachi|trisiti|bezzaf|kayen|chta|we9t|9bel|9alli)\b/i.test(query) ||
-      (/[\u0600-\u06FF]/.test(query) && (query.includes("باش") || query.includes("ديال") || query.includes("بغيت") || query.includes("شنو") || query.includes("واش") || query.includes("شحال") || query.includes("فين")))));
+  // 7. Action Detection: Greetings
+  const isGreeting =
+    /^(salam|mar7ba|bonjour|salut|hello|hi|hey|coucou|ahla|مرحبا|أهلا|سلام)/i.test(query) ||
+    query === "salam" ||
+    query === "bonjour" ||
+    query === "hello";
 
-  if (language === "darija" || isDarijaOrArabizi) {
+  if (isGreeting) {
+    const reply =
+      effectiveLang === "darija"
+        ? "Salam! 👋 Ana l'assistant technique IA ta3 Devyx. Kifech n9der n3awnek f l'projet ta3ek lyoum?"
+        : effectiveLang === "fr"
+        ? "Bonjour ! 👋 Je suis l'assistant technique IA de Devyx. Comment puis-je vous accompagner sur votre projet ?"
+        : effectiveLang === "ar"
+        ? "أهلاً بك! 👋 أنا المساعد التقني الذكي لـ Devyx. كيف يمكنني مساعدتك في مشروعك اليوم؟"
+        : "Hello! 👋 I'm your Devyx AI assistant. How can I assist with your software project today?";
+    return new SimulationResultWrapper({ reply });
+  }
+
+  // 8. Action Detection: Out-of-Scope Queries (General trivia, recipes, poetry, sports, shoes/clothes, etc.)
+  const isOutOfScope =
+    /\b(recette|recipe|pizza|cake|gateau|chocolat|cuisine|cook|cooking|tabkh|tayab|makla|طبيخ|طبخ|وصفة|اكل|ماكلة)\b/i.test(query) ||
+    /\b(sabat|sabate|chaussure|shoes|sneakers|vetement|clothes|chri|nechri|nechriw|حذاء|شراء\s*حذاء|صباط)\b/i.test(query) ||
+    /\b(world\s*cup|football|messi|ronaldo|ballon\s*d'or|match|coupe\s*du\s*monde|كأس\s*العالم|كرة\s*القدم|ميسي|رونالدو)\b/i.test(query) ||
+    /\b(po[eèé]me|poetry|poem|ch3ar|ch3er|chعر|قصيدة|شعر|blague|joke|nokat|nokta|نكتة|نكت)\b/i.test(query) ||
+    /\b(who\s*is\s*(?!devyx)|qui\s*est\s*(?!devyx)|chkoun\s*(?!devyx)|من\s*هو\s*(?!devyx))\b/i.test(query) ||
+    /\b(capital\s*of|capitale\s*de|عاصمة|weather|météo|taqs|how\s*old\s*is|quel\s*âge\s*a)\b/i.test(query) ||
+    /\b(homework|devoir|math\s*problem|calculus|histoire\s*de\s*france|president|politique|election)\b/i.test(query);
+
+  if (isOutOfScope) {
+    const reply =
+      effectiveLang === "darija"
+        ? "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"
+        : effectiveLang === "fr"
+        ? "Je suis l'assistant technique IA de Devyx. Je réponds exclusivement aux questions relatives à l'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n et IA). Comment puis-je vous accompagner sur votre projet digital ?"
+        : effectiveLang === "ar"
+        ? "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"
+        : "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?";
+    return new SimulationResultWrapper({ reply: effectiveLang === "darija" ? sanitizeDarijaText(reply) : reply });
+  }
+
+  // 9. Domain Queries (Web, n8n, Mobile) & Concise Defaults
+  if (effectiveLang === "darija") {
     if (query.includes("سيت") || query.includes("موقع") || query.includes("web") || query.includes("site")) {
-      const rawResponse =
-        "Salam! F Devyx n7atto des plateformes w des sites web haute performance b Next.js 15 w PostgreSQL:\n\n" +
-        "- Vitesse sub-seconde: LCP t7et 0.8s b l'edge caching mli7 fi we9tou.\n" +
-        "- Support complet: trilingue RTL/LTR (Darija, Français, Anglais).\n" +
-        "- Sécurité kbira: PostgreSQL m'sécurisé w zéro pannes.\n\n" +
-        "Wach rak 7ab t'développi site e-commerce wela plateforme SaaS? T9der tcontactina direct f [WhatsApp](https://wa.me/213000000000) wela t'réservez consultation f [Page Contact](/contact)!";
-      return new SimulationResultWrapper({ reply: sanitizeDarijaText(rawResponse) });
+      const reply = "N7atto des plateformes Next.js 15 rapides (LCP < 0.8s) w sécurisées. Rak 7ab site vitrine, e-commerce wela SaaS? Hder direct f [WhatsApp](https://wa.me/213000000000)!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
     }
 
     if (query.includes("n8n") || query.includes("أتمتة") || query.includes("اتمتة") || query.includes("automation") || query.includes("workflow")) {
-      const rawResponse =
-        "Salam! L'automatisation b n8n hiya la spécialité ta3na f Devyx:\n\n" +
-        "- Self-hosted: les workflows ta3ek f les serveurs ta3ek bla ma tkhales abonnement 3la kol tâche.\n" +
-        "- Connexion direct: nconnectiw site web ta3ek m3a CRM, WhatsApp, Google Sheets w les paiements.\n" +
-        "- Traitement instantané: les leads w les factures yrou7o direct bla ma tkharab fihom b yeddik.\n\n" +
-        "Chnouma les tâches li rak 7ab t'automatisihom? T9der tcontactina f [WhatsApp](https://wa.me/213000000000) bach ndiroulek devis gratuit w étude technique f lwe9t!";
-      return new SimulationResultWrapper({ reply: sanitizeDarijaText(rawResponse) });
+      const reply = "L'automation n8n (self-hosted) tconnecti site ta3ek m3a CRM, WhatsApp w paiements bla abonnements. Chnouma les tâches li 7ab t'automatisihom?";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
     }
 
     if (query.includes("تطبيق") || query.includes("ابليكاسيون") || query.includes("app") || query.includes("mobile") || query.includes("موبايل")) {
-      const rawResponse =
-        "Salam! Le développement mobile f Devyx fih:\n\n" +
-        "- Application unifiée: code wa7ed y'tourni native f iOS w Android.\n" +
-        "- Offline-first: l'application temchi mli7 7atta ida trisiti wela l'connexion t9at3et, w t'synchronisi ki twelli l'internet.\n" +
-        "- Sécurité: connexion b l'empreinte (biométrie) w des notifications push direct.\n\n" +
-        "T9der t'plannifi rendez-vous bach nchoufou l'projet ta3ek f [Page Contact](/contact) wela direct f [WhatsApp](https://wa.me/213000000000).";
-      return new SimulationResultWrapper({ reply: sanitizeDarijaText(rawResponse) });
+      const reply = "N'développiw des applications iOS w Android unifiées (offline-first) b Flutter w React Native. T9der t'demandi devis f [WhatsApp](https://wa.me/213000000000)!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
     }
 
-    // Default welcoming response
-    const defaultRaw =
-      "Salam w mar7ba bik f Devyx! Rani hna l'ingénieur consultant ta3ek:\n\n" +
-      "- Plateformes Web Next.js 15 ultra-rapides\n" +
-      "- Applications Mobile iOS & Android (Offline-First)\n" +
-      "- Workflows n8n autonomes (Self-Hosted)\n" +
-      "- Agents IA Gemini w qualification ta3 les leads 24/7\n\n" +
-      "Kifech n9edrou n3awnou l'projet ta3ek lyoum? T9der thder m3ana f [WhatsApp](https://wa.me/213000000000) wela t'demandi consultation f [Page Contact](/contact)!";
-    return new SimulationResultWrapper({ reply: sanitizeDarijaText(defaultRaw) });
+    const reply = "Devyx spécialiste f plateformes Next.js 15, apps mobile w automations n8n. Goulli wach ra7 t'bni wela hder m3ana f [WhatsApp](https://wa.me/213000000000)!";
+    return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
   }
 
   // French Fallback
-  if (language === "fr") {
+  if (effectiveLang === "fr") {
     if (query.includes("web") || query.includes("site")) {
       return new SimulationResultWrapper({
-        reply:
-          "Bienvenue chez **Devyx** ! Nous concevons des plateformes web haute performance basées sur **Next.js 15** et **PostgreSQL** :\n\n" +
-          "▸ **Vitesse sub-seconde** : LCP inférieur à 0.8s grâce à une mise en cache edge (ISR).\n" +
-          "▸ **Support trilingue natif** : Prise en charge RTL/LTR pour l'arabe, le français et l'anglais.\n" +
-          "▸ **Sécurité renforcée** : Protection RLS au niveau de la base de données.\n\n" +
-          "Souhaitez-vous planifier une consultation ? Contactez-nous directement sur [WhatsApp](https://wa.me/213000000000) ou via notre [Page Contact](/fr/contact).",
+        reply: "Nous développons des plateformes Next.js 15 ultra-rapides (LCP < 0.8s) avec support trilingue RTL/LTR. Décrivez votre besoin ou écrivez sur [WhatsApp](https://wa.me/213000000000).",
+      });
+    }
+    if (query.includes("n8n") || query.includes("automatisation") || query.includes("workflow")) {
+      return new SimulationResultWrapper({
+        reply: "Nous déployons des pipelines n8n auto-hébergés sans abonnement par tâche (CRM, paiements, WhatsApp). Quels processus souhaitez-vous automatiser ?",
+      });
+    }
+    if (query.includes("mobile") || query.includes("app") || query.includes("application")) {
+      return new SimulationResultWrapper({
+        reply: "Nous créons des apps mobiles unifiées iOS & Android avec support offline-first. Souhaitez-vous échanger sur votre cahier des charges sur [WhatsApp](https://wa.me/213000000000) ?",
       });
     }
     return new SimulationResultWrapper({
-      reply:
-        "Bienvenue sur le terminal technique **Devyx** ! Je suis votre consultant d'ingénierie automatisé propulsé par **Gemini AI** et **n8n**.\n\n" +
-        "Nous pouvons vous accompagner sur :\n" +
-        "▸ 🌐 Architecture de Plateformes Web modernes (Next.js 15)\n" +
-        "▸ 📱 Applications Mobiles multiplateformes (iOS & Android)\n" +
-        "▸ ⚙️ Pipelines d'Automatisation n8n auto-hébergés\n" +
-        "▸ 🤖 Agents IA de qualification et chatbots intelligents\n\n" +
-        "Quel système souhaitez-vous concevoir ? Vous pouvez également échanger sur [WhatsApp](https://wa.me/213000000000).",
+      reply: "Devyx conçoit des plateformes Next.js 15, apps mobiles et pipelines d'automatisation n8n. Comment pouvons-nous vous aider ? Échangez directement sur [WhatsApp](https://wa.me/213000000000).",
     });
   }
 
   // Arabic Fallback
-  if (language === "ar") {
+  if (effectiveLang === "ar") {
+    if (query.includes("ويب") || query.includes("موقع") || query.includes("منصة")) {
+      return new SimulationResultWrapper({
+        reply: "نبني منصات Next.js 15 فائقة الأداء (LCP < 0.8s) تدعم تعدد اللغات بأمان تام. صف لنا فكرة مشروعك أو تواصل عبر [واتساب](https://wa.me/213000000000).",
+      });
+    }
+    if (query.includes("أتمتة") || query.includes("اتمتة") || query.includes("n8n") || query.includes("مسار")) {
+      return new SimulationResultWrapper({
+        reply: "نصمم مسارات n8n مستضافة ذاتياً لربط قواعد البيانات ونقاط الدفع و CRM بدون رسوم وسيطة. ما العمليات التي ترغب في أتمتتها؟",
+      });
+    }
+    if (query.includes("تطبيق") || query.includes("موبايل") || query.includes("هاتف")) {
+      return new SimulationResultWrapper({
+        reply: "نطور تطبيقات موحدة لأنظمة iOS و Android تعمل دون اتصال (Offline-First). هل ترغب في مناقشة تفاصيل التطبيق عبر [واتساب](https://wa.me/213000000000)؟",
+      });
+    }
     return new SimulationResultWrapper({
-      reply:
-        "أهلاً بك في **ديفيكس (Devyx)**! أنا المستشار الهندسي المؤتمت المدعوم بـ **Gemini AI** و **n8n**.\n\n" +
-        "نحن متخصصون في بناء الحلول البرمجية عالية الأداء:\n" +
-        "▸ 🌐 **منصات الويب فائقة السرعة** المبنية على Next.js 15 مع تخزين سحابي متقدم (LCP < 0.8s).\n" +
-        "▸ 📱 **تطبيقات الهواتف الذكية** الموحدة لأنظمة iOS و Android مع دعم العمل دون اتصال.\n" +
-        "▸ ⚙️ **مسارات أتمتة الأعمال عبر n8n** المستقلة والمستضافة ذاتياً بدون رسوم منصات وسيطة.\n" +
-        "▸ 🤖 **وكلاء الذكاء الاصطناعي** لتأهيل العملاء وتقديم الدعم الفني على مدار الساعة.\n\n" +
-        "كيف يمكننا مساعدة مشروعك اليوم؟ يمكنك حجز استشارة مباشرة عبر [صفحة التواصل](/ar/contact) أو عبر [واتساب](https://wa.me/213000000000).",
+      reply: "أهلاً بك في Devyx! نبني منصات الويب الحديثة وتطبيقات الجوال ومسارات أتمتة n8n. كيف يمكننا مساعدتك اليوم؟ تواصل معنا عبر [واتساب](https://wa.me/213000000000).",
     });
   }
 
-  // English Default
+  // English Fallback
+  if (query.includes("web") || query.includes("site") || query.includes("next")) {
+    return new SimulationResultWrapper({
+      reply: "We engineer high-performance Next.js 15 platforms (sub-0.8s LCP) with trilingual RTL/LTR support. What web system are you planning? Let's discuss on [WhatsApp](https://wa.me/213000000000).",
+    });
+  }
+  if (query.includes("n8n") || query.includes("automation") || query.includes("workflow")) {
+    return new SimulationResultWrapper({
+      reply: "We deploy autonomous, self-hosted n8n pipelines connecting CRMs, APIs, and payments with zero per-task SaaS fees. Which workflows do you want automated?",
+    });
+  }
+  if (query.includes("mobile") || query.includes("app") || query.includes("ios") || query.includes("android")) {
+    return new SimulationResultWrapper({
+      reply: "We build unified iOS & Android mobile apps with offline-first local caching. Ready to discuss specifications on [WhatsApp](https://wa.me/213000000000)?",
+    });
+  }
   return new SimulationResultWrapper({
-    reply:
-      "Welcome to **Devyx**! I am your automated engineering consultant powered by **Gemini AI** and **n8n**.\n\n" +
-      "We specialize in deterministic software engineering across:\n" +
-      "▸ 🌐 **Web Platform Architecture**: Next.js 15 App Router, sub-0.8s LCP, trilingual RTL/LTR support.\n" +
-      "▸ 📱 **Cross-Platform Mobile Engineering**: High-performance unified apps for iOS & Android with offline-first synchronization.\n" +
-      "▸ ⚙️ **Autonomous n8n Pipelines**: Self-hosted workflow automation connecting CRMs, APIs, and payments with zero per-task SaaS tax.\n" +
-      "▸ 🤖 **Gemini AI Qualification Agents**: 24/7 intelligent qualification agents with multilingual & Darija support.\n\n" +
-      "What architectural requirements are you planning? You can also connect directly with an engineering director via [WhatsApp](https://wa.me/213000000000) or our [Contact Page](/en/contact).",
+    reply: "Welcome to Devyx! We specialize in Next.js 15 web platforms, mobile apps, and self-hosted n8n automations. Tell me about your requirements or connect on [WhatsApp](https://wa.me/213000000000).",
   });
 }

@@ -328,7 +328,7 @@ async function callGroqQwenTranslation(
       { role: "user", content: `Translate into pure Latin Arabizi Algérois:\n${englishText}` },
     ],
     temperature: 0.05,
-    max_tokens: 1024,
+    max_tokens: 350,
   };
 
   const response = await fetch(url, {
@@ -338,7 +338,7 @@ async function callGroqQwenTranslation(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(3500),
   });
 
   if (!response.ok) {
@@ -366,49 +366,43 @@ export async function translateToAlgéroisDarija(englishOrFrenchText: string): P
   let rawOutput: string | null = null;
   let usedModel = "simulation";
 
-  // Tier 1: Primary Gemini Flash
-  if (keys.geminiKey) {
-    try {
-      rawOutput = await callGeminiFlashTranslation(keys.geminiKey, englishOrFrenchText, "gemini-3.8-flash");
-      usedModel = "gemini-3.8-flash";
-    } catch (err1) {
-      console.warn("[Darija Engine] Primary Gemini Flash failed, trying fallback...", err1);
-      try {
-        rawOutput = await callGeminiFlashTranslation(keys.geminiKey, englishOrFrenchText, "gemini-3.5-flash");
-        usedModel = "gemini-3.5-flash";
-      } catch (err1b) {
-        console.warn("[Darija Engine] Gemini 3.5 Flash also failed", err1b);
-      }
-    }
-  }
-
-  // Tier 2: Secondary Gemini Flash
-  if (!rawOutput && keys.geminiSecondary) {
-    try {
-      rawOutput = await callGeminiFlashTranslation(keys.geminiSecondary, englishOrFrenchText, "gemini-3.8-flash");
-      usedModel = "gemini-secondary";
-    } catch (err2) {
-      console.warn("[Darija Engine] Secondary Gemini failed, falling back to Groq Qwen...", err2);
-    }
-  }
-
-  // Tier 3: Primary Groq Qwen 27B
-  if (!rawOutput && keys.groqKey) {
+  // Tier 1: Primary Groq Qwen 27B (Ultra-fast LPU: ~150ms)
+  if (keys.groqKey) {
     try {
       rawOutput = await callGroqQwenTranslation(keys.groqKey, englishOrFrenchText);
       usedModel = "groq-qwen-27b";
-    } catch (err3) {
-      console.warn("[Darija Engine] Primary Groq Qwen failed, trying secondary Groq...", err3);
+    } catch (err1) {
+      console.warn("[Darija Engine] Primary Groq Qwen failed, trying secondary Groq...", err1);
     }
   }
 
-  // Tier 4: Secondary Groq Qwen 27B
+  // Tier 2: Secondary Groq Qwen 27B
   if (!rawOutput && keys.groqSecondary) {
     try {
       rawOutput = await callGroqQwenTranslation(keys.groqSecondary, englishOrFrenchText);
       usedModel = "groq-qwen-secondary";
+    } catch (err2) {
+      console.warn("[Darija Engine] Secondary Groq failed, falling back to Gemini...", err2);
+    }
+  }
+
+  // Tier 3: Primary Gemini Flash (Fallback)
+  if (!rawOutput && keys.geminiKey) {
+    try {
+      rawOutput = await callGeminiFlashTranslation(keys.geminiKey, englishOrFrenchText, "gemini-3.8-flash");
+      usedModel = "gemini-3.8-flash";
+    } catch (err3) {
+      console.warn("[Darija Engine] Primary Gemini Flash failed...", err3);
+    }
+  }
+
+  // Tier 4: Secondary Gemini Flash (Fallback)
+  if (!rawOutput && keys.geminiSecondary) {
+    try {
+      rawOutput = await callGeminiFlashTranslation(keys.geminiSecondary, englishOrFrenchText, "gemini-3.8-flash");
+      usedModel = "gemini-secondary";
     } catch (err4) {
-      console.warn("[Darija Engine] Secondary Groq failed", err4);
+      console.warn("[Darija Engine] Secondary Gemini failed", err4);
     }
   }
 
@@ -453,23 +447,57 @@ export async function analyzeAttachmentMultimodal(
 
   const isDarija = targetLanguage === "darija" || targetLanguage === "ar-MA";
 
-  // Instruction prompt tailored to language
+  // Instruction prompt tailored to language with strict Devyx software engineering boundary
   const promptInstruction = isDarija
-    ? `You are the Lead Technical Architect for Devyx. Examine this ${isImage ? "image" : "document"} carefully. 
-Explain architectural insights, UI design, bugs, or system components clearly.
-${userMessage ? `User question: "${userMessage}"` : "Provide a structured breakdown of what is shown."}
-Formulate your technical answer in clean, precise language.`
+    ? `You are the AI Technical Consultant for Devyx, a software engineering agency (Next.js 15, mobile apps, self-hosted n8n automations, AI systems).
+Examine this ${isImage ? "image" : "document"}.
+${userMessage ? `User query: "${userMessage}"` : ""}
+
+CRITICAL STRICT SCOPE & BREVITY CONSTRAINTS:
+1. STRICT DEVYX SCOPE: Devyx ONLY evaluates software engineering visuals: website/app UI designs, wireframes, system architecture diagrams, database schemas, code snippets, or server error logs.
+2. OUT-OF-SCOPE REFUSAL: If this image is NOT directly related to software engineering (e.g. sports, soccer/football, match tactical screens, selfies, food, clothing, gaming memes, nature, non-tech):
+   DO NOT analyze, break down, or describe the image contents.
+   Reply IMMEDIATELY with this exact refusal:
+   "I am an AI assistant for Devyx. I only evaluate software engineering visuals like UI designs, web/mobile screenshots, architecture diagrams, and error logs. How can I assist with your software project?"
+3. MAXIMUM BREVITY: If the image IS related to software engineering, provide a rapid, concise technical takeaway in STRICTLY 1 to 3 short sentences maximum.
+   NEVER write an "Executive Summary", multi-section report, or numbered breakdown lists. Keep it rapid, punchy, and conversational.`
     : targetLanguage === "fr"
-    ? `Vous êtes l'Architecte Technique Principal de Devyx. Analysez cette ${isImage ? "image" : "pièce jointe"} technique.
-${userMessage ? `Question utilisateur : "${userMessage}"` : "Fournissez une analyse technique structurée (composants, UI, architecture, points d'attention)."}
-Répondez EXCLUSIVEMENT en Français professionnel avec puces et texte en gras.`
+    ? `Vous êtes le consultant technique IA de Devyx, agence d'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n, agents IA).
+Examinez cette ${isImage ? "image" : "pièce jointe"}.
+${userMessage ? `Question utilisateur : "${userMessage}"` : ""}
+
+CONTRAINTES STRICTES DE PÉRIMÈTRE ET DE BRIÈVETÉ :
+1. PÉRIMÈTRE DEVYX : Devyx analyse EXCLUSIVEMENT les visuels d'ingénierie logicielle : maquettes UI/UX de sites ou d'applications, schémas d'architecture système, bases de données, extraits de code ou journaux d'erreurs techniques.
+2. REFUS HORS PÉRIMÈTRE : Si cette image N'EST PAS liée à l'ingénierie logicielle (ex : sports, football, schémas tactiques de match, photos personnelles, nourriture, vêtements, mèmes, nature, etc.) :
+   NE DÉCRIVEZ PAS et n'analysez pas le contenu de l'image.
+   Répondez IMMÉDIATEMENT par ce refus en 1 à 2 phrases :
+   "Je suis l'assistant technique IA de Devyx. J'analyse uniquement les visuels d'ingénierie logicielle tels que les maquettes d'applications, schémas d'architecture et erreurs techniques. Comment puis-je vous accompagner sur votre projet digital ?"
+3. CONCISION ABSOLUE : Si l'image est liée à l'ingénierie logicielle, formulez une évaluation technique rapide en STRICTEMENT 1 à 3 phrases maximum.
+   JAMAIS de résumé exécutif, de rapport détaillé ou de listes numérotées. Soyez concis et percutant.`
     : targetLanguage === "ar"
-    ? `أنت كبير مهندسي منصة ديفيكس (Devyx). قم بفحص هذا ${isImage ? "الملف الصوري" : "المستند"}.
-${userMessage ? `استفسار المستخدم: "${userMessage}"` : "قدم تقريراً فنياً دقيقاً وموجزاً عن المحتوى التقني الظاهر."}
-أجب باللغة العربية الفصحى المنظمة.`
-    : `You are the Lead Technical Architect for Devyx. Analyze this ${isImage ? "image" : "document"}.
-${userMessage ? `User query: "${userMessage}"` : "Provide a structured engineering evaluation (UI architecture, specs, highlights)."}
-Respond in clean, professional English with Markdown formatting.`;
+    ? `أنت المستشار التقني الذكي لمنصة ديفيكس (Devyx) المتخصصة في هندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي).
+قم بفحص هذا ${isImage ? "الملف الصوري" : "المستند"}.
+${userMessage ? `استفسار المستخدم: "${userMessage}"` : ""}
+
+ضوابط صارمة لنطاق الاختصاص والإيجاز:
+1. نطاق ديفيكس البرمجي: تفحص ديفيكس حصرياً الصور المتعلقة بهندسة البرمجيات: واجهات وتصاميم المستخدم (UI/UX) للمواقع والتطبيقات، المخططات المعمارية للنظم، الشفرات البرمجية أو سجلات الأخطاء.
+2. رفض ما هو خارج النطاق: إذا كانت الصورة خارج نطاق هندسة البرمجيات (مثل مباريات كرة القدم والرياضة، الشاشات التكتيكية للمباريات، الصور الشخصية، الأطعمة، الملابس، الألعاب الترفيهية):
+   لا تقم بوصف أو تفصيل الصورة إطلاقاً.
+   اكتفِ بالرد فوراً بهذه العبارة في جملة أو جملتين:
+   "أنا المساعد التقني الذكي لـ Devyx. أقوم فقط بتحليل واجهات ومخططات البرمجيات والأخطاء التقنية. كيف يمكنني مساعدتك في مشروعك البرمجي اليوم؟"
+3. إيجاز وسرعة فائقة: إذا كانت الصورة متعلقة بالبرمجيات، قدم تقييماً مقتضباً في جملة إلى 3 جمل كحد أقصى، دون أي عناوين تفصيلية أو قوائم مرقمة مطولة.`
+    : `You are the AI technical consultant for Devyx, a software engineering agency (Next.js 15, mobile apps, self-hosted n8n automations, AI systems).
+Examine this ${isImage ? "image" : "document"}.
+${userMessage ? `User query: "${userMessage}"` : ""}
+
+CRITICAL STRICT SCOPE & BREVITY CONSTRAINTS:
+1. STRICT DEVYX SCOPE: Devyx ONLY evaluates software engineering visuals: website/app UI designs, wireframes, architecture diagrams, database schemas, code snippets, or server error logs.
+2. OUT-OF-SCOPE REFUSAL: If this image is NOT directly related to software engineering (e.g. sports, soccer/football, tactical match tracking, selfies, food, clothing, gaming memes, nature, non-tech):
+   DO NOT analyze, break down, or describe the image contents.
+   Reply IMMEDIATELY with this concise 1-2 sentence refusal:
+   "I am an AI assistant for Devyx. I only evaluate software engineering visuals like UI designs, web/mobile screenshots, architecture diagrams, and error logs. How can I assist with your software project?"
+3. MAXIMUM BREVITY: If the image IS related to software engineering, provide a rapid, concise technical takeaway in STRICTLY 1 to 3 short sentences maximum.
+   NEVER write an "Executive Summary", multi-section report, or numbered breakdown lists. Keep it rapid, punchy, and conversational.`;
 
   // Attempt Gemini Vision with Primary Key
   const tryGemini = async (key: string, model: string = "gemini-3.8-flash") => {
@@ -491,8 +519,8 @@ Respond in clean, professional English with Markdown formatting.`;
     const body = {
       contents: [{ parts }],
       generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 1200,
+        temperature: 0.15,
+        maxOutputTokens: 250,
       },
     };
 
@@ -511,41 +539,88 @@ Respond in clean, professional English with Markdown formatting.`;
     return candidateText.trim();
   };
 
+  const GEMINI_VISION_MODELS = [
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash-preview",
+    "gemini-flash-lite-latest",
+    "gemini-3.5-flash-lite",
+    "gemini-3.8-flash",
+  ];
+
   let visionResult: string | null = null;
 
   if (keys.geminiKey) {
-    try {
-      visionResult = await tryGemini(keys.geminiKey, "gemini-3.8-flash");
-    } catch (e1) {
-      console.warn("[Vision Engine] Primary Gemini 3.8 Flash failed, trying gemini-3.5-flash...", e1);
+    for (const model of GEMINI_VISION_MODELS) {
       try {
-        visionResult = await tryGemini(keys.geminiKey, "gemini-3.5-flash");
-      } catch (e1b) {
-        console.warn("[Vision Engine] Gemini 3.5 Flash failed", e1b);
+        visionResult = await tryGemini(keys.geminiKey, model);
+        if (visionResult) break;
+      } catch (e1) {
+        console.warn(`[Vision Engine] Primary Gemini (${model}) failed:`, (e1 as Error).message);
       }
     }
   }
 
-  if (!visionResult && keys.geminiSecondary) {
-    try {
-      visionResult = await tryGemini(keys.geminiSecondary, "gemini-3.8-flash");
-    } catch (e2) {
-      console.warn("[Vision Engine] Secondary Gemini failed", e2);
+  if (!visionResult && keys.geminiSecondary && keys.geminiSecondary !== keys.geminiKey) {
+    for (const model of GEMINI_VISION_MODELS) {
+      try {
+        visionResult = await tryGemini(keys.geminiSecondary, model);
+        if (visionResult) break;
+      } catch (e2) {
+        console.warn(`[Vision Engine] Secondary Gemini (${model}) failed:`, (e2 as Error).message);
+      }
     }
   }
 
-  // Fallback to Groq Qwen if Gemini vision fails
-  if (!visionResult && (keys.groqKey || keys.groqSecondary)) {
+  // Helper to attempt Groq vision or context-based analysis
+  const tryGroqVision = async (key: string, label: string) => {
     try {
-      const groqKey = keys.groqKey || keys.groqSecondary!;
+      if (isImage && attachment.data) {
+        try {
+          const visionRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${key}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "llama-3.2-11b-vision-preview",
+              messages: [
+                {
+                  role: "user",
+                  content: [
+                    { type: "text", text: promptInstruction },
+                    {
+                      type: "image_url",
+                      image_url: {
+                        url: `data:${attachment.type};base64,${attachment.data}`,
+                      },
+                    },
+                  ],
+                },
+              ],
+              temperature: 0.15,
+              max_tokens: 250,
+            }),
+            signal: AbortSignal.timeout(10000),
+          });
+          if (visionRes.ok) {
+            const vJson = await visionRes.json();
+            const vText = vJson.choices?.[0]?.message?.content?.trim();
+            if (vText) return vText;
+          }
+        } catch (eVision) {
+          console.warn(`[Vision Engine] ${label} llama vision attempt failed:`, eVision);
+        }
+      }
+
       const textContext = `The user uploaded an attachment named "${attachment.name}" (${attachment.type}, ${(attachment.size ? attachment.size / 1024 : 0).toFixed(0)} KB).
-User Message: "${userMessage || 'Please review this system specification.'}"
-As Devyx's Technical Consultant, acknowledge the upload and provide architectural guidance based on the filename and context.`;
+User Message: "${userMessage || 'Please review this software project asset.'}"
+Prompt Instruction: ${promptInstruction}`;
 
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${groqKey}`,
+          Authorization: `Bearer ${key}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -554,22 +629,40 @@ As Devyx's Technical Consultant, acknowledge the upload and provide architectura
             { role: "system", content: "You are the Senior Technical Consultant for Devyx software engineering agency." },
             { role: "user", content: textContext },
           ],
-          temperature: 0.1,
-          max_tokens: 800,
+          temperature: 0.15,
+          max_tokens: 250,
         }),
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(8000),
       });
 
       if (response.ok) {
         const json = await response.json();
-        visionResult = json.choices?.[0]?.message?.content || null;
+        return json.choices?.[0]?.message?.content?.trim() || null;
+      } else {
+        console.warn(`[Vision Engine] ${label} failed with status`, response.status);
       }
     } catch (eGroq) {
-      console.warn("[Vision Engine] Groq fallback error", eGroq);
+      console.warn(`[Vision Engine] ${label} error`, eGroq);
     }
+    return null;
+  };
+
+  // Fallback Tier 3: Primary Groq
+  if (!visionResult && keys.groqKey) {
+    visionResult = await tryGroqVision(keys.groqKey, "Groq Primary");
+  }
+
+  // Fallback Tier 4: Secondary Groq
+  if (!visionResult && keys.groqSecondary && keys.groqSecondary !== keys.groqKey) {
+    visionResult = await tryGroqVision(keys.groqSecondary, "Groq Secondary");
   }
 
   if (!visionResult) return null;
+
+  // Cleanup: if model produced an "Executive Summary" header, strip it cleanly
+  visionResult = visionResult
+    .replace(/^#+\s*(?:Executive Summary|Summary|Analysis|Overview)[:\s]*/i, "")
+    .trim();
 
   // If target language is Darija, translate the vision analysis into Native Algérois Arabizi!
   if (isDarija) {

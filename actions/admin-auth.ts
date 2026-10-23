@@ -30,8 +30,9 @@ export async function adminLogin(formData: FormData): Promise<AdminAuthResult> {
     });
 
     if (error) {
-      // Local development fallback if live Supabase project is not yet configured
+      // Local development fallback if live Supabase project is not yet configured (development only)
       if (
+        process.env.NODE_ENV === "development" &&
         (process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("placeholder") ||
           !process.env.SUPABASE_SERVICE_ROLE_KEY) &&
         email === "admin@devyx.com" &&
@@ -40,7 +41,7 @@ export async function adminLogin(formData: FormData): Promise<AdminAuthResult> {
         const cookieStore = await cookies();
         cookieStore.set("devyx_dev_admin_session", "authenticated", {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
+          secure: false,
           sameSite: "lax",
           path: "/",
           maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -63,12 +64,16 @@ export async function adminLogin(formData: FormData): Promise<AdminAuthResult> {
 
     return { success: true };
   } catch (err: any) {
-    // Check dev fallback
-    if (email === "admin@devyx.com" && password === "admin123") {
+    // Check dev fallback (development only)
+    if (
+      process.env.NODE_ENV === "development" &&
+      email === "admin@devyx.com" &&
+      password === "admin123"
+    ) {
       const cookieStore = await cookies();
       cookieStore.set("devyx_dev_admin_session", "authenticated", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: false,
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
@@ -129,7 +134,8 @@ export async function getAdminSession(): Promise<AdminSession> {
     // Supabase auth client may fail in local stub
   }
 
-  if (devSession === "authenticated") {
+  // Only accept dev fallback session cookie in development mode
+  if (process.env.NODE_ENV === "development" && devSession === "authenticated") {
     return {
       authenticated: true,
       email: "admin@devyx.com",

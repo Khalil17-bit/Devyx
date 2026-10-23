@@ -17,8 +17,6 @@ import {
   Sparkles,
   Mic,
   MicOff,
-  Moon,
-  Sun,
   FolderKanban,
   Calculator,
   UserCheck,
@@ -31,8 +29,10 @@ import {
   XCircle,
   Bell,
   AlertTriangle,
+  Pencil,
 } from "lucide-react";
 import type { JarvisAction, HandoffData, EstimateData } from "@/lib/ai/assistant-context";
+import { ImageMarkupModal } from "./image-markup-modal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,16 +56,29 @@ interface ChatMessage {
   handoff?: HandoffData;
   estimate?: EstimateData;
   attachmentPreview?: { name: string; type: string; previewUrl?: string };
-  tokenBudget?: { dailyRemaining: number; sessionRemaining: number };
+  tokenBudget?: {
+    hourlyRemaining?: number;
+    sessionRemaining: number;
+    hourlyLimit?: number;
+    resetsInMinutes?: number;
+    dailyRemaining?: number;
+  };
 }
 
 const STORAGE_KEY = "devyx_ai_chat_session_v3";
 
-type ChatLanguage = "darija" | "ar" | "fr" | "en";
+type ChatLanguage = "auto" | "darija" | "ar" | "fr" | "en";
 
 // ─── Static Content ───────────────────────────────────────────────────────────
 
 const STARTER_PROMPTS: Record<ChatLanguage, string[]> = {
+  auto: [
+    "🌐 Next.js 15 Web Platform Architecture",
+    "⚙️ n8n Workflow Automation (Zero SaaS Tax)",
+    "📱 Mobile App Development (iOS & Android)",
+    "💰 Estimer le Coût & Délais de mon Projet",
+    "📁 وريني مشاريع ديفيكس السابقة",
+  ],
   darija: [
     "🌐 سيت ويب لشركتي بـ Next.js 15",
     "⚙️ أتمتة الخدمة بـ n8n (Workflows)",
@@ -105,30 +118,24 @@ const STARTER_PROMPTS: Record<ChatLanguage, string[]> = {
 };
 
 const WELCOME_MESSAGES: Record<ChatLanguage, string> = {
-  darija:
-    "مرحبا بيك فـ ديفيكس (**Devyx Jarvis Copilot**)! 👋\n\nأنا المساعد التقني الذكي ديالك. عندي تحكم كامل فـ الموقع نقدر:\n" +
-    "- 🎨 **نبدل لـ Dark/Light mode**\n" +
-    "- 📁 **نفتحلك صفحات المشاريع والخدمات**\n" +
-    "- 💰 **نحسبلك دوفيز وتقدير فوري للمشروع**\n" +
-    "- 🚨 **نصيفط تقرير لمجموعة تيليجرام باش يتواصل معاك مهندس بشري**\n" +
-    "- 📎 **تقدر ترسل لي صور أو ملفات PDF وغادي نحللهم**\n\n" +
-    "فاش نقدر نعاونك اليوم؟ تواصل معايا بالكتابة، الصوت، أو بإرسال ملف!",
-  ar: "أهلاً بك في نظام **ديفيكس الذكي (Devyx Jarvis)**. أنا مهندسك الاستشاري المؤتمت ومزود بصلاحيات التحكم في المنصة:\n- 🎨 تفعيل الوضع الداكن أو الفاتح\n- 📁 التوجيه الفوري لصفحات المشاريع والخدمات\n- 💰 حساب تقدير أولي للتكلفة والجدول الزمني\n- 🚨 إرسال إشعار فوري لفريق الإدارة عبر Telegram عند طلب استشارة بشرية\n- 📎 تحليل الصور والملفات المرفقة\n\nكيف يمكننا خدمة مشروعكم اليوم؟",
-  fr: "Bienvenue sur le terminal **Devyx Jarvis Copilot**. Je suis votre assistant d'ingénierie doté d'un contrôle direct sur la plateforme :\n- 🎨 Basculer entre Dark et Light mode\n- 📁 Naviguer instantanément vers les Projets ou Services\n- 💰 Générer une estimation technique et budgétaire en temps réel\n- 🚨 Déclencher une alerte Telegram prioritaire pour parler à un ingénieur humain\n- 📎 Analyser vos images ou fichiers PDF joints\n\nComment puis-je orienter votre projet aujourd'hui ?",
-  en: "Welcome to the **Devyx Jarvis Copilot**. I am your automated engineering consultant with direct platform control:\n- 🎨 Toggle Dark / Light mode on demand\n- 📁 Smoothly navigate to Projects, Services or Contact\n- 💰 Compute instant preliminary cost & timeline estimates\n- 🚨 Dispatch an executive Telegram alert to connect you with a human engineer\n- 📎 Analyze attached images and PDF files\n\nWhat system requirements are you planning to engineer?",
+  auto: "Salam / Hello! 👋 I'm your Devyx AI assistant. Talk to me in English, Français, العربية, or بالدارجة — I will automatically reply in your language!",
+  darija: "Salam! 👋 Ana l'assistant technique IA ta3 Devyx. Kifech n9der n3awnek f l'projet ta3ek lyoum?",
+  ar: "مرحباً بك! 👋 أنا المساعد التقني الذكي لـ Devyx. كيف يمكنني مساعدتك في مشروعك اليوم؟",
+  fr: "Bonjour ! 👋 Je suis votre assistant technique IA chez Devyx. Comment puis-je vous aider sur votre projet ?",
+  en: "Hey there! 👋 I'm your Devyx AI assistant. How can I assist with your software project today?",
 };
 
 const PLACEHOLDER_TEXT: Record<ChatLanguage, string> = {
+  auto: "Auto (English, Français, الدارجة, العربية)...",
   darija: "كتب رسالتك بالدارجة، العربية، الفرنسية أو الإنجليزية...",
-  ar: "اكتب تفاصيل النظام المطلوب (بحد أقصى 1500 حرف)...",
-  fr: "Décrivez votre projet (max 1 500 caractères)...",
-  en: "Describe system requirements (max 1,500 chars)...",
+  ar: "اكتب رسالتك هنا...",
+  fr: "Écrivez votre message ici...",
+  en: "Type your message here...",
 };
 
-// Max file sizes in bytes
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
-const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10 MB
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+// Strict file limits: PNG and JPEG/WEBP only, 2 MB max
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 // ─── Markdown Renderer ────────────────────────────────────────────────────────
 
@@ -137,7 +144,8 @@ function RenderMarkdown({ text }: { text: string }) {
 
   const parseInline = (lineText: string): React.ReactNode[] => {
     const tokens: React.ReactNode[] = [];
-    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g;
+    // Match both markdown [Label](url) and raw URLs http(s)://...
+    const linkRegex = /\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\s)]+)\)|(https?:\/\/[^\s<]+)/g;
     let lastIndex = 0;
     let match;
 
@@ -149,11 +157,21 @@ function RenderMarkdown({ text }: { text: string }) {
           content: lineText.substring(lastIndex, match.index),
         });
       }
-      processedSegments.push({
-        type: "link",
-        content: match[1],
-        url: match[2],
-      });
+      if (match[1] && match[2]) {
+        // Markdown [Label](url)
+        processedSegments.push({
+          type: "link",
+          content: match[1],
+          url: match[2],
+        });
+      } else if (match[3]) {
+        // Raw URL https://...
+        processedSegments.push({
+          type: "link",
+          content: match[3],
+          url: match[3],
+        });
+      }
       lastIndex = linkRegex.lastIndex;
     }
     if (lastIndex < lineText.length) {
@@ -171,10 +189,10 @@ function RenderMarkdown({ text }: { text: string }) {
             href={segment.url}
             target={segment.url?.startsWith("http") ? "_blank" : undefined}
             rel={segment.url?.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="text-accent-primary font-semibold underline underline-offset-2 hover:text-accent-signal inline-flex items-center gap-0.5"
+            className="text-accent-primary font-bold underline underline-offset-2 hover:text-accent-signal cursor-pointer inline-flex items-center gap-1 transition-colors"
           >
             <span>{segment.content}</span>
-            {segment.url?.startsWith("http") && <ArrowUpRight className="w-3 h-3 inline" />}
+            {segment.url?.startsWith("http") && <ArrowUpRight className="w-3 h-3 inline flex-shrink-0" />}
           </a>
         );
       } else {
@@ -237,6 +255,62 @@ function RenderMarkdown({ text }: { text: string }) {
   );
 }
 
+/**
+ * 5-sided continuous vector border for 40x40 chamfered buttons.
+ * Guarantees that the 45-degree diagonal corner cut lights up seamlessly on hover.
+ */
+function ChamferButtonBorder({
+  className = "text-border-grid group-hover:text-accent-primary",
+  active = false,
+}: {
+  className?: string;
+  active?: boolean;
+}) {
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none rtl:-scale-x-100 z-10 overflow-visible"
+      viewBox="0 0 40 40"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M 0.5 0.5 L 39.5 0.5 L 39.5 29.5 L 29.5 39.5 L 0.5 39.5 Z"
+        stroke="currentColor"
+        strokeWidth="1"
+        className={`transition-colors duration-150 ${className} ${active ? "!text-accent-primary" : ""}`}
+      />
+    </svg>
+  );
+}
+
+/**
+ * Diagonal cut border line for variable-sized chamfered elements.
+ * Connects the bottom and right borders across the 45-degree chamfer cut.
+ */
+function ChamferCornerLine({
+  className = "text-border-grid group-hover:text-accent-primary",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg
+      className={`absolute bottom-0 right-0 w-[10px] h-[10px] pointer-events-none rtl:right-auto rtl:left-0 rtl:-scale-x-100 overflow-visible z-10 transition-colors duration-150 ${className}`}
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden="true"
+    >
+      <line
+        x1="0"
+        y1="10"
+        x2="10"
+        y2="0"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
 export function ChatWidget() {
@@ -246,6 +320,7 @@ export function ChatWidget() {
   const pathname = usePathname();
 
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isBooting, setIsBooting] = React.useState(false);
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = React.useState("");
   const [sessionId, setSessionId] = React.useState("");
@@ -255,31 +330,46 @@ export function ChatWidget() {
   const [showProactiveBubble, setShowProactiveBubble] = React.useState(false);
   const [attachment, setAttachment] = React.useState<AttachmentPreview | null>(null);
   const [attachmentError, setAttachmentError] = React.useState<string | null>(null);
+  const [isMarkupModalOpen, setIsMarkupModalOpen] = React.useState(false);
+  const [lightboxImage, setLightboxImage] = React.useState<{ url: string; name: string } | null>(null);
 
   // Token budget state (shown in footer)
   const [tokenBudget, setTokenBudget] = React.useState<{
-    dailyRemaining: number;
+    hourlyRemaining?: number;
     sessionRemaining: number;
+    hourlyLimit?: number;
+    resetsInMinutes?: number;
+    dailyRemaining?: number;
   } | null>(null);
 
   // Queue notification
   const [queueNotice, setQueueNotice] = React.useState<string | null>(null);
 
-  const [selectedLanguage, setSelectedLanguage] = React.useState<ChatLanguage>(
-    pageLocale === "ar" ? "darija" : pageLocale === "fr" ? "fr" : "en"
-  );
+  // Anti-spam token pacing cooldown (seconds)
+  const [cooldownRemaining, setCooldownRemaining] = React.useState(0);
+  const cooldownTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Voice recording & Whisper transcription
+  const [isTranscribing, setIsTranscribing] = React.useState(false);
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const audioChunksRef = React.useRef<Blob[]>([]);
+
+  const [selectedLanguage, setSelectedLanguage] = React.useState<ChatLanguage>("auto");
 
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const speechRecognitionRef = React.useRef<any>(null);
+  const queueTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // ── Sync language when page locale changes ──────────────────────────────────
+  // ── Clear queue timeout on unmount ──────────────────────────────────────────
   React.useEffect(() => {
-    const derived: ChatLanguage =
-      pageLocale === "ar" ? "darija" : pageLocale === "fr" ? "fr" : "en";
-    setSelectedLanguage(derived);
-  }, [pageLocale]);
+    return () => {
+      if (queueTimeoutRef.current) {
+        clearTimeout(queueTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // ── Restore or initialize session from localStorage ─────────────────────────
   React.useEffect(() => {
@@ -303,8 +393,7 @@ export function ChatWidget() {
     }
 
     const newSessionId = crypto.randomUUID();
-    const initialLang: ChatLanguage =
-      pageLocale === "ar" ? "darija" : pageLocale === "fr" ? "fr" : "en";
+    const initialLang: ChatLanguage = "auto";
     setSelectedLanguage(initialLang);
 
     const initialMessage: ChatMessage = {
@@ -324,7 +413,7 @@ export function ChatWidget() {
     } catch {
       // Non-blocking storage
     }
-  }, [pageLocale]);
+  }, []);
 
   // ── Persist messages & language ─────────────────────────────────────────────
   React.useEffect(() => {
@@ -357,6 +446,17 @@ export function ChatWidget() {
     return () => clearTimeout(timer);
   }, [isOpen, messages.length]);
 
+  // ── Futuristic HUD Boot Trigger ─────────────────────────────────────────────
+  React.useEffect(() => {
+    if (isOpen) {
+      setIsBooting(true);
+      const timer = setTimeout(() => {
+        setIsBooting(false);
+      }, 750);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   // ── Global event listener for opening chat from CTA buttons ─────────────────
   React.useEffect(() => {
     function handleOpenChat(e: Event) {
@@ -388,24 +488,43 @@ export function ChatWidget() {
             case "SET_THEME":
               if (act.payload === "dark" || act.payload === "light") {
                 setTheme(act.payload);
-                setActionNotice(`🎨 Jarvis: Theme set to ${act.payload.toUpperCase()}`);
+                setActionNotice(`🎨 Theme set to ${act.payload.toUpperCase()}`);
                 setTimeout(() => setActionNotice(null), 3500);
               }
               break;
 
             case "NAVIGATE":
               if (typeof act.payload === "string" && act.payload.startsWith("/")) {
-                router.push(act.payload);
-                setActionNotice(`📁 Jarvis: Navigated to ${act.payload}`);
+                let targetPath = act.payload;
+                const localeMatch = targetPath.match(/^\/(?:en|fr|ar)(\/.*)?$/);
+                if (localeMatch) {
+                  targetPath = localeMatch[1] || "/";
+                }
+                router.push(targetPath);
+                setActionNotice(`📁 Navigated to ${targetPath}`);
                 setTimeout(() => setActionNotice(null), 3500);
               }
               break;
 
             case "SET_LOCALE":
-              if (act.payload === "ar" || act.payload === "fr" || act.payload === "en") {
-                router.replace(pathname, { locale: act.payload });
-                setSelectedLanguage(act.payload === "ar" ? "darija" : act.payload);
-                setActionNotice(`🌐 Jarvis: Language switched to ${act.payload.toUpperCase()}`);
+              if (
+                act.payload === "ar" ||
+                act.payload === "fr" ||
+                act.payload === "en" ||
+                act.payload === "darija"
+              ) {
+                const targetLang = act.payload as ChatLanguage;
+                setSelectedLanguage(targetLang);
+                if (targetLang === "ar" || targetLang === "fr" || targetLang === "en") {
+                  router.replace(pathname, { locale: targetLang });
+                }
+                const langLabels: Record<string, string> = {
+                  darija: "🇩🇿 DARIJA",
+                  fr: "FRANÇAIS 🇫🇷",
+                  en: "ENGLISH 🇬🇧",
+                  ar: "العربية 🇸🇦",
+                };
+                setActionNotice(`🌐 Language mode switched to ${langLabels[targetLang] || targetLang.toUpperCase()}`);
                 setTimeout(() => setActionNotice(null), 3500);
               }
               break;
@@ -441,29 +560,26 @@ export function ChatWidget() {
 
     setAttachmentError(null);
 
-    // Type validation
+    // Type validation (Images only: PNG, JPEG, WEBP)
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setAttachmentError(
         selectedLanguage === "fr"
-          ? "Format non supporté. Acceptés : JPG, PNG, WEBP, GIF, PDF."
+          ? "Format non supporté. Seules les images (PNG, JPG, WEBP) sont acceptées."
           : selectedLanguage === "darija" || selectedLanguage === "ar"
-          ? "الملف غير مدعوم. المقبول: JPG, PNG, WEBP, GIF, PDF."
-          : "Unsupported format. Accepted: JPG, PNG, WEBP, GIF, PDF."
+          ? "الملف غير مدعوم. المقبول: صور فقط (PNG أو JPG)."
+          : "Unsupported format. Only PNG, JPG, or WEBP images are accepted."
       );
       return;
     }
 
-    // Size validation
-    const isImage = file.type.startsWith("image/");
-    const maxSize = isImage ? MAX_IMAGE_SIZE : MAX_PDF_SIZE;
-    if (file.size > maxSize) {
-      const limit = isImage ? "5MB" : "10MB";
+    // Size validation (2MB ceiling)
+    if (file.size > MAX_FILE_SIZE) {
       setAttachmentError(
         selectedLanguage === "fr"
-          ? `Fichier trop volumineux. Limite : ${limit}.`
+          ? "Image trop volumineuse. Limite maximale : 2MB."
           : selectedLanguage === "darija" || selectedLanguage === "ar"
-          ? `الملف كبير بزاف. الحد الأقصى: ${limit}.`
-          : `File too large. Maximum size: ${limit}.`
+          ? "الصورة كبيرة بزاف. الحد الأقصى: 2MB."
+          : "Image too large. Maximum size is 2MB."
       );
       return;
     }
@@ -482,6 +598,7 @@ export function ChatWidget() {
     });
 
     // Generate preview URL for images
+    const isImage = file.type.startsWith("image/");
     let previewUrl: string | undefined;
     if (isImage) {
       previewUrl = URL.createObjectURL(file);
@@ -498,28 +615,119 @@ export function ChatWidget() {
   }
 
   function clearAttachment() {
-    if (attachment?.previewUrl) {
-      URL.revokeObjectURL(attachment.previewUrl);
+    if (attachment?.previewUrl && !attachment.previewUrl.startsWith("data:")) {
+      try {
+        URL.revokeObjectURL(attachment.previewUrl);
+      } catch {}
     }
     setAttachment(null);
     setAttachmentError(null);
   }
 
+  function handleMarkupApply(annotatedBase64: string) {
+    if (!attachment) return;
+    const dataUrl = `data:image/png;base64,${annotatedBase64}`;
+    const estimatedSize = Math.round((annotatedBase64.length * 3) / 4);
+
+    setAttachment({
+      ...attachment,
+      base64: annotatedBase64,
+      previewUrl: dataUrl,
+      type: "image/png",
+      size: estimatedSize,
+      name: attachment.name.replace(/\.[^/.]+$/, "") + "-annotated.png",
+    });
+    setActionNotice("✏️ Image markup applied! Ready to send.");
+    setTimeout(() => setActionNotice(null), 3000);
+  }
+
   // ── Voice Recording ──────────────────────────────────────────────────────────
-  function toggleVoiceRecording() {
+  async function toggleVoiceRecording() {
     if (isListening) {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
       if (speechRecognitionRef.current) {
-        speechRecognitionRef.current.stop();
+        try { speechRecognitionRef.current.stop(); } catch {}
       }
       setIsListening(false);
       return;
     }
 
+    // Attempt MediaRecorder + /api/transcribe (Whisper AI / Gemini Audio)
+    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunksRef.current = [];
+        const mimeType =
+          typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
+            ? "audio/webm"
+            : typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : "audio/wav";
+
+        const recorder = new MediaRecorder(stream, { mimeType });
+        mediaRecorderRef.current = recorder;
+
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        recorder.onstop = async () => {
+          stream.getTracks().forEach((track) => track.stop());
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+          if (audioBlob.size < 200) return;
+
+          setIsTranscribing(true);
+          setActionNotice("🎙️ Transcribing voice note (Whisper AI)...");
+
+          try {
+            const formData = new FormData();
+            formData.append("file", audioBlob, `voice_note.${mimeType.split("/")[1] || "webm"}`);
+
+            const res = await fetch("/api/transcribe", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              if (data.text?.trim()) {
+                setInputMessage((prev) => (prev ? prev + " " + data.text.trim() : data.text.trim()));
+                setActionNotice(`✨ Voice transcribed (${data.provider || "Whisper"})`);
+                setTimeout(() => setActionNotice(null), 2500);
+              }
+            } else {
+              setActionNotice("⚠️ Transcription service unavailable.");
+              setTimeout(() => setActionNotice(null), 3000);
+            }
+          } catch (transcribeErr) {
+            console.warn("[Transcribe Upload Error]", transcribeErr);
+            setActionNotice("⚠️ Failed to transcribe audio.");
+            setTimeout(() => setActionNotice(null), 3000);
+          } finally {
+            setIsTranscribing(false);
+            setTimeout(() => inputRef.current?.focus(), 100);
+          }
+        };
+
+        recorder.start();
+        setIsListening(true);
+        setActionNotice("🎙️ Recording... Click mic again when done.");
+        return;
+      } catch (mediaErr) {
+        console.warn("[MediaRecorder Audio Init Failure, falling back to Web Speech API]", mediaErr);
+      }
+    }
+
+    // Fallback: Web Speech API
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setActionNotice("⚠️ Speech Recognition not supported in this browser.");
+      setActionNotice("⚠️ Voice input not supported in this browser.");
       setTimeout(() => setActionNotice(null), 3500);
       return;
     }
@@ -536,7 +744,9 @@ export function ChatWidget() {
           ? "ar-DZ"
           : selectedLanguage === "fr"
           ? "fr-FR"
-          : "en-US";
+          : selectedLanguage === "en"
+          ? "en-US"
+          : (typeof navigator !== "undefined" && navigator.language ? navigator.language : "en-US");
 
       recognition.onstart = () => {
         setIsListening(true);
@@ -573,6 +783,9 @@ export function ChatWidget() {
   // ── Language Change ──────────────────────────────────────────────────────────
   function handleLanguageChange(newLang: ChatLanguage) {
     setSelectedLanguage(newLang);
+    if (newLang === "ar" || newLang === "fr" || newLang === "en") {
+      router.replace(pathname, { locale: newLang });
+    }
     if (messages.length <= 1) {
       const updatedWelcome: ChatMessage = {
         id: "initial-welcome",
@@ -585,39 +798,87 @@ export function ChatWidget() {
   }
 
   // ── Send Message ─────────────────────────────────────────────────────────────
-  async function sendMessage(textToSend?: string) {
+  async function sendMessage(
+    textToSend?: string,
+    options?: { isRetry?: boolean; retryCount?: number; retryAttachment?: AttachmentPreview }
+  ) {
     const rawText = textToSend !== undefined ? textToSend : inputMessage;
     const trimmed = rawText.trim();
+    const isRetry = options?.isRetry ?? false;
+    const retryCount = options?.retryCount ?? 0;
+    const activeAttachment = options?.retryAttachment ?? attachment;
+
+    // Anti-spam cooldown gate: block rapid-fire message spam to preserve token budget
+    if (cooldownRemaining > 0 && !isRetry) {
+      setActionNotice(`⏳ Pacing: Please wait ${cooldownRemaining}s before sending.`);
+      setTimeout(() => setActionNotice(null), 2000);
+      return;
+    }
 
     // Need either text or attachment
-    if ((!trimmed && !attachment) || isLoading) return;
+    if ((!trimmed && !activeAttachment) || (isLoading && !isRetry)) return;
 
-    // Build user message for display
-    const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
-      sender: "user",
-      text: trimmed || `📎 ${attachment!.name}`,
-      timestamp: new Date().toISOString(),
-      attachmentPreview: attachment
-        ? { name: attachment.name, type: attachment.type, previewUrl: attachment.previewUrl }
-        : undefined,
-    };
+    // Build user message for display on initial dispatch (not on background queue retries)
+    if (!isRetry) {
+      const userMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        sender: "user",
+        text: trimmed || `📎 ${activeAttachment!.name}`,
+        timestamp: new Date().toISOString(),
+        attachmentPreview: activeAttachment
+          ? {
+              name: activeAttachment.name,
+              type: activeAttachment.type,
+              previewUrl: activeAttachment.base64
+                ? `data:${activeAttachment.type};base64,${activeAttachment.base64}`
+                : activeAttachment.previewUrl,
+            }
+          : undefined,
+      };
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInputMessage("");
+      setMessages((prev) => [...prev, userMessage]);
+      setInputMessage("");
+    }
+
     setIsLoading(true);
-    setQueueNotice(null);
 
-    const currentAttachment = attachment;
-    clearAttachment();
+    // Anti-spam token pacing: 1-second debounce cooldown
+    if (!isRetry) {
+      if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+      setCooldownRemaining(1);
+      cooldownTimerRef.current = setInterval(() => {
+        setCooldownRemaining((prev) => {
+          if (prev <= 1) {
+            if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    const currentAttachment = activeAttachment;
+    if (!isRetry) {
+      clearAttachment();
+    }
 
     try {
+      // Extract recent conversation history for memory (last 10 turns, excluding failed/queued/initial-welcome)
+      const history = messages
+        .filter((m) => m.text && !m.failed && !m.queued && m.id !== "initial-welcome")
+        .slice(-10)
+        .map((m) => ({
+          role: (m.sender === "user" ? "user" : "assistant") as "user" | "assistant",
+          content: m.text.slice(0, 2000),
+        }));
+
       const body: Record<string, any> = {
         sessionId,
         message: trimmed,
         language: selectedLanguage,
         currentPage: window.location.pathname,
         theme: resolvedTheme === "light" ? "light" : "dark",
+        history,
       };
 
       if (currentAttachment) {
@@ -644,24 +905,64 @@ export function ChatWidget() {
 
       // Handle queued response (202)
       if (response.status === 202 && data.queued) {
+        const waitSec = Math.max(1, Math.round((data.estimatedWaitMs || 1200) / 1000));
         const queueMsg =
           selectedLanguage === "darija"
-            ? `⏳ كاين ${data.queuePosition} مستخدم قدامك — Jarvis غادي يجاوبك فـ دورتك`
+            ? `⏳ كاين ${data.queuePosition} فـ الطابور — غادي نجاوبك فـ ~${waitSec} ثواني`
             : selectedLanguage === "fr"
-            ? `⏳ ${data.queuePosition} utilisateur(s) avant vous — Jarvis répond dès que possible`
-            : `⏳ ${data.queuePosition} user(s) ahead — Jarvis will respond when it's your turn`;
+            ? `⏳ En file d'attente (position #${data.queuePosition}) — réponse dans ~${waitSec}s`
+            : `⏳ In queue (Position #${data.queuePosition}) — processing in ~${waitSec}s`;
         setQueueNotice(queueMsg);
 
-        const queuedBotMsg: ChatMessage = {
-          id: crypto.randomUUID(),
-          sender: "assistant",
-          text: data.reply,
-          timestamp: new Date().toISOString(),
-          queued: true,
-        };
-        setMessages((prev) => [...prev, queuedBotMsg]);
-        setIsLoading(false);
+        // Display or update the queued notice placeholder in chat
+        setMessages((prev) => {
+          const hasQueued = prev.some((m) => m.queued);
+          if (hasQueued) {
+            return prev.map((m) => (m.queued ? { ...m, text: data.reply } : m));
+          }
+          const queuedBotMsg: ChatMessage = {
+            id: crypto.randomUUID(),
+            sender: "assistant",
+            text: data.reply,
+            timestamp: new Date().toISOString(),
+            queued: true,
+          };
+          return [...prev, queuedBotMsg];
+        });
+
+        // Automatically schedule polling retry after wait estimate (up to 8 retries)
+        if (queueTimeoutRef.current) clearTimeout(queueTimeoutRef.current);
+        const retryDelay = Math.min(8000, Math.max(1000, data.estimatedWaitMs || 1200));
+        if (retryCount < 8) {
+          queueTimeoutRef.current = setTimeout(() => {
+            sendMessage(trimmed, {
+              isRetry: true,
+              retryCount: retryCount + 1,
+              retryAttachment: currentAttachment || undefined,
+            });
+          }, retryDelay);
+        }
+
         return;
+      }
+
+      // Automatic retry with backoff on transient 429 concurrency spikes
+      if (response.status === 429 && data.error === "RATE_LIMIT_EXCEEDED" && retryCount < 3) {
+        setActionNotice("⏳ Server traffic peak. Auto-retrying in 2s...");
+        setTimeout(() => {
+          sendMessage(trimmed, {
+            isRetry: true,
+            retryCount: retryCount + 1,
+            retryAttachment: currentAttachment || undefined,
+          });
+        }, 2000);
+        return;
+      }
+
+      // Clear any active queue polling timeout
+      if (queueTimeoutRef.current) {
+        clearTimeout(queueTimeoutRef.current);
+        queueTimeoutRef.current = null;
       }
 
       if (!response.ok && !data.reply) {
@@ -682,7 +983,14 @@ export function ChatWidget() {
         tokenBudget: data.tokenBudget,
       };
 
-      setMessages((prev) => [...prev, botMessage]);
+      // If there was a queued placeholder message, swap it with the resolved response
+      setMessages((prev) => {
+        const hasQueued = prev.some((m) => m.queued);
+        if (hasQueued) {
+          return prev.map((m) => (m.queued ? botMessage : m));
+        }
+        return [...prev, botMessage];
+      });
 
       // Execute any Jarvis actions returned
       if (data.actions) {
@@ -693,14 +1001,20 @@ export function ChatWidget() {
       if (queueNotice) {
         setActionNotice(
           selectedLanguage === "darija"
-            ? "✅ Jarvis جاوبك — اقرأ الجواب أسفل!"
+            ? "✅ تم استلام الرد — اقرأ الجواب أسفل!"
             : selectedLanguage === "fr"
-            ? "✅ Jarvis a répondu !"
-            : "✅ Jarvis responded!"
+            ? "✅ L'assistant a répondu !"
+            : "✅ AI Assistant responded!"
         );
         setTimeout(() => setActionNotice(null), 4000);
       }
     } catch {
+      if (queueTimeoutRef.current) {
+        clearTimeout(queueTimeoutRef.current);
+        queueTimeoutRef.current = null;
+      }
+      setQueueNotice(null);
+
       const errorMessage: ChatMessage = {
         id: crypto.randomUUID(),
         sender: "assistant",
@@ -723,6 +1037,10 @@ export function ChatWidget() {
   }
 
   function handleResetChat() {
+    if (queueTimeoutRef.current) {
+      clearTimeout(queueTimeoutRef.current);
+      queueTimeoutRef.current = null;
+    }
     const newSessionId = crypto.randomUUID();
     const initialMessage: ChatMessage = {
       id: crypto.randomUUID(),
@@ -749,7 +1067,13 @@ export function ChatWidget() {
 
   // ── Budget Bar ───────────────────────────────────────────────────────────────
   const budgetPct = tokenBudget
-    ? Math.max(0, Math.min(100, Math.round((tokenBudget.sessionRemaining / 8000) * 100)))
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          Math.round((tokenBudget.sessionRemaining / (tokenBudget.hourlyLimit || 2000)) * 100)
+        )
+      )
     : null;
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -774,6 +1098,7 @@ export function ChatWidget() {
       {/* Proactive Floating Jarvis Teaser */}
       {!isOpen && showProactiveBubble && (
         <div className="mb-3 max-w-xs p-3 bg-bg-surface border border-accent-primary shadow-2xl clip-chamfer animate-in fade-in slide-in-from-bottom-3 duration-200 flex items-start gap-2 select-none relative">
+          <ChamferCornerLine className="text-accent-primary" />
           <button
             type="button"
             onClick={() => setShowProactiveBubble(false)}
@@ -806,49 +1131,93 @@ export function ChatWidget() {
         </div>
       )}
 
-      {/* Expanded Chat Window */}
+      {/* Expanded Chat Window with Futuristic HUD Deployment */}
       {isOpen && (
-        <div
-          role="dialog"
-          aria-label="Devyx AI Qualification Assistant"
-          className="mb-3 w-[calc(100vw-1.5rem)] sm:w-[440px] h-[560px] sm:h-[630px] max-h-[88dvh] bg-bg-surface border border-border-grid shadow-2xl clip-chamfer flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200 select-text"
-        >
-          {/* Blueprint Terminal Header */}
-          <div className="px-4 py-3 bg-bg-elevated border-b border-border-grid flex flex-col gap-2 select-none">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-status-operational animate-pulse" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] font-bold text-text-primary tracking-wider uppercase">
-                      // DEVYX_JARVIS_COPILOT
-                    </span>
-                    <span className="font-mono text-[9px] text-accent-signal px-1 border border-accent-signal/30 flex items-center gap-1">
-                      <Sparkles className="w-2.5 h-2.5 text-accent-signal inline" />
-                      GEMINI
-                    </span>
+        <div className="relative mb-3 group/hud select-text">
+          {/* Tactical HUD Corner Reticles (Locking into place on deployment) */}
+          {isBooting && (
+            <>
+              {/* Top-Left Target Bracket */}
+              <div className="absolute -top-3 -left-3 z-40 pointer-events-none text-accent-signal flex flex-col animate-hud-corner-tl">
+                <div className="flex items-center gap-1 font-mono text-[8px] tracking-widest text-accent-signal/90 font-bold">
+                  <span className="w-3.5 h-3.5 border-t-2 border-l-2 border-accent-signal" />
+                  <span className="opacity-90">SYS:01</span>
+                </div>
+              </div>
+
+              {/* Top-Right Target Bracket */}
+              <div className="absolute -top-3 -right-3 z-40 pointer-events-none text-accent-signal flex flex-col items-end animate-hud-corner-tr">
+                <div className="flex items-center gap-1 font-mono text-[8px] tracking-widest text-accent-signal/90 font-bold">
+                  <span className="opacity-90">LINK:100%</span>
+                  <span className="w-3.5 h-3.5 border-t-2 border-r-2 border-accent-signal" />
+                </div>
+              </div>
+
+              {/* Bottom-Left Target Bracket */}
+              <div className="absolute -bottom-3 -left-3 z-40 pointer-events-none text-accent-signal flex flex-col animate-hud-corner-bl">
+                <div className="flex items-center gap-1 font-mono text-[8px] tracking-widest text-accent-signal/90 font-bold">
+                  <span className="w-3.5 h-3.5 border-b-2 border-l-2 border-accent-signal" />
+                  <span className="opacity-90">DEVYX_AI</span>
+                </div>
+              </div>
+
+              {/* Bottom-Right Target Bracket */}
+              <div className="absolute -bottom-3 -right-3 z-40 pointer-events-none text-accent-signal flex flex-col items-end animate-hud-corner-br">
+                <div className="flex items-center gap-1 font-mono text-[8px] tracking-widest text-accent-signal/90 font-bold">
+                  <span className="opacity-90">HUD_ACTIVE</span>
+                  <span className="w-3.5 h-3.5 border-b-2 border-r-2 border-accent-signal" />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Main Chamfered HUD Panel */}
+          <div
+            role="dialog"
+            aria-label="Devyx AI Qualification Assistant"
+            className="w-[calc(100vw-1.5rem)] sm:w-[440px] h-[560px] sm:h-[630px] max-h-[88dvh] bg-bg-surface/95 backdrop-blur-md border border-accent-signal/40 shadow-2xl clip-chamfer flex flex-col overflow-hidden animate-hud-deploy relative"
+          >
+            <ChamferCornerLine className="text-accent-signal/40" />
+            {/* Holographic Laser Scanline Sweep */}
+            {isBooting && (
+              <div className="absolute inset-x-0 z-50 pointer-events-none animate-hud-laser">
+                <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-accent-signal via-white to-transparent shadow-[0_0_18px_#00E0FF,0_0_35px_#00E0FF]" />
+                <div className="h-16 w-full bg-gradient-to-b from-accent-signal/20 to-transparent" />
+              </div>
+            )}
+
+            {/* Micro Boot Telemetry HUD Bar (First 650ms) */}
+            {isBooting && (
+              <div className="absolute top-0 inset-x-0 z-40 pointer-events-none animate-hud-telemetry">
+                <div className="h-0.5 bg-gradient-to-r from-accent-secondary via-accent-signal to-white animate-hud-ticker" />
+                <div className="px-3 py-1 bg-bg-primary/90 border-b border-accent-signal/30 flex items-center justify-between text-[8px] font-mono text-accent-signal">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent-signal animate-ping" />
+                    <span>DEVYX_AI // QUANTUM_STREAM_INITIALIZED</span>
                   </div>
-                  <span className="font-mono text-[9px] text-text-muted block">
-                    AUTONOMOUS_CLIENT_ENGINEER // ONLINE
+                  <span className="font-bold tracking-wider">OK // 200</span>
+                </div>
+              </div>
+            )}
+
+            {/* Subtle Blueprint Mesh Grid overlay */}
+            <div className="absolute inset-0 blueprint-grid opacity-15 pointer-events-none z-0" />
+          {/* Blueprint Terminal Header */}
+          <div className="px-4 pt-3 pb-2.5 bg-bg-elevated border-b border-border-grid flex flex-col select-none">
+            <div className="flex items-center justify-between pb-2">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-status-operational animate-pulse flex-shrink-0" />
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-text-primary tracking-tight">
+                    Devyx Assistant
+                  </span>
+                  <span className="font-mono text-[10px] text-status-operational font-medium">
+                    • Online
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-1">
-                {/* Theme Toggle */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = resolvedTheme === "dark" ? "light" : "dark";
-                    setTheme(next);
-                    setActionNotice(`🎨 Theme switched to ${next.toUpperCase()}`);
-                    setTimeout(() => setActionNotice(null), 2500);
-                  }}
-                  title="Toggle Platform Theme (Dark/Light)"
-                  className="p-1.5 text-text-muted hover:text-accent-primary hover:bg-bg-surface transition-colors clip-chamfer"
-                >
-                  {resolvedTheme === "dark" ? <Sun className="w-3.5 h-3.5 text-accent-signal" /> : <Moon className="w-3.5 h-3.5 text-accent-primary" />}
-                </button>
                 <button
                   type="button"
                   onClick={handleResetChat}
@@ -870,29 +1239,23 @@ export function ChatWidget() {
             </div>
 
             {/* Language Switcher Pills */}
-            <div className="flex items-center justify-between pt-1 border-t border-border-grid/60">
-              <div className="flex items-center gap-1">
-                <span className="text-[9px] font-mono text-text-muted me-1">LANG:</span>
-                {(["darija", "ar", "fr", "en"] as ChatLanguage[]).map((lang) => (
+            <div className="flex items-center justify-between pt-2 border-t border-border-grid/60">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-mono text-text-muted me-1 uppercase tracking-wider">LANG:</span>
+                {(["auto", "darija", "ar", "fr", "en"] as ChatLanguage[]).map((lang) => (
                   <button
                     key={lang}
                     type="button"
                     onClick={() => handleLanguageChange(lang)}
-                    className={`text-[10px] font-mono px-2 py-0.5 transition-colors clip-chamfer ${
+                    className={`text-[10px] font-mono px-2 py-0.5 leading-none transition-colors clip-chamfer flex items-center justify-center ${
                       selectedLanguage === lang
                         ? "bg-accent-primary text-bg-primary font-bold shadow-sm"
                         : "text-text-muted hover:text-text-primary bg-bg-surface border border-border-grid"
                     }`}
                   >
-                    {lang === "darija" ? "🇲🇦 دارجة" : lang === "ar" ? "العربية" : lang.toUpperCase()}
+                    {lang === "auto" ? "AUTO" : lang === "darija" ? "🇩🇿 دارجة" : lang === "ar" ? "العربية" : lang.toUpperCase()}
                   </button>
                 ))}
-              </div>
-
-              {/* Telegram Status Badge */}
-              <div className="flex items-center gap-1 text-[9px] font-mono text-accent-signal">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-signal animate-ping" />
-                <span>TG_DISPATCH: READY</span>
               </div>
             </div>
           </div>
@@ -906,10 +1269,6 @@ export function ChatWidget() {
                   key={msg.id}
                   className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
                 >
-                  <span className="font-mono text-[9px] text-text-muted mb-1 px-1">
-                    {isUser ? "// CLIENT_TRANSMIT" : "// DEVYX_JARVIS_ENGINE"}
-                  </span>
-
                   <div
                     className={`max-w-[92%] p-3.5 clip-chamfer text-xs ${
                       isUser
@@ -921,13 +1280,36 @@ export function ChatWidget() {
                   >
                     {isUser ? (
                       <div className="space-y-2">
-                        {/* Image preview in user bubble */}
+                        {/* Image preview in user bubble with click-to-expand and fallback */}
                         {msg.attachmentPreview?.previewUrl && (
-                          <img
-                            src={msg.attachmentPreview.previewUrl}
-                            alt={msg.attachmentPreview.name}
-                            className="max-w-[200px] max-h-[140px] object-cover rounded border border-bg-primary/30"
-                          />
+                          <div className="relative group overflow-hidden rounded border border-bg-primary/30 shadow-md">
+                            <img
+                              src={msg.attachmentPreview.previewUrl}
+                              alt={msg.attachmentPreview.name}
+                              onClick={() => {
+                                if (msg.attachmentPreview?.previewUrl) {
+                                  setLightboxImage({
+                                    url: msg.attachmentPreview.previewUrl,
+                                    name: msg.attachmentPreview.name,
+                                  });
+                                }
+                              }}
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                                const fallbackEl = document.getElementById(`fallback-${msg.id}`);
+                                if (fallbackEl) fallbackEl.style.display = "flex";
+                              }}
+                              className="max-w-[220px] max-h-[160px] object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
+                            />
+                            <div
+                              id={`fallback-${msg.id}`}
+                              style={{ display: "none" }}
+                              className="items-center gap-1.5 text-[10px] opacity-90 p-2 bg-bg-primary/20 rounded border border-bg-primary/30"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>{msg.attachmentPreview.name}</span>
+                            </div>
+                          </div>
                         )}
                         {msg.attachmentPreview && !msg.attachmentPreview.previewUrl && (
                           <div className="flex items-center gap-1.5 text-[10px] opacity-80">
@@ -946,7 +1328,7 @@ export function ChatWidget() {
                         {msg.queued && (
                           <div className="flex items-center gap-1.5 text-amber-400 text-[10px] font-mono mb-1">
                             <Clock className="w-3 h-3" />
-                            <span>QUEUED — waiting for Jarvis slot</span>
+                            <span>QUEUED — waiting for available slot</span>
                           </div>
                         )}
                         <RenderMarkdown text={msg.text} />
@@ -1068,18 +1450,18 @@ export function ChatWidget() {
             {isLoading && (
               <div className="flex flex-col items-start animate-in fade-in duration-150">
                 <span className="font-mono text-[9px] text-accent-signal mb-1 px-1">
-                  // JARVIS_EVALUATING_SYSTEM_SPECS
+                  // AI_EVALUATING_SYSTEM_SPECS
                 </span>
                 <div className="p-3 bg-bg-elevated border border-border-grid clip-chamfer flex items-center gap-2">
                   <Loader2 className="w-3.5 h-3.5 text-accent-primary animate-spin" />
                   <span className="font-mono text-xs text-text-muted">
                     {selectedLanguage === "darija"
-                      ? "Jarvis kaychouf l'architecture m3a Gemini w n8n..."
+                      ? "L'assistant IA kaychouf l'architecture..."
                       : selectedLanguage === "ar"
-                      ? "جاري تحليل المتطلبات وهندسة الإجابة عبر Gemini..."
+                      ? "جاري تحليل المتطلبات وهندسة الإجابة..."
                       : selectedLanguage === "fr"
-                      ? "Jarvis évalue les spécifications architecturales..."
-                      : "Jarvis analyzing technical specs via Gemini..."}
+                      ? "L'assistant IA évalue les spécifications architecturales..."
+                      : "AI Assistant analyzing technical specs..."}
                   </span>
                 </div>
               </div>
@@ -1088,62 +1470,51 @@ export function ChatWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Jarvis Capabilities Bar */}
-          <div className="px-3 py-2 bg-bg-surface border-t border-border-grid flex items-center justify-between gap-1 overflow-x-auto select-none no-scrollbar">
-            <button
-              type="button"
-              onClick={() => sendMessage("🌙 switch dark mode")}
-              className="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-1 bg-bg-elevated border border-border-grid hover:border-accent-primary text-text-secondary hover:text-text-primary clip-chamfer flex-shrink-0"
-            >
-              <Moon className="w-2.5 h-2.5 text-accent-signal" />
-              <span>Dark Mode</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => sendMessage("📁 werili les projets")}
-              className="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-1 bg-bg-elevated border border-border-grid hover:border-accent-primary text-text-secondary hover:text-text-primary clip-chamfer flex-shrink-0"
-            >
-              <FolderKanban className="w-2.5 h-2.5 text-accent-primary" />
-              <span>Projects</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => sendMessage("💰 ch7al y9am projet web Next.js w automation n8n")}
-              className="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-1 bg-bg-elevated border border-border-grid hover:border-accent-primary text-text-secondary hover:text-text-primary clip-chamfer flex-shrink-0"
-            >
-              <Calculator className="w-2.5 h-2.5 text-accent-signal" />
-              <span>Cost Estimate</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => sendMessage("👨‍💻 Bghit nahder m3a un ingénieur humain")}
-              className="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-1 bg-bg-elevated border border-border-grid hover:border-accent-primary text-text-secondary hover:text-text-primary clip-chamfer flex-shrink-0"
-            >
-              <UserCheck className="w-2.5 h-2.5 text-status-operational" />
-              <span>Human Specialist</span>
-            </button>
-          </div>
-
           {/* Attachment Preview Strip */}
           {attachment && (
             <div className="px-3 py-2 bg-bg-elevated border-t border-border-grid flex items-center gap-2 select-none">
-              {attachment.previewUrl ? (
-                <img
-                  src={attachment.previewUrl}
-                  alt={attachment.name}
-                  className="w-10 h-10 object-cover border border-border-grid flex-shrink-0"
-                />
-              ) : (
-                <div className="w-10 h-10 bg-bg-surface border border-border-grid flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-accent-primary" />
-                </div>
-              )}
+              <div className="relative group">
+                {attachment.previewUrl ? (
+                  <img
+                    src={attachment.previewUrl}
+                    alt={attachment.name}
+                    className="w-10 h-10 object-cover border border-border-grid flex-shrink-0 rounded"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-bg-surface border border-border-grid flex items-center justify-center flex-shrink-0 rounded">
+                    <FileText className="w-5 h-5 text-accent-primary" />
+                  </div>
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-mono text-[10px] text-text-primary truncate">{attachment.name}</p>
                 <p className="font-mono text-[9px] text-text-muted">
-                  {(attachment.size / 1024).toFixed(0)} KB · {attachment.type.split("/")[1].toUpperCase()}
+                  {(attachment.size / 1024).toFixed(0)} KB · {attachment.type.split("/")[1]?.toUpperCase() || "IMAGE"}
+                  {attachment.name.includes("-annotated") && (
+                    <span className="ms-1.5 text-accent-signal font-bold">✓ Annotated</span>
+                  )}
                 </p>
               </div>
+
+              {/* Quick Markup / Draw button */}
+              {attachment.type.startsWith("image/") && (
+                <button
+                  type="button"
+                  onClick={() => setIsMarkupModalOpen(true)}
+                  className="px-2.5 py-1 font-mono text-[10px] bg-accent-primary text-bg-primary hover:bg-accent-signal font-bold clip-chamfer flex items-center gap-1 transition-colors shadow-sm flex-shrink-0"
+                  title="Draw zones or add text callouts to this picture"
+                >
+                  <Pencil className="w-3 h-3" />
+                  <span>
+                    {selectedLanguage === "fr"
+                      ? "Annoter"
+                      : selectedLanguage === "darija" || selectedLanguage === "ar"
+                      ? "تعديل ورسم"
+                      : "Annotate / Draw"}
+                  </span>
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={clearAttachment}
@@ -1194,14 +1565,15 @@ export function ChatWidget() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading}
-                title="Attach image or PDF"
-                className={`w-10 h-10 clip-chamfer flex items-center justify-center transition-colors flex-shrink-0 ${
+                title="Attach image (PNG, JPG, max 2MB)"
+                className={`relative w-10 h-10 clip-chamfer flex items-center justify-center transition-colors flex-shrink-0 group ${
                   attachment
                     ? "bg-accent-primary text-bg-primary"
-                    : "bg-bg-surface border border-border-grid text-text-secondary hover:text-accent-primary hover:border-accent-primary"
+                    : "bg-bg-surface text-text-secondary hover:text-accent-primary"
                 } disabled:opacity-50`}
               >
-                <Paperclip className="w-4 h-4" />
+                {!attachment && <ChamferButtonBorder />}
+                <Paperclip className="w-4 h-4 relative z-20" />
               </button>
 
               <input
@@ -1210,8 +1582,12 @@ export function ChatWidget() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={
-                  isListening
-                    ? "Listening... Speak in Darija / Multi..."
+                  cooldownRemaining > 0
+                    ? `⏳ Pacing (${cooldownRemaining}s)... preserving tokens`
+                    : isTranscribing
+                    ? "Transcribing with Whisper AI..."
+                    : isListening
+                    ? "Recording voice note... Click mic to stop"
                     : attachment
                     ? selectedLanguage === "fr"
                       ? "Ajoutez un commentaire (optionnel)..."
@@ -1225,6 +1601,8 @@ export function ChatWidget() {
                 className={`flex-1 h-10 px-3 bg-bg-surface border text-text-primary font-mono text-base sm:text-xs focus:border-accent-primary focus:outline-none disabled:opacity-50 ${
                   isListening
                     ? "border-status-error animate-pulse text-status-error placeholder:text-status-error"
+                    : isTranscribing
+                    ? "border-accent-primary animate-pulse text-accent-primary placeholder:text-accent-primary"
                     : "border-border-grid"
                 }`}
               />
@@ -1233,23 +1611,37 @@ export function ChatWidget() {
               <button
                 type="button"
                 onClick={toggleVoiceRecording}
-                title={isListening ? "Stop listening" : "Speak voice note"}
-                className={`w-10 h-10 clip-chamfer flex items-center justify-center transition-colors flex-shrink-0 ${
+                disabled={isTranscribing}
+                title={isTranscribing ? "Transcribing voice..." : isListening ? "Stop listening" : "Speak voice note"}
+                className={`relative w-10 h-10 clip-chamfer flex items-center justify-center transition-colors flex-shrink-0 group ${
                   isListening
                     ? "bg-status-error text-white animate-pulse"
-                    : "bg-bg-surface border border-border-grid text-text-secondary hover:text-accent-primary hover:border-accent-primary"
+                    : isTranscribing
+                    ? "bg-accent-primary/20 text-accent-primary animate-pulse"
+                    : "bg-bg-surface text-text-secondary hover:text-accent-primary"
                 }`}
               >
-                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                {!isListening && !isTranscribing && <ChamferButtonBorder />}
+                {isTranscribing ? (
+                  <Loader2 className="w-4 h-4 animate-spin relative z-20" />
+                ) : isListening ? (
+                  <MicOff className="w-4 h-4 relative z-20" />
+                ) : (
+                  <Mic className="w-4 h-4 relative z-20" />
+                )}
               </button>
 
               <button
                 type="submit"
-                disabled={(!inputMessage.trim() && !attachment) || isLoading}
+                disabled={(!inputMessage.trim() && !attachment) || isLoading || cooldownRemaining > 0}
                 aria-label="Send message"
                 className="w-10 h-10 bg-accent-primary text-bg-primary clip-chamfer flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-transform disabled:opacity-50 disabled:pointer-events-none flex-shrink-0"
               >
-                <Send className="w-4 h-4 rtl:rotate-180" />
+                {cooldownRemaining > 0 ? (
+                  <span className="text-[10px] font-mono font-bold tracking-tighter">{cooldownRemaining}s</span>
+                ) : (
+                  <Send className="w-4 h-4 rtl:rotate-180" />
+                )}
               </button>
             </div>
 
@@ -1259,8 +1651,8 @@ export function ChatWidget() {
                 <Shield className="w-2.5 h-2.5 text-accent-signal flex-shrink-0" />
                 {budgetPct !== null ? (
                   <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                    <span className="truncate">TOKEN_BUDGET</span>
-                    <div className="flex-1 h-1 bg-bg-surface border border-border-grid/50 min-w-[40px]">
+                    <span className="truncate">BUDGET (HOURLY)</span>
+                    <div className="flex-1 h-1 bg-bg-surface border border-border-grid/50 min-w-[36px]">
                       <div
                         className={`h-full transition-all ${
                           budgetPct > 50
@@ -1272,16 +1664,19 @@ export function ChatWidget() {
                         style={{ width: `${budgetPct}%` }}
                       />
                     </div>
-                    <span className="flex-shrink-0">{budgetPct}%</span>
+                    <span className="flex-shrink-0 text-accent-signal">
+                      {tokenBudget?.resetsInMinutes ? `⏳ ${tokenBudget.resetsInMinutes}m` : `${budgetPct}%`}
+                    </span>
                   </div>
                 ) : (
-                  <span className="truncate">JARVIS CONTROLS // TELEGRAM SYNC</span>
+                  <span className="truncate">DEVYX // COPILOT</span>
                 )}
               </div>
               <span className="flex-shrink-0">{inputMessage.length}/1500</span>
             </div>
           </form>
         </div>
+      </div>
       )}
 
       {/* Floating Launcher Button */}
@@ -1294,26 +1689,74 @@ export function ChatWidget() {
         aria-label="Toggle Devyx AI Engineering Assistant"
         className="min-h-[44px] sm:h-13 px-3 sm:px-4 py-2 bg-bg-surface border border-border-grid text-text-primary clip-chamfer shadow-xl hover:border-accent-primary transition-all flex items-center gap-2 sm:gap-3 group relative select-none hover:-translate-y-0.5 active:scale-95"
       >
+        <ChamferCornerLine />
         <span className="w-2.5 h-2.5 bg-status-operational rounded-full animate-pulse flex-shrink-0" />
         <div className="flex flex-col text-start leading-tight">
           <span className="font-mono text-[9px] sm:text-[10px] text-accent-signal uppercase tracking-wider font-bold flex items-center gap-1">
-            DEVYX // JARVIS COPILOT
+            DEVYX // AI ASSISTANT
             <span className="hidden sm:inline text-[8px] bg-accent-signal/10 px-1 border border-accent-signal/30 text-accent-signal">
-              🇲🇦 DARIJA
+              {selectedLanguage === "auto" ? "AUTO" : selectedLanguage === "darija" ? "🇩🇿 DARIJA" : selectedLanguage.toUpperCase()}
             </span>
           </span>
           <span className="font-sans text-[11px] sm:text-xs text-text-secondary group-hover:text-text-primary transition-colors">
             {pageLocale === "ar"
-              ? "استشر الذكاء الاصطناعي (بالدارجة والتحكم)"
+              ? "استشر المساعد التقني الذكي"
               : pageLocale === "fr"
-              ? "Devyx Jarvis (Contrôle & Devis)"
-              : "Devyx Jarvis (Control & Estimator)"}
+              ? "Devyx AI (Contrôle & Devis)"
+              : "Devyx AI (Control & Estimator)"}
           </span>
         </div>
         <div className="w-7 h-7 sm:w-8 sm:h-8 bg-bg-elevated border border-border-grid flex items-center justify-center text-accent-primary group-hover:bg-accent-primary group-hover:text-bg-primary transition-colors flex-shrink-0 clip-chamfer">
           {isOpen ? <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
         </div>
       </button>
+
+      {/* Interactive Image Markup Modal */}
+      {attachment && isMarkupModalOpen && (
+        <ImageMarkupModal
+          isOpen={isMarkupModalOpen}
+          onClose={() => setIsMarkupModalOpen(false)}
+          imageSrc={
+            attachment.base64
+              ? `data:${attachment.type};base64,${attachment.base64}`
+              : attachment.previewUrl || ""
+          }
+          imageName={attachment.name}
+          onApply={handleMarkupApply}
+          language={selectedLanguage}
+        />
+      )}
+
+      {/* Fullsize Image Lightbox Modal */}
+      {lightboxImage && (
+        <div
+          onClick={() => setLightboxImage(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in select-none"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-4xl max-h-[90vh] bg-bg-surface border border-accent-primary/40 p-3 clip-chamfer flex flex-col shadow-2xl"
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-border-grid mb-2">
+              <span className="font-mono text-xs text-text-primary font-bold truncate">
+                {lightboxImage.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => setLightboxImage(null)}
+                className="p-1 text-text-muted hover:text-text-primary"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <img
+              src={lightboxImage.url}
+              alt={lightboxImage.name}
+              className="max-w-full max-h-[75vh] object-contain rounded"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,12 +9,13 @@ export default function middleware(req: NextRequest) {
 
   // Administrative Control Room Route Guard
   if (pathname.startsWith("/admin")) {
-    const devSession = req.cookies.get("devyx_dev_admin_session")?.value;
+    const isDev = process.env.NODE_ENV === "development";
+    const devSession = isDev ? req.cookies.get("devyx_dev_admin_session")?.value : undefined;
     const hasSupabaseAuthToken = req.cookies
       .getAll()
       .some((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"));
 
-    const isAuthenticated = devSession === "authenticated" || hasSupabaseAuthToken;
+    const isAuthenticated = (isDev && devSession === "authenticated") || hasSupabaseAuthToken;
 
     if (pathname === "/admin/login") {
       if (isAuthenticated) {

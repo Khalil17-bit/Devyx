@@ -2,21 +2,28 @@ import { z } from "zod";
 import type { JarvisAction, HandoffData, EstimateData } from "@/lib/ai/assistant-context";
 
 /**
- * Attachment schema: base64-encoded image or PDF
- * Max sizes enforced in frontend; schema validates structure only.
+ * Attachment schema: strictly base64-encoded images (JPEG, PNG, WEBP)
+ * 2MB max ceiling strictly enforced to protect tokens and serverless memory.
  */
 const attachmentSchema = z.object({
-  /** MIME type of the attachment */
-  type: z.enum(["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"]),
-  /** Base64-encoded file content */
-  data: z.string().min(1).max(15_000_000), // ~10MB base64 ceiling
+  /** MIME type of the attachment — PNG, JPEG, WEBP only */
+  type: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  /** Base64-encoded file content (~2.8MB base64 characters max for 2MB file) */
+  data: z.string().min(1).max(3_000_000),
   /** Original filename */
   name: z.string().max(255),
-  /** File size in bytes (for display) */
-  size: z.number().optional(),
+  /** File size in bytes (strictly <= 2MB) */
+  size: z.number().max(2 * 1024 * 1024).optional(),
 });
 
 export type AttachmentInput = z.infer<typeof attachmentSchema>;
+
+export const chatHistoryItemSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().max(2500),
+});
+
+export type ChatHistoryItem = z.infer<typeof chatHistoryItemSchema>;
 
 /**
  * Validation schema for the AI Chatbot Proxy (/api/chat)
@@ -33,9 +40,11 @@ export const chatMessageSchema = z.object({
     .min(0)
     .max(1500, { message: "Message exceeds maximum 1,500 character limit" })
     .default(""),
-  language: z.enum(["ar", "fr", "en", "darija", "ar-MA"]).default("en"),
+  language: z.enum(["ar", "fr", "en", "darija", "ar-MA", "auto"]).default("auto"),
   currentPage: z.string().max(256).default("/"),
   theme: z.enum(["dark", "light"]).optional(),
+  /** Recent conversation history (client-side memory) */
+  history: z.array(chatHistoryItemSchema).optional(),
   /** Optional file attachment (image or PDF) */
   attachment: attachmentSchema.optional(),
 }).refine(
@@ -60,7 +69,10 @@ export interface ChatApiResponse {
   estimatedWaitMs?: number;
   /** Token budget info */
   tokenBudget?: {
-    dailyRemaining: number;
+    hourlyRemaining?: number;
     sessionRemaining: number;
+    hourlyLimit?: number;
+    resetsInMinutes?: number;
+    dailyRemaining: number;
   };
 }
