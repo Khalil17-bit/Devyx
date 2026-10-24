@@ -36,3 +36,4 @@ next-env.d.ts
 .agents/packages/
 .agents/node_modules/
 supabase/.temp/
+scratch/

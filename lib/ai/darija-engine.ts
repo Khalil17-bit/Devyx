@@ -88,11 +88,32 @@ CRITICAL HARD RULES (ZERO TOLERANCE FOR MISTAKES):
      * Strictly 'nlégaliziw' or 'ncertifiw'.
 
 6. BAN MOROCCAN, TUNISIAN & FUS'HA LEAKS:
-   - BAN Moroccan: 'daba' (use 'doka'), 'ghadi' (use 'ra7'), 'dyal' (use 'ta3'), 'mzyan' (use 'mli7'), '7it' (use '3la khater'), 'mika' (use 'sachi').
-   - BAN Levantine/Fus'ha: 'matar' (rain is 'chta', falls as 'ti7 chta'), 'bkra' (tomorrow is 'ghodwa').
+   - BAN Moroccan: 'daba' (use 'doka'), 'ghadi' (use 'ra7'), 'dyal' (use 'ta3' or 'dyalna/ta3na'), 'mzyan' (use 'mli7'), '7it' (use '3la khater'), 'mika' (use 'sachi'), 'wakha' (use "d'accord"), 'kifach' (use 'kifech'), 'ach/chno' (use 'wach/chnou').
+   - BAN Tunisian: 'barsha' (use 'bezzef'), 'bahi' (use 'mli7'), 'chbik' (use 'wach bik'), 'tawa' (use 'doka').
+   - BAN Levantine/Fus'ha: 'matar' (rain is 'chta', falls as 'ti7 chta'), 'bkra' (tomorrow is 'ghodwa'), 'hal yumkin', 'akhi', 'shukran' (use 'sa7a/bla mziya').
    - Obligation is impersonal: 'lazem' (NEVER 'lazmek' or 'lazim').
 
-7. FORMAT:
+7. DEVYX TECH AGENCY FEW-SHOT ANCHORS:
+   - Greeting:
+     English: "Hello! Welcome to Devyx. How can I assist you with your software project today?"
+     Algérois: "Salam! Mar7ba bik f Devyx 👋 Kifech n9der n3awnek f l'projet ta3ek lyoum?"
+   - Web Platform:
+     English: "We build ultra-fast Next.js 15 web platforms with sub-0.8s load times. Web projects typically range between $950 and $1,800 delivered in 10 to 20 days. Let's discuss on [WhatsApp](https://wa.me/213000000000) or check our [Projects page](/projects)."
+     Algérois: "N'développiw des plateformes web Next.js 15 ultra-rapides (LCP < 0.8s). Les projets web ykellfou bin $950 w $1,800 f 10 7tal 20 jours. T9der tahdar m3ana direct f [WhatsApp](https://wa.me/213000000000) wela tchouf [Page Projets](/projects)!"
+   - Mobile App:
+     English: "We engineer cross-platform mobile apps for iOS and Android using Flutter with offline-first caching. A delivery app typically costs between $1,400 and $2,600 in 14 to 28 days. You can request a quote on [WhatsApp](https://wa.me/213000000000)."
+     Algérois: "N'développiw des applications mobile unifiées pour iOS w Android b Flutter m3a cache offline-first. Application ta3 livraison tkellef bin $1,400 w $2,600 f 14 7tal 28 jours. T9der t'demandi devis gratuit direct f [WhatsApp](https://wa.me/213000000000)!"
+   - n8n Automation:
+     English: "Self-hosted n8n automation connects your CRM, WhatsApp, and billing workflows with zero recurring SaaS fees. Which business processes do you want to automate?"
+     Algérois: "L'automatisation n8n (self-hosted) tconnecti l'CRM, WhatsApp, w la facturation ta3ek bla ma tkhales des abonnements kol chher (0$ SaaS fees). Chnouma les processus li 7ab t'automatisihom?"
+   - Escalation:
+     English: "I dispatched an alert to our lead engineering team on Telegram. Please provide your WhatsApp number or email, or connect with us directly on [WhatsApp](https://wa.me/213000000000)."
+     Algérois: "Sayeft alerte direct l l'équipe technique ta3na f Telegram 🚨. 3tina noumrou WhatsApp ta3ek wela email bach y'contactik un développeur f lwe9t, wela hder direct f [WhatsApp](https://wa.me/213000000000)."
+   - Out of Scope Refusal:
+     English: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"
+     Algérois: "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, automations n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"
+
+8. FORMAT:
    - Output ONLY the translated text in Latin Arabizi.
    - No explanations, no introductory notes, no quotation marks.`;
 
@@ -163,6 +184,9 @@ export function sanitizeDarijaTextV2(input: string): SanitizerResult {
   replaceAndCount(/[\u0600-\u06FF]/g, '');
 
   // 2. Strict '9' for Qaf: clamp any remaining 'q' in Arabizi words
+  replaceAndCount(/\bnqder\b/gi, 'n9der');
+  replaceAndCount(/\bnqedrou\b/gi, 'n9edrou');
+  replaceAndCount(/\btqder\b/gi, 't9der');
   replaceAndCount(/\bqbel\b/gi, '9bel');
   replaceAndCount(/\bqbal\b/gi, '9bel');
   replaceAndCount(/\bqalli\b/gi, '9alli');
@@ -172,12 +196,18 @@ export function sanitizeDarijaTextV2(input: string): SanitizerResult {
   replaceAndCount(/\bqriba\b/gi, '9riba');
   replaceAndCount(/\bwaqt\b/gi, 'we9t');
   replaceAndCount(/\blwaqt\b/gi, 'lwe9t');
+  replaceAndCount(/\bweqt\b/gi, 'we9t');
+  replaceAndCount(/\blweqt\b/gi, 'lwe9t');
   replaceAndCount(/\byetqta3\b/gi, 'yet9ta3');
   replaceAndCount(/\btqta3et\b/gi, 't9at3et');
   replaceAndCount(/\blqdim\b/gi, 'l9dim');
   replaceAndCount(/\blqdam\b/gi, 'l9dam');
+  replaceAndCount(/\bqa3ed\b/gi, '9a3ed');
+  replaceAndCount(/\bqa3da\b/gi, '9a3da');
   replaceAndCount(/\bchqoun\b/gi, 'chkoun');
   replaceAndCount(/\bdeqiq[ae]\b/gi, 'd9i9a');
+  replaceAndCount(/\bdqiq[ae]\b/gi, 'd9i9a');
+  replaceAndCount(/\bdqiqa\b/gi, 'd9i9a');
   replaceAndCount(/\btqerbe3ch\b/gi, 't9erbe3ch');
   replaceAndCount(/\bqer3a\b/gi, '9er3a');
   replaceAndCount(/\btqeyyel\b/gi, 't9eyyel');
@@ -217,7 +247,23 @@ export function sanitizeDarijaTextV2(input: string): SanitizerResult {
   replaceAndCount(/\bgal\s+lih\b/gi, '9allou');
   replaceAndCount(/\bgalli\b/gi, '9alli');
   replaceAndCount(/\bmzyan[ae]?\b/gi, 'mli7');
+  replaceAndCount(/\bbzzaf\b/gi, 'bezzef');
+  replaceAndCount(/\bbzaf\b/gi, 'bezzef');
+  replaceAndCount(/\bwakha\b/gi, "d'accord");
   replaceAndCount(/\bmika\b/gi, 'sachi');
+  replaceAndCount(/\bkifach\b/gi, 'kifech');
+  replaceAndCount(/\bachnou\b/gi, 'wach');
+  replaceAndCount(/\bach\b/gi, 'wach');
+  replaceAndCount(/\bchno\b/gi, 'chnou');
+
+  // 7b. Tunisian & Fus'ha purge
+  replaceAndCount(/\bbarsha\b/gi, 'bezzef');
+  replaceAndCount(/\bbahi\b/gi, 'mli7');
+  replaceAndCount(/\bchbik\b/gi, 'wach bik');
+  replaceAndCount(/\btawa\b/gi, 'doka');
+  replaceAndCount(/\bmta3\b/gi, 'ta3');
+  replaceAndCount(/\bakhi\b/gi, 'khoya');
+  replaceAndCount(/\bshukran\b/gi, 'sa7a');
 
   // 8. Spatial location & gender agreement
   replaceAndCount(/\brahi mawjouda\b/gi, 'jaya');
@@ -274,7 +320,7 @@ function getApiKeys(): ModelApiKeys {
 async function callGeminiFlashTranslation(
   apiKey: string,
   englishText: string,
-  modelName: string = "gemini-3.8-flash"
+  modelName: string = "gemini-3.1-flash-lite"
 ): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
@@ -288,8 +334,8 @@ async function callGeminiFlashTranslation(
       },
     ],
     generationConfig: {
-      temperature: 0.15,
-      maxOutputTokens: 1024,
+      temperature: 0.1,
+      maxOutputTokens: 500,
     },
   };
 
@@ -297,7 +343,7 @@ async function callGeminiFlashTranslation(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(6500),
   });
 
   if (!response.ok) {
@@ -366,43 +412,53 @@ export async function translateToAlgéroisDarija(englishOrFrenchText: string): P
   let rawOutput: string | null = null;
   let usedModel = "simulation";
 
-  // Tier 1: Primary Groq Qwen 27B (Ultra-fast LPU: ~150ms)
-  if (keys.groqKey) {
+  // Tier 1: Primary Gemini Flash Lite (Dialect Nuance & High Rate Limit)
+  if (keys.geminiKey) {
     try {
-      rawOutput = await callGroqQwenTranslation(keys.groqKey, englishOrFrenchText);
-      usedModel = "groq-qwen-27b";
+      rawOutput = await callGeminiFlashTranslation(keys.geminiKey, englishOrFrenchText, "gemini-3.1-flash-lite");
+      usedModel = "gemini-3.1-flash-lite";
     } catch (err1) {
-      console.warn("[Darija Engine] Primary Groq Qwen failed, trying secondary Groq...", err1);
+      try {
+        rawOutput = await callGeminiFlashTranslation(keys.geminiKey, englishOrFrenchText, "gemini-3.8-flash");
+        usedModel = "gemini-3.8-flash";
+      } catch (err1b) {
+        console.warn("[Darija Engine] Primary Gemini failed, falling back to secondary...", err1b);
+      }
     }
   }
 
-  // Tier 2: Secondary Groq Qwen 27B
+  // Tier 2: Secondary Gemini Flash Lite
+  if (!rawOutput && keys.geminiSecondary) {
+    try {
+      rawOutput = await callGeminiFlashTranslation(keys.geminiSecondary, englishOrFrenchText, "gemini-3.1-flash-lite");
+      usedModel = "gemini-secondary";
+    } catch (err2) {
+      try {
+        rawOutput = await callGeminiFlashTranslation(keys.geminiSecondary, englishOrFrenchText, "gemini-3.8-flash");
+        usedModel = "gemini-3.8-secondary";
+      } catch (err2b) {
+        console.warn("[Darija Engine] Secondary Gemini failed, falling back to Groq...", err2b);
+      }
+    }
+  }
+
+  // Tier 3: Secondary Groq Qwen (Keep primary Groq for Stage 1 Reasoner)
   if (!rawOutput && keys.groqSecondary) {
     try {
       rawOutput = await callGroqQwenTranslation(keys.groqSecondary, englishOrFrenchText);
       usedModel = "groq-qwen-secondary";
-    } catch (err2) {
-      console.warn("[Darija Engine] Secondary Groq failed, falling back to Gemini...", err2);
-    }
-  }
-
-  // Tier 3: Primary Gemini Flash (Fallback)
-  if (!rawOutput && keys.geminiKey) {
-    try {
-      rawOutput = await callGeminiFlashTranslation(keys.geminiKey, englishOrFrenchText, "gemini-3.8-flash");
-      usedModel = "gemini-3.8-flash";
     } catch (err3) {
-      console.warn("[Darija Engine] Primary Gemini Flash failed...", err3);
+      console.warn("[Darija Engine] Secondary Groq failed...", err3);
     }
   }
 
-  // Tier 4: Secondary Gemini Flash (Fallback)
-  if (!rawOutput && keys.geminiSecondary) {
+  // Tier 4: Primary Groq Qwen
+  if (!rawOutput && keys.groqKey) {
     try {
-      rawOutput = await callGeminiFlashTranslation(keys.geminiSecondary, englishOrFrenchText, "gemini-3.8-flash");
-      usedModel = "gemini-secondary";
+      rawOutput = await callGroqQwenTranslation(keys.groqKey, englishOrFrenchText);
+      usedModel = "groq-qwen-27b";
     } catch (err4) {
-      console.warn("[Darija Engine] Secondary Gemini failed", err4);
+      console.warn("[Darija Engine] Primary Groq failed", err4);
     }
   }
 

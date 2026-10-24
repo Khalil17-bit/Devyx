@@ -554,17 +554,25 @@ export async function POST(req: NextRequest) {
       localJarvis.handoff.dispatched = tgResult.dispatched;
     }
 
-    // Helper to format/translate reply according to selected language
+    // Helper to format/translate reply according to selected language (Two-Stage Pipeline)
     const formatFinalReply = async (rawReply: string, targetLocale?: string): Promise<string> => {
       const activeLanguage = targetLocale || language;
       if (activeLanguage === "darija" || activeLanguage === "ar-MA") {
-        // If the reply contains English words or Fus'ha/Moroccan leaks, run through translation + 11-tier sanitizer
-        if (
-          /^[a-zA-Z\s.,!?'"#-]+$/.test(rawReply) &&
-          !/\b(salam|mar7ba|kayen|doka|ra7|ta3|mli7|bghit|khedma)\b/i.test(rawReply)
-        ) {
+        // If the reply is an action confirmation in French/English, preserve it
+        if (/^parfait\b/i.test(rawReply.trim()) || targetLocale === "fr" || targetLocale === "en") {
+          return rawReply;
+        }
+
+        // Check if the reply is in English or needs Stage 2 translation
+        const hasEnglishWords =
+          /\b(we build|we engineer|our pricing|typically takes|how can i assist|please review|depending on|we develop|building a high-performance|i am an ai assistant|welcome to devyx|our team|feel free|software engineering|web development|mobile apps|automations|delivery|costs between|ranges from)\b/i.test(rawReply);
+        const hasNoDarijaMarkers =
+          !/\b(salam|mar7ba|kayen|doka|dorka|ra7|ta3|mli7|bghit|khedma|n9der|n9edrou|t9der|ch7al|kifech|bla mziya)\b/i.test(rawReply);
+
+        if (hasEnglishWords || hasNoDarijaMarkers) {
           return await translateToAlgéroisDarija(rawReply);
         }
+
         return sanitizeDarijaTextV2(rawReply).text;
       }
       return rawReply;

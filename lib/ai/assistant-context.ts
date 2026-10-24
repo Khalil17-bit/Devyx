@@ -250,11 +250,16 @@ You MUST write 100% of your response in MODERN STANDARD ARABIC.`;
     greetingTemplate = `Greeting template: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك البرمجي اليوم؟"`;
     refusalTemplate = `Out-of-scope refusal: "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"`;
   } else if (targetLanguage === "darija" || targetLanguage === "ar-MA") {
-    languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
-The visitor has explicitly selected: ALGERIAN DARIJA MODE (Latin Arabizi).
-You MUST write 100% of your response in ALGERIAN DARIJA ARABIZI.`;
-    greetingTemplate = `Greeting template: "Salam! Mar7ba bik f Devyx 👋 Kifech n9der n3awnek f l'projet ta3ek lyoum?"`;
-    refusalTemplate = `Out-of-scope refusal: "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"`;
+    languageDirective = `### ⚠️ TWO-STAGE PIPELINE MANDATE (STAGE 1 REASONER FOR DARIJA):
+The visitor is communicating in ALGERIAN DARIJA (or has selected Darija mode).
+You are Stage 1 of the Two-Stage AI Pipeline: The Senior Technical Reasoner.
+You MUST write 100% of your response in clear, concise, professional ENGLISH (strictly 1 to 3 short sentences, under 60 words).
+Stage 2 (our specialized Algérois Darija translator) will immediately localize your English response into authentic Algérois Latin Arabizi.
+- Fully understand all Algerian Darija terminology (e.g. "ch7al ykellef site web", "app mobile delivery kima Yassir", "fhamni wach ma3natha n8n", "salam khoya", "nahdar m3a un developpeur", "werili les projets").
+- Provide accurate Devyx details: Next.js 15 platforms ($950-$1,800, 10-20 days), Flutter/React Native mobile apps ($1,400-$2,600, 14-28 days), self-hosted n8n automations ($600-$1,200, 5-12 days, zero SaaS fees), AI agents (Gemini/Groq 24/7 lead qualification), WhatsApp (https://wa.me/213000000000), Contact page (/contact).
+- Append autonomous action tags when relevant: [ACTION:NAVIGATE:/projects], [ACTION:NAVIGATE:/services], [ACTION:NAVIGATE:/contact], [ACTION:THEME:dark], [ACTION:THEME:light], [ACTION:SET_LOCALE:fr].`;
+    greetingTemplate = `Greeting template: "Hello! Welcome to Devyx 👋 How can I assist with your software project today?"`;
+    refusalTemplate = `Out-of-scope refusal: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"`;
   } else {
     languageDirective = `### ⚠️ DYNAMIC LANGUAGE REFLECTION (AUTO MODE):
 Detect the visitor's language dynamically and respond EXCLUSIVELY in that exact same language:
@@ -636,7 +641,7 @@ export function generateDevSimulationResponse(
   ) {
     actions.push({ type: "SET_LOCALE", payload: "darija" });
     return new SimulationResultWrapper({
-      reply: "Salam ! Beddelt l-mode ta3 l-chat l ed-Darija 🇩🇿. Kifech n9der n3awnek f l'projet tech dyalek lyoum?",
+      reply: "Salam! Beddelt l'mode ta3 l'chat l ed-Darija 🇩🇿. Kifech n9der n3awnek f l'projet tech ta3ek lyoum?",
       actions,
     });
   }
@@ -734,14 +739,14 @@ export function generateDevSimulationResponse(
 
     const reply = hasContact
       ? effectiveLang === "darija"
-        ? `Sayeft les coordonnées dyalek (${contactInfo}) l'équipe technique f Telegram 🚨. غادي يتواصل معاك مسؤول تقني فالحين!`
+        ? `Sayeft les coordonnées ta3ek (${contactInfo}) l l'équipe technique f Telegram 🚨. Ra7 y'contactik un responsable technique f a9reb we9t!`
         : effectiveLang === "fr"
         ? `Vos coordonnées (${contactInfo}) ont été transmises à notre équipe technique sur Telegram 🚨. Un responsable va vous recontacter rapidement.`
         : effectiveLang === "ar"
         ? `تم إرسال بياناتكم (${contactInfo}) إلى فريق الإدارة الهندسية عبر تيليجرام 🚨. سيتواصل معكم مسؤول تقني في أقرب وقت.`
         : `Your contact info (${contactInfo}) has been dispatched to our engineering team on Telegram 🚨. A lead specialist will reach out shortly.`
       : effectiveLang === "darija"
-        ? "Sayeft alerte l'équipe technique f Telegram 🚨. 3tina noumrou WhatsApp dyalek wela email باش يتواصلو معاك فالحين، ولا تواصل ديريكت عبر [WhatsApp](https://wa.me/213000000000)."
+        ? "Sayeft alerte direct l l'équipe technique f Telegram 🚨. 3tina noumrou WhatsApp ta3ek wela email bach y'contactiwak f lwe9t, wela hder direct f [WhatsApp](https://wa.me/213000000000)."
         : effectiveLang === "fr"
         ? "Alerte transmise en direct à l'équipe technique sur Telegram 🚨. Laissez-nous votre WhatsApp ou email pour vous recontacter immédiatement, ou écrivez-nous sur [WhatsApp](https://wa.me/213000000000)."
         : effectiveLang === "ar"
