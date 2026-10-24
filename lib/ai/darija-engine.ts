@@ -255,6 +255,9 @@ export function sanitizeDarijaTextV2(input: string): SanitizerResult {
   replaceAndCount(/\bachnou\b/gi, 'wach');
   replaceAndCount(/\bach\b/gi, 'wach');
   replaceAndCount(/\bchno\b/gi, 'chnou');
+  replaceAndCount(/\bkaykhedjem\b/gi, 'yekhdem');
+  replaceAndCount(/\bkaykhedem\b/gi, 'yekhdem');
+  replaceAndCount(/\bkay([b-df-hj-np-tv-z][a-z]{3,})\b/gi, 'y$1');
 
   // 7b. Tunisian & Fus'ha purge
   replaceAndCount(/\bbarsha\b/gi, 'bezzef');
@@ -343,7 +346,7 @@ async function callGeminiFlashTranslation(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(6500),
+    signal: AbortSignal.timeout(12000),
   });
 
   if (!response.ok) {

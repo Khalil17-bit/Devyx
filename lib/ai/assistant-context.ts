@@ -452,59 +452,60 @@ export function generateDevSimulationResponse(
   const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
 
   // 2. Action Detection: Theme Switching (Seamless Autonomous Control)
-  const isDarkRequest =
-    /\b(dark\s*mode|mode\s*sombre|k7el|ke7el|layla|layl|ليل|الوضع\s*الداكن|داكن|dark\s*mod|black\s*mod|black\s*mode|noir|nocturne|night\s*mode|night)\b/i.test(query) ||
-    query.includes("dark mode") ||
-    query.includes("dark mod") ||
-    query.includes("mode sombre") ||
-    query.includes("black mode") ||
-    query.includes("black mod") ||
-    query.includes("night mode") ||
-    (query.includes("dark") && !query.includes("light") && !query.includes("white") && !query.includes("whiet")) ||
-    (query.includes("sombre") && !query.includes("clair")) ||
-    (query.includes("black") && !query.includes("white") && !query.includes("whiet"));
+  const hasThemeContext =
+    /\b(theme|thème|mode|couleur|color|affichage|look|fond|ecran|écran|3ayniya|3iniya|عينيا)\b/i.test(query) ||
+    /\b(dark|sombre|k7el|ke7el|layl|layla|ليل|داكن|black|noir|nocturne|night)\b/i.test(query) ||
+    /\b(light|clair|byed|byedh|byadh|byad|abyad|blanc|white|نهار|فاتح|day)\b/i.test(query);
 
-  if (isDarkRequest) {
-    actions.push({ type: "SET_THEME", payload: "dark" });
-    const reply =
-      effectiveLang === "darija"
-        ? "Safy! Badaltlek l'mode l **Dark Mode** 🌙."
-        : effectiveLang === "fr"
-        ? "J'ai basculé l'interface en **Dark Mode** 🌙."
-        : effectiveLang === "ar"
-        ? "تم تحويل واجهة المنصة إلى **الوضع الداكن** 🌙 بنجاح."
-        : "Switched to **Dark Mode** 🌙!";
-    return new SimulationResultWrapper({ reply, actions });
-  }
+  if (hasThemeContext) {
+    const mentionsLight = /\b(light|clair|byed|byedh|byadh|byad|abyad|blanc|white|نهار|فاتح|day\s*mode)\b/i.test(query);
+    const mentionsDark = /\b(dark|sombre|k7el|ke7el|layl|layla|ليل|داكن|black|noir|nocturne|night\s*mode)\b/i.test(query);
+    const fromDark = /\b(men|min|from|quitter)\s+(l'?\s*)?(k7el|ke7el|dark|sombre|noir|black|layl)\b/i.test(query);
+    const fromLight = /\b(men|min|from|quitter)\s+(l'?\s*)?(byed|byedh|byadh|byad|abyad|light|clair|white)\b/i.test(query);
+    const toLight =
+      /\b(l'?\s*|vers|to|into)\s*(byed|byedh|byadh|byad|abyad|light|clair|white|blanc)\b/i.test(query) ||
+      /\b(mode\s+l'?\s*(byed|byedh|byadh|byad|abyad|light|clair|white))\b/i.test(query);
+    const toDark =
+      /\b(l'?\s*|vers|to|into)\s*(k7el|ke7el|dark|sombre|noir|black)\b/i.test(query) ||
+      /\b(mode\s+l'?\s*(k7el|ke7el|dark|sombre|noir|black))\b/i.test(query);
 
-  const isLightRequest =
-    /\b(light\s*mode|light\s*mod|mode\s*clair|byad|byed|abyad|نهار|الوضع\s*الفاتح|فاتح|white\s*mod|whiet\s*mod|white\s*mode|whiet\s*mode|day\s*mode|day\s*mod|clair|blanc|soleil|sun\s*mode)\b/i.test(query) ||
-    query.includes("light mode") ||
-    query.includes("light mod") ||
-    query.includes("white mode") ||
-    query.includes("white mod") ||
-    query.includes("whiet mode") ||
-    query.includes("whiet mod") ||
-    query.includes("mode clair") ||
-    query.includes("day mode") ||
-    query.includes("day mod") ||
-    query.includes("whiet") ||
-    (query.includes("white") && !query.includes("dark") && !query.includes("black")) ||
-    (query.includes("light") && !query.includes("dark") && !query.includes("black")) ||
-    (query.includes("clair") && !query.includes("sombre")) ||
-    query.includes("blanc");
+    let targetTheme: "light" | "dark" | null = null;
 
-  if (isLightRequest) {
-    actions.push({ type: "SET_THEME", payload: "light" });
-    const reply =
-      effectiveLang === "darija"
-        ? "Safy! Badaltlek l'mode l **Light Mode** ☀️."
-        : effectiveLang === "fr"
-        ? "J'ai basculé l'interface en **Light Mode** ☀️."
-        : effectiveLang === "ar"
-        ? "تم تحويل واجهة المنصة إلى **الوضع الفاتح** ☀️ بنجاح."
-        : "Switched to **Light Mode** ☀️!";
-    return new SimulationResultWrapper({ reply, actions });
+    if (fromDark || toLight) {
+      targetTheme = "light";
+    } else if (fromLight || toDark) {
+      targetTheme = "dark";
+    } else if (mentionsLight && !mentionsDark) {
+      targetTheme = "light";
+    } else if (mentionsDark && !mentionsLight) {
+      targetTheme = "dark";
+    }
+
+    if (targetTheme === "dark") {
+      actions.push({ type: "SET_THEME", payload: "dark" });
+      const reply =
+        effectiveLang === "darija"
+          ? "Saye! Beddeltlek l'mode l **Dark Mode** 🌙."
+          : effectiveLang === "fr"
+          ? "J'ai basculé l'interface en **Dark Mode** 🌙."
+          : effectiveLang === "ar"
+          ? "تم تحويل واجهة المنصة إلى **الوضع الداكن** 🌙 بنجاح."
+          : "Switched to **Dark Mode** 🌙!";
+      return new SimulationResultWrapper({ reply, actions });
+    }
+
+    if (targetTheme === "light") {
+      actions.push({ type: "SET_THEME", payload: "light" });
+      const reply =
+        effectiveLang === "darija"
+          ? "Saye! Beddeltlek l'mode l **Light Mode** ☀️."
+          : effectiveLang === "fr"
+          ? "J'ai basculé l'interface en **Light Mode** ☀️."
+          : effectiveLang === "ar"
+          ? "تم تحويل واجهة المنصة إلى **الوضع الفاتح** ☀️ بنجاح."
+          : "Switched to **Light Mode** ☀️!";
+      return new SimulationResultWrapper({ reply, actions });
+    }
   }
 
   // 3. Action Detection: Navigation
@@ -614,14 +615,17 @@ export function generateDevSimulationResponse(
     }
   }
 
-  // 4. Action Detection: Language Switching Request
-  // French
-  if (
-    query.includes("french") ||
-    query.includes("français") ||
-    query.includes("francais") ||
-    /\b(parle|speak|switch|change|passer).*(français|francais|french)/i.test(query)
-  ) {
+  // 4. Action Detection: Language Switching Request (Explicit Switch Directive)
+  // French switch
+  const isFrenchSwitch =
+    (/\b(switch|change|bedel|bedli|badal|passer|parle|parler|speak|ahdar|hder)\b.*(français|francais|french)/i.test(query) ||
+      /\b(en français|en francais|au francais|parle français|parle francais|speak french|mode français|mode francais)\b/i.test(query) ||
+      query === "french" ||
+      query === "français" ||
+      query === "francais") &&
+    !/\b(app|application|site|learning|formation|cours|traduction|translate)\b/i.test(query);
+
+  if (isFrenchSwitch) {
     actions.push({ type: "SET_LOCALE", payload: "fr" });
     return new SimulationResultWrapper({
       reply: "Parfait ! J'ai basculé le mode de discussion en français 🇫🇷. Comment puis-je vous accompagner sur votre projet technique ?",
@@ -629,16 +633,16 @@ export function generateDevSimulationResponse(
     });
   }
 
-  // Darija
-  if (
-    query.includes("darija") ||
-    query.includes("darja") ||
-    query.includes("derja") ||
-    query.includes("الدارجة") ||
-    query.includes("دارجة") ||
-    /\b(ahdar|hder|hdr|kellem|ehki|speak|switch).*(darija|darja|algerian|dzair)/i.test(query) ||
-    /\b(bel darija|b darija|b ed-darija)\b/i.test(query)
-  ) {
+  // Darija switch
+  const isDarijaSwitch =
+    (/\b(switch|change|bedel|bedli|badal|passer|parle|parler|speak|ahdar|hder|hdr|kellem|ehki)\b.*(darija|darja|algerian|dzair)/i.test(query) ||
+      /\b(bel darija|b darija|b ed-darija|b eddarja|f darija)\b/i.test(query) ||
+      query === "darija" ||
+      query === "الدارجة" ||
+      query === "دارجة") &&
+    !/\b(app|application|transcription|voix|voice|audio|model|ai|api)\b/i.test(query);
+
+  if (isDarijaSwitch) {
     actions.push({ type: "SET_LOCALE", payload: "darija" });
     return new SimulationResultWrapper({
       reply: "Salam! Beddelt l'mode ta3 l'chat l ed-Darija 🇩🇿. Kifech n9der n3awnek f l'projet tech ta3ek lyoum?",
@@ -646,16 +650,15 @@ export function generateDevSimulationResponse(
     });
   }
 
-  // English
-  if (
-    query.includes("speak english") ||
-    query.includes("in english") ||
-    query.includes("to english") ||
-    query.includes("switch to english") ||
-    query.includes("english") ||
-    query.includes("anglais") ||
-    /\b(parle|speak|switch|change).*(english|anglais)/i.test(query)
-  ) {
+  // English switch
+  const isEnglishSwitch =
+    (/\b(switch|change|bedel|bedli|badal|passer|parle|parler|speak|ahdar|hder)\b.*(english|anglais)/i.test(query) ||
+      /\b(in english|to english|speak english|parle anglais|english please|mode english|english mode)\b/i.test(query) ||
+      query === "english" ||
+      query === "anglais") &&
+    !/\b(app|application|learning|cours|formation|platform|site|ecommerce)\b/i.test(query);
+
+  if (isEnglishSwitch) {
     actions.push({ type: "SET_LOCALE", payload: "en" });
     return new SimulationResultWrapper({
       reply: "Affirmative! Switched the chat language mode to English 🇬🇧. What technical architecture or software project are you planning?",
@@ -663,15 +666,16 @@ export function generateDevSimulationResponse(
     });
   }
 
-  // Arabic
-  if (
-    query.includes("بالعربية") ||
-    query.includes("عربية") ||
-    query.includes("arabe") ||
-    query.includes("arabic") ||
-    query.includes("بالفصحى") ||
-    /\b(speak|switch|change|t7aded).*(arabic|arabe|عربية)/i.test(query)
-  ) {
+  // Arabic (Fus'ha) switch
+  const isArabicSwitch =
+    (/\b(switch|change|bedel|bedli|badal|passer|speak|ahdar|hder|t7aded|تحدث|تكلم|حول|غير|بدل)\b.*(arabic|arabe|عربية|فصحى|بالعربية)/i.test(query) ||
+      /\b(بالعربية|بالفصحى|en arabe|in arabic|mode arabe|arabic mode)\b/i.test(query) ||
+      query === "arabic" ||
+      query === "arabe" ||
+      query === "العربية" ||
+      query === "عربية");
+
+  if (isArabicSwitch) {
     actions.push({ type: "SET_LOCALE", payload: "ar" });
     return new SimulationResultWrapper({
       reply: "تم تحويل لغة المحادثة إلى العربية 🇸🇦. كيف يمكننا خدمة مشروعكم التقني اليوم؟",
