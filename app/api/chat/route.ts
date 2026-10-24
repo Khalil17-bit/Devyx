@@ -760,14 +760,18 @@ let geminiChatBackoffUntil = 0;
           },
         };
 
+        const isRemoteTunnel = !n8nWebhookUrl.includes("localhost") && !n8nWebhookUrl.includes("127.0.0.1");
+        const webhookTimeoutMs = isRemoteTunnel ? 15000 : 4000;
+
         const upstreamResponse = await fetch(n8nWebhookUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-n8n-secret": n8nWebhookSecret || "",
+            "ngrok-skip-browser-warning": "true",
           },
           body: JSON.stringify(upstreamPayload),
-          signal: AbortSignal.timeout(1200),
+          signal: AbortSignal.timeout(webhookTimeoutMs),
         });
 
         if (!upstreamResponse.ok) return null;
