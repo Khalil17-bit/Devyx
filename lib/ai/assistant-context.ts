@@ -234,32 +234,33 @@ The visitor has explicitly selected: ENGLISH MODE.
 You MUST write 100% of your response in ENGLISH.
 - EVEN IF the visitor writes in Darija, Arabic, or French (such as "salam hada test bark", "bonjour", "kifach"), DO NOT REPLY IN DARIJA, ARABIC, OR FRENCH.
 - You are STRICTLY FORBIDDEN from answering in Darija or Arabic when English mode is active. Answer ONLY in English.`;
-    greetingTemplate = `Greeting template: "Hello! Welcome to Devyx 👋 How can I assist with your software project today?"`;
-    refusalTemplate = `Out-of-scope refusal: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"`;
+    greetingTemplate = `Greeting template: "Hello! Welcome to Devyx 👋 How can I assist with your project today?"`;
+    refusalTemplate = `Out-of-scope refusal: "I am an AI assistant for Devyx. I help prospective clients with custom websites, mobile applications (iOS & Android), business workflow automations, and AI systems. How can I assist with your software project today?"`;
   } else if (targetLanguage === "fr") {
     languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
 The visitor has explicitly selected: FRENCH MODE.
 You MUST write 100% of your response in FRENCH.
 - EVEN IF the visitor writes in English, Arabic, or Darija, DO NOT REPLY IN THOSE LANGUAGES. Reply ONLY in French.`;
     greetingTemplate = `Greeting template: "Bonjour et bienvenue chez Devyx 👋 Comment puis-je vous accompagner sur votre projet aujourd'hui ?"`;
-    refusalTemplate = `Out-of-scope refusal: "Je suis l'assistant technique IA de Devyx. Je réponds exclusivement aux questions relatives à l'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n et IA). Comment puis-je vous accompagner sur votre projet digital ?"`;
+    refusalTemplate = `Out-of-scope refusal: "Je suis l'assistant IA de Devyx. Je vous accompagne exclusivement sur vos projets de création de sites web, applications mobiles (iOS & Android), automatisations et solutions d'intelligence artificielle. Comment puis-je vous accompagner sur votre projet digital ?"`;
   } else if (targetLanguage === "ar") {
     languageDirective = `### ⚠️ ABSOLUTE LANGUAGE CONSTRAINT (HARD OVERRIDE):
 The visitor has explicitly selected: ARABIC MODE (الفصحى).
 You MUST write 100% of your response in MODERN STANDARD ARABIC.`;
-    greetingTemplate = `Greeting template: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك البرمجي اليوم؟"`;
-    refusalTemplate = `Out-of-scope refusal: "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"`;
+    greetingTemplate = `Greeting template: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك اليوم؟"`;
+    refusalTemplate = `Out-of-scope refusal: "أنا المساعد الذكي لـ Devyx. أساعدك حصرياً في مشاريع تطوير المواقع، تطبيقات الهاتف (iOS وأندرويد)، أتمتة الأعمال، وحلول الذكاء الاصطناعي. كيف يمكنني مساعدتك في مشروعك اليوم؟"`;
   } else if (targetLanguage === "darija" || targetLanguage === "ar-MA") {
     languageDirective = `### ⚠️ TWO-STAGE PIPELINE MANDATE (STAGE 1 REASONER FOR DARIJA):
 The visitor is communicating in ALGERIAN DARIJA (or has selected Darija mode).
 You are Stage 1 of the Two-Stage AI Pipeline: The Senior Technical Reasoner.
 You MUST write 100% of your response in clear, concise, professional ENGLISH (strictly 1 to 3 short sentences, under 60 words).
 Stage 2 (our specialized Algérois Darija translator) will immediately localize your English response into authentic Algérois Latin Arabizi.
-- Fully understand all Algerian Darija terminology (e.g. "ch7al ykellef site web", "app mobile delivery kima Yassir", "fhamni wach ma3natha n8n", "salam khoya", "nahdar m3a un developpeur", "werili les projets").
-- Provide accurate Devyx details: Next.js 15 platforms ($950-$1,800, 10-20 days), Flutter/React Native mobile apps ($1,400-$2,600, 14-28 days), self-hosted n8n automations ($600-$1,200, 5-12 days, zero SaaS fees), AI agents (Gemini/Groq 24/7 lead qualification), WhatsApp (https://wa.me/213000000000), Contact page (/contact).
+- Fully understand all Algerian Darija terminology (e.g. "ch7al ykellef site web", "app mobile delivery kima Yassir", "salam khoya", "nahdar m3a un developpeur", "werili les projets").
+- Provide client-friendly Devyx details: Professional custom websites ($950-$1,800, 10-20 days), Mobile apps for iOS & Android ($1,400-$2,600, 14-28 days), Workflow automations ($600-$1,200, 5-12 days), AI agents for 24/7 lead qualification, WhatsApp (https://wa.me/213000000000), Contact page (/contact).
+- 🛑 CLIENT-FIRST MANDATE: Talk to clients, not tech goats! DO NOT voluntarily mention technical plumbing ('Next.js 15', 'PostgreSQL', 'Flutter', 'n8n', 'RLS') UNLESS the user explicitly asks for technical details or stack information.
 - Append autonomous action tags when relevant: [ACTION:NAVIGATE:/projects], [ACTION:NAVIGATE:/services], [ACTION:NAVIGATE:/contact], [ACTION:THEME:dark], [ACTION:THEME:light], [ACTION:SET_LOCALE:fr].`;
     greetingTemplate = `Greeting template: "Hello! Welcome to Devyx 👋 How can I assist with your software project today?"`;
-    refusalTemplate = `Out-of-scope refusal: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"`;
+    refusalTemplate = `Out-of-scope refusal: "I am an AI assistant for Devyx. I help prospective clients with custom websites, mobile apps, workflow automations, and AI systems. How can I assist with your software project?"`;
   } else {
     languageDirective = `### ⚠️ DYNAMIC LANGUAGE REFLECTION (AUTO MODE):
 Detect the visitor's language dynamically and respond EXCLUSIVELY in that exact same language:
@@ -271,15 +272,15 @@ Detect the visitor's language dynamically and respond EXCLUSIVELY in that exact 
 - English: "Hello! Welcome to Devyx 👋 How can I assist with your software project today?"
 - French: "Bonjour et bienvenue chez Devyx 👋 Comment puis-je vous accompagner sur votre projet aujourd'hui ?"
 - Darija: "Salam! Mar7ba bik f Devyx 👋 Kifech n9der n3awnek f l'projet ta3ek lyoum?"
-- Arabic: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك البرمجي اليوم؟"`;
+- Arabic: "أهلاً بك في ديفيكس 👋 كيف يمكنني مساعدتك في مشروعك اليوم؟"`;
     refusalTemplate = `Out-of-scope refusals:
-- English: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"
-- French: "Je suis l'assistant technique IA de Devyx. Je réponds exclusivement aux questions relatives à l'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n et IA). Comment puis-je vous accompagner sur votre projet digital ?"
-- Darija: "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"
-- Arabic: "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"`;
+- English: "I am an AI assistant for Devyx. I help prospective clients with custom websites, mobile applications (iOS & Android), business workflow automations, and AI systems. How can I assist with your software project today?"
+- French: "Je suis l'assistant IA de Devyx. Je vous accompagne exclusivement sur vos projets de création de sites web, applications mobiles (iOS & Android), automatisations et intelligence artificielle. Comment puis-je vous accompagner sur votre projet digital ?"
+- Darija: "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile (iOS/Android), l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?"
+- Arabic: "أنا المساعد الذكي لـ Devyx. أساعدك حصرياً في مشاريع تطوير المواقع، تطبيقات الهاتف (iOS وأندرويد)، أتمتة الأعمال، وحلول الذكاء الاصطناعي. كيف يمكنني مساعدتك في مشروعك اليوم؟"`;
   }
 
-  return `You are the Lead Technical AI Assistant for **Devyx**, a premium software engineering agency specializing in high-performance web platforms (Next.js 15), cross-platform mobile apps, self-hosted n8n workflow automations, and autonomous AI agents.
+  return `You are the Lead Client AI Assistant for **Devyx**, a premium software engineering agency creating high-performance custom websites, mobile apps for iOS & Android, business workflow automations, and autonomous AI systems.
 
 ${languageDirective}
 
@@ -287,9 +288,19 @@ ${languageDirective}
 - DO NOT say "I am Jarvis" or refer to yourself as "Jarvis" under ANY circumstance.
 - You are simply "Devyx AI Assistant" or "an AI assistant for Devyx".
 
+### 🛑 CLIENT-FIRST COMMUNICATION MANDATE (NON-TECHNICAL BY DEFAULT):
+You are communicating with everyday business owners, startup founders, store managers, and regular clients — NOT developer "tech goats".
+- **DO NOT voluntarily bring up internal developer technologies, frameworks, or tech acronyms** (such as "Next.js 15", "PostgreSQL", "Supabase", "Redis", "n8n", "Flutter", "React Native", "RLS", "Docker", "ISR", "LCP") in regular client discussions.
+- Instead, speak in clear, approachable business terms that any client understands:
+  * For Web: Say "custom websites", "fast modern web platforms", or "professional online stores" (in Darija: "site web pro", "plateforme sur-mesure", "site e-commerce").
+  * For Mobile: Say "mobile applications for iPhone and Android" (in Darija: "application mobile iPhone w Android").
+  * For Automations: Say "business automation workflows" or "connecting your tools and messages automatically" (in Darija: "l'automatisation ta3 l'khedma", "système li y'connecti kolchi automatique").
+  * For AI: Say "smart AI assistants", "chatbots", or "automated lead qualification" (in Darija: "les agents IA", "bot intelligent").
+- **WHEN TO USE TECH TERMS**: Disclose specific technical frameworks ("Next.js 15", "PostgreSQL", "Flutter", "n8n", etc.) **ONLY IF AND WHEN the visitor explicitly asks for technical details** (e.g., "what tech stack do you use?", "wachmen base de données tkhadmo biha?", "what framework is it built with?", "how is it coded?").
+
 ### YOUR ROLE & MISSION:
-1. Greet visitors warmly and act as an expert technical consultant.
-2. Answer questions accurately about Devyx's services, architectural philosophy, delivery process, and tech stack.
+1. Greet visitors warmly and act as an approachable technical consultant.
+2. Answer questions accurately about Devyx's services, delivery process, and preliminary pricing.
 3. Help prospective clients qualify their project needs (e.g., project scope, target platform, timeline, and automation goals).
 4. Direct qualified leads to schedule a discovery meeting or reach the engineering team directly via WhatsApp (${DEVYX_AGENCY_CONTEXT.contact.whatsappUrl}) or the Contact page (/contact).
 5. Communicate with high clarity, professionalism, and structured Markdown (bullet points, bold text). Keep responses concise and action-oriented.
@@ -316,9 +327,11 @@ ${languageDirective}
 ${refusalTemplate}
 
 2. **CONCISENESS (1-3 SENTENCES MAX)**: Keep answers punchy, helpful, and conversational. NEVER lecture the visitor with huge technical manuals, internal agent protocols, or developer handover guides.
-3. **GREETINGS**: When the visitor sends a greeting (like "salam", "hello", "hi", "bonjour", "salut"), reply with a friendly 1-2 sentence greeting:
+3. **GREETINGS & COMBINED QUESTIONS**:
+   - If the visitor sends ONLY a greeting (like "salam", "hello", "hi", "bonjour", "salut"), reply with a warm 1-2 sentence greeting:
 ${greetingTemplate}
-4. **DEVYX AGENCY SCOPE**: Devyx builds Next.js 15 web platforms, mobile apps (Flutter/React Native), self-hosted n8n automations, and AI agents.
+   - If the visitor combines a greeting with a question (e.g. "salam khoya ch7al ykellef site web", "bonjour combien coûte une application mobile"), warmly greet them in one phrase AND directly answer their question!
+4. **DEVYX AGENCY SCOPE**: Devyx builds modern custom websites & web platforms, mobile apps (iOS & Android), business workflow automations, and intelligent AI agents. (Only name specific frameworks like Next.js 15 or Flutter when the user explicitly asks for technical architecture).
 5. **AUTONOMOUS PLATFORM ACTIONS, LANGUAGE SWITCHING & MEMORY (MANDATORY)**:
    You have executive platform control to navigate pages, change themes, or SWITCH THE CHAT LANGUAGE MODE.
    - **Language Switching Requests**: When the visitor asks to switch language, speak in a specific language, or switch language mode (e.g. "switch language mode in this chat to french", "speak in french", "parle en français", "ahdar bel darija", "speak in arabic", "switch to english"):
@@ -775,38 +788,38 @@ export function generateDevSimulationResponse(
     query.includes("pricing") ||
     query.includes("estimation")
   ) {
-    let projectType = "Full-Stack Web & Automation Pipeline";
+    let projectType = "Plateforme Web Professionnelle";
     let cost = "$950 – $1,800";
     let timeline = "10 – 20 Days";
-    let stack = ["Next.js 15", "n8n Self-Hosted", "PostgreSQL", "Tailwind CSS"];
+    let stack = ["Web Moderne", "Design Responsive", "Base de Données", "Optimisation SEO"];
     let deliverables = [
-      "Custom Next.js 15 Web Platform with Sub-0.8s LCP",
-      "Self-Hosted n8n Workflow Automation (Zero SaaS Tax)",
-      "Automated CRM Lead Routing & WhatsApp Sync",
-      "Hardened Supabase PostgreSQL with RLS Security",
+      "Site web sur-mesure ultra-rapide et responsive",
+      "Design moderne adapté à votre marque et mobile",
+      "Connexion automatique avec WhatsApp et vos contacts",
+      "Sécurité maximale et hébergement optimisé",
     ];
 
-    if (query.includes("mobile") || query.includes("تطبيق") || query.includes("app")) {
-      projectType = "Cross-Platform Mobile Application";
+    if (query.includes("mobile") || query.includes("تطبيق") || /\b(app|apps|application|applications|l'app)\b/i.test(query)) {
+      projectType = "Application Mobile (iOS & Android)";
       cost = "$1,400 – $2,600";
       timeline = "14 – 28 Days";
-      stack = ["Flutter / React Native", "SQLite Offline Cache", "Supabase Auth", "Push Alerts"];
+      stack = ["iOS & Android", "Interface Fluide", "Notifications Push", "Cloud Sync"];
       deliverables = [
-        "Unified iOS & Android Native Codebase",
-        "Offline-First Data Storage & Auto-Sync",
-        "Biometric Security (FaceID / Fingerprint)",
-        "App Store & Google Play Ready Build",
+        "Application mobile fluide pour iPhone et Android",
+        "Fonctionnement rapide et synchronisation automatique",
+        "Authentification sécurisée et notifications push",
+        "Prête pour publication sur App Store et Google Play",
       ];
     } else if (query.includes("n8n") || query.includes("automation") || query.includes("أتمتة")) {
-      projectType = "Autonomous n8n Business Pipeline";
+      projectType = "Système d'Automatisation des Tâches";
       cost = "$600 – $1,200";
       timeline = "5 – 12 Days";
-      stack = ["n8n (Self-Hosted)", "Webhooks", "PostgreSQL", "REST APIs"];
+      stack = ["Workflow Automation", "API Integration", "Webhooks", "Database Sync"];
       deliverables = [
-        "Zero-SaaS-Fee Workflow Engine on Dedicated Server",
-        "Multi-Step API Synchronization (CRM, Sheets, Invoicing)",
-        "Automated Error Recovery & Telegram Alerting",
-        "Real-Time Data Pipelines",
+        "Connexion automatique de vos outils (WhatsApp, CRM, Sheets)",
+        "Gain de temps précieux et élimination des tâches manuelles",
+        "Alertes instantanées en temps réel",
+        "Zéro abonnement mensuel par tâche",
       ];
     }
 
@@ -821,12 +834,12 @@ export function generateDevSimulationResponse(
 
     const reply =
       effectiveLang === "darija"
-        ? `Dertlek estimation technique instantanée (${cost} | ${timeline}) lte7t 💰. T9der t'valider f [WhatsApp](https://wa.me/213000000000) wela [Page Contact](/contact)!`
+        ? `Dertlek estimation préliminaire (${cost} | ${timeline}) lte7t 💰. T9der t'valider f [WhatsApp](https://wa.me/213000000000) wela f [Page Contact](/contact)!`
         : effectiveLang === "fr"
-        ? `Voici l'estimation technique (${cost} | ${timeline}) affichée ci-dessous 💰. Échangeons sur [WhatsApp](https://wa.me/213000000000) ou via la [Page Contact](/fr/contact).`
+        ? `Voici une estimation préliminaire (${cost} | ${timeline}) affichée ci-dessous 💰. Échangeons sur [WhatsApp](https://wa.me/213000000000) ou via la [Page Contact](/fr/contact).`
         : effectiveLang === "ar"
         ? `تم إعداد تقدير أولي (${cost} | ${timeline}) في البطاقة أدناه 💰. يمكنك اعتماده عبر [واتساب](https://wa.me/213000000000) أو [صفحة التواصل](/ar/contact).`
-        : `Generated instant engineering estimate below (${cost} | ${timeline}) 💰. Ready to review on [WhatsApp](https://wa.me/213000000000) or our [Contact Page](/en/contact)?`;
+        : `Generated preliminary estimate below (${cost} | ${timeline}) 💰. Ready to review on [WhatsApp](https://wa.me/213000000000) or our [Contact Page](/en/contact)?`;
 
     return new SimulationResultWrapper({ reply, actions, estimate });
   }
@@ -841,19 +854,21 @@ export function generateDevSimulationResponse(
   if (isGreeting) {
     const reply =
       effectiveLang === "darija"
-        ? "Salam! 👋 Ana l'assistant technique IA ta3 Devyx. Kifech n9der n3awnek f l'projet ta3ek lyoum?"
+        ? "Salam! 👋 Ana l'assistant IA ta3 Devyx. Kifech n9der n3awnek f l'projet ta3ek lyoum?"
         : effectiveLang === "fr"
-        ? "Bonjour ! 👋 Je suis l'assistant technique IA de Devyx. Comment puis-je vous accompagner sur votre projet ?"
+        ? "Bonjour ! 👋 Je suis l'assistant IA de Devyx. Comment puis-je vous accompagner sur votre projet aujourd'hui ?"
         : effectiveLang === "ar"
-        ? "أهلاً بك! 👋 أنا المساعد التقني الذكي لـ Devyx. كيف يمكنني مساعدتك في مشروعك اليوم؟"
-        : "Hello! 👋 I'm your Devyx AI assistant. How can I assist with your software project today?";
+        ? "أهلاً بك! 👋 أنا المساعد الذكي لـ Devyx. كيف يمكنني مساعدتك في مشروعك اليوم؟"
+        : "Hello! 👋 I'm your Devyx AI assistant. How can I assist with your project today?";
     return new SimulationResultWrapper({ reply });
   }
 
-  // 8. Action Detection: Out-of-Scope Queries (General trivia, recipes, poetry, sports, shoes/clothes, etc.)
+  // 8. Action Detection: Out-of-Scope Queries (General trivia, recipes, poetry, sports, shoes/clothes, cars, real estate, etc.)
   const isOutOfScope =
     /\b(recette|recipe|pizza|cake|gateau|chocolat|cuisine|cook|cooking|tabkh|tayab|makla|طبيخ|طبخ|وصفة|اكل|ماكلة)\b/i.test(query) ||
     /\b(sabat|sabate|chaussure|shoes|sneakers|vetement|clothes|chri|nechri|nechriw|حذاء|شراء\s*حذاء|صباط)\b/i.test(query) ||
+    /\b(tomobil|voiture|car|cars|moteur|panne|garage|mecanique|mécanique|autoroute|piece|pièce|kera|appartement|louer|location|immobilier|villa|studio|f3|f4|f2|hydra|kouba|دار|كراء|شقة|سيارة|طوموبيل)\b/i.test(query) ||
+    /\b(docteur|medecin|médicin|tabib|dwa|malade|mrid|hôpital|hopital|طبيب|دواء|مستشفى)\b/i.test(query) ||
     /\b(world\s*cup|football|messi|ronaldo|ballon\s*d'or|match|coupe\s*du\s*monde|كأس\s*العالم|كرة\s*القدم|ميسي|رونالدو)\b/i.test(query) ||
     /\b(po[eèé]me|poetry|poem|ch3ar|ch3er|chعر|قصيدة|شعر|blague|joke|nokat|nokta|نكتة|نكت)\b/i.test(query) ||
     /\b(who\s*is\s*(?!devyx)|qui\s*est\s*(?!devyx)|chkoun\s*(?!devyx)|من\s*هو\s*(?!devyx))\b/i.test(query) ||
@@ -863,33 +878,96 @@ export function generateDevSimulationResponse(
   if (isOutOfScope) {
     const reply =
       effectiveLang === "darija"
-        ? "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"
+        ? "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile, l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?"
         : effectiveLang === "fr"
-        ? "Je suis l'assistant technique IA de Devyx. Je réponds exclusivement aux questions relatives à l'ingénierie logicielle (Next.js 15, applications mobiles, automatisations n8n et IA). Comment puis-je vous accompagner sur votre projet digital ?"
+        ? "Je suis l'assistant IA de Devyx. Je vous accompagne exclusivement sur vos projets de création de sites web, applications mobiles, automatisations et solutions d'intelligence artificielle. Comment puis-je vous accompagner sur votre projet digital ?"
         : effectiveLang === "ar"
-        ? "أنا المساعد التقني الذكي لـ Devyx. أجيب حصرياً على الاستفسارات المتعلقة بهندسة البرمجيات (Next.js 15، تطبيقات الجوال، أتمتة n8n، والذكاء الاصطناعي). كيف يمكنني مساعدتك في مشروعك البرمجي؟"
-        : "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?";
+        ? "أنا المساعد الذكي لـ Devyx. أساعدك حصرياً في مشاريع تطوير المواقع، تطبيقات الهاتف، أتمتة الأعمال، وحلول الذكاء الاصطناعي. كيف يمكنني مساعدتك في مشروعك اليوم؟"
+        : "I am an AI assistant for Devyx. I help prospective clients with custom websites, mobile applications (iOS & Android), business workflow automations, and AI systems. How can I assist with your software project today?";
     return new SimulationResultWrapper({ reply: effectiveLang === "darija" ? sanitizeDarijaText(reply) : reply });
   }
 
-  // 9. Domain Queries (Web, n8n, Mobile) & Concise Defaults
+  // 9. Domain Queries (Specific to General) & Concise Defaults
   if (effectiveLang === "darija") {
+    // Payment integrations DZ
+    if (/\b(chargily|satim|cib|dahabia|edahabia)\b/i.test(query) || (/\b(paiement|paiements)\b/i.test(query) && /\b(ligne|carte|passerelle|gateway|dz)\b/i.test(query))) {
+      const reply = "Iyeh, n'intégrer-iw les solutions de paiement DZ kima Chargily w Satim (CIB / Edahabia) direct f les sites w les apps ta3na bach ykoun le paiement sahle w sécurisé.";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // AI voice / Transcription
+    if (/\b(transcription|vocal|vocale|voix|audio|speech)\b/i.test(query)) {
+      const reply = "Oui, n9edrou n'intégrer la transcription vocale b Darija f l'application mobile ta3ek bach les utilisateurs y'hedrou b tbi3ethom. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000)!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Chatbots & Social Messaging
+    if (/\b(bot|chatbot|instagram|facebook|messagerie|messages)\b/i.test(query)) {
+      const reply = "N'développiw des bots w agents IA intelligents li y'jawbou 3la les clients f Instagram w Facebook 24/7. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000) bach n'beddaw!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Meeting / Office inquiry
+    if (/\b(bureau|office|meet|meeting|visite|siege|siège)\b/i.test(query)) {
+      const reply = "7na agency remote 100%, ma 3endnach bureau physique f Dzayer. Mais, n9edrou n'programmiw Google Meet m3a l'équipe ta3na bach n'nahdrou 3la l'projet ta3ek direct!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Negotiation / Pricing discount
+    if (/\b(ghali|remise|reduction|réduction|facilitez|facilité|cher|ghla)\b/i.test(query)) {
+      const reply = "Les prix ta3na y'3akssou la qualité l'3alya w la livraison rapide (site web men $950 f 10-20 jours). T9der t'contactina f [WhatsApp](https://wa.me/213000000000) bach n'choufou solution t'sa3ed l'budget ta3ek!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // UI/UX & Design
+    if (/\b(ui|ux|design|figma|maquette|maquettes)\b/i.test(query)) {
+      const reply = "N'khedmou le design men sfer (from scratch) 3la 7sab l'identité ta3ek, wela n'khadmiw b les maquettes Figma ta3ek b interface moderne w sahla. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000)!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Maintenance & Technical support
+    if (/\b(maintenance|support|garantie|suivi)\b/i.test(query)) {
+      const reply = "Oui, n'fourniw support technique, maintenance w garantie mor ma n'lanciwha l'projet bach n'garantiw belli kolchi yemchi mli7 bla 7ta mouchkil. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000)!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Hosting & Domain
+    if (query.includes("hebergement") || query.includes("hébergement") || query.includes("domaine") || query.includes("serveur") || query.includes("hosting")) {
+      const reply = "7na n'gériw ga3 la partie technique ta3 l'hébergement w le nom de domaine bach ykoun le site rapide w sécurisé 100%. 3lik ghir t'meddelna le nom de domaine li 7ab t'khdem bih!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Data security & Privacy
+    if (/\b(securite|sécurité|securise|sécurisé|donnees|données|serveur|serveurs|stockage|stocker|stockés|stocké)\b/i.test(query)) {
+      const reply = "Les données ta3ek w ta3 les clients rahom m7miyin f des serveurs sécurisés w cryptés b a3la standard de protection w confidentialité.";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Closing & Contract
+    if (/\b(contrat|cahier des charges|signiw|finaliser|lanciwha)\b/i.test(query)) {
+      const reply = "Bach n'wedjou l'cahier des charges w n'signiw l'contrat, t9der t'prendi rendez-vous direct f [WhatsApp](https://wa.me/213000000000) wela f la page [Contact](/contact) bach n'beddaw direct!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Workflow automation & Sheets
+    if (query.includes("n8n") || query.includes("أتمتة") || query.includes("اتمتة") || query.includes("automation") || query.includes("automatique") || query.includes("workflow") || query.includes("sheets")) {
+      const reply = "L'automatisation t'connecti les outils ta3ek (CRM, Google Sheets, WhatsApp) bach kolchi yemchi automatique bla ma t'dhaye3 we9tek. Chnouma les tâches li 7ab t'khallihom automatiques?";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Mobile apps
+    if (query.includes("تطبيق") || query.includes("ابليكاسيون") || query.includes("mobile") || query.includes("موبايل") || /\b(app|apps|application|applications|l'app|l'application)\b/i.test(query)) {
+      const reply = "N'développiw des applications mobile li yemchiw f iPhone w Android f nafs lwe9t, b interface sahla w rapide. T9der t'demandi devis gratuit direct f [WhatsApp](https://wa.me/213000000000)!";
+      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
+    }
+
+    // Websites & Web Platforms
     if (query.includes("سيت") || query.includes("موقع") || query.includes("web") || query.includes("site")) {
-      const reply = "N7atto des plateformes Next.js 15 rapides (LCP < 0.8s) w sécurisées. Rak 7ab site vitrine, e-commerce wela SaaS? Hder direct f [WhatsApp](https://wa.me/213000000000)!";
+      const reply = "N'développiw des sites web modernes, rapides w professionnels (sites vitrine, e-commerce wela plateformes sur-mesure). Rak 7ab tchouf des exemples wela nahdrou direct f [WhatsApp](https://wa.me/213000000000)?";
       return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
     }
 
-    if (query.includes("n8n") || query.includes("أتمتة") || query.includes("اتمتة") || query.includes("automation") || query.includes("workflow")) {
-      const reply = "L'automation n8n (self-hosted) tconnecti site ta3ek m3a CRM, WhatsApp w paiements bla abonnements. Chnouma les tâches li 7ab t'automatisihom?";
-      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
-    }
-
-    if (query.includes("تطبيق") || query.includes("ابليكاسيون") || query.includes("app") || query.includes("mobile") || query.includes("موبايل")) {
-      const reply = "N'développiw des applications iOS w Android unifiées (offline-first) b Flutter w React Native. T9der t'demandi devis f [WhatsApp](https://wa.me/213000000000)!";
-      return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
-    }
-
-    const reply = "Devyx spécialiste f plateformes Next.js 15, apps mobile w automations n8n. Goulli wach ra7 t'bni wela hder m3ana f [WhatsApp](https://wa.me/213000000000)!";
+    const reply = "Devyx agence spécialisée f la création des sites web, applications mobile, l'automatisation des tâches w les solutions d'IA. Goulli wach men projet rak 7ab t'dir wela hder m3ana direct f [WhatsApp](https://wa.me/213000000000)!";
     return new SimulationResultWrapper({ reply: sanitizeDarijaText(reply) });
   }
 
@@ -897,21 +975,21 @@ export function generateDevSimulationResponse(
   if (effectiveLang === "fr") {
     if (query.includes("web") || query.includes("site")) {
       return new SimulationResultWrapper({
-        reply: "Nous développons des plateformes Next.js 15 ultra-rapides (LCP < 0.8s) avec support trilingue RTL/LTR. Décrivez votre besoin ou écrivez sur [WhatsApp](https://wa.me/213000000000).",
+        reply: "Nous développons des sites web et plateformes sur-mesure, modernes et rapides (vitrines, e-commerce, portails clients). Décrivez votre projet ou écrivez-nous sur [WhatsApp](https://wa.me/213000000000).",
       });
     }
     if (query.includes("n8n") || query.includes("automatisation") || query.includes("workflow")) {
       return new SimulationResultWrapper({
-        reply: "Nous déployons des pipelines n8n auto-hébergés sans abonnement par tâche (CRM, paiements, WhatsApp). Quels processus souhaitez-vous automatiser ?",
+        reply: "Nos systèmes d'automatisation connectent vos outils (CRM, WhatsApp, facturation) pour vous faire gagner un temps précieux. Quels processus souhaitez-vous automatiser ?",
       });
     }
-    if (query.includes("mobile") || query.includes("app") || query.includes("application")) {
+    if (query.includes("mobile") || query.includes("application") || /\b(app|apps)\b/i.test(query)) {
       return new SimulationResultWrapper({
-        reply: "Nous créons des apps mobiles unifiées iOS & Android avec support offline-first. Souhaitez-vous échanger sur votre cahier des charges sur [WhatsApp](https://wa.me/213000000000) ?",
+        reply: "Nous créons des applications mobiles fluides pour iPhone et Android. Souhaitez-vous échanger sur votre projet sur [WhatsApp](https://wa.me/213000000000) ?",
       });
     }
     return new SimulationResultWrapper({
-      reply: "Devyx conçoit des plateformes Next.js 15, apps mobiles et pipelines d'automatisation n8n. Comment pouvons-nous vous aider ? Échangez directement sur [WhatsApp](https://wa.me/213000000000).",
+      reply: "Devyx conçoit des sites web sur-mesure, des applications mobiles et des solutions d'automatisation. Comment pouvons-nous vous aider ? Échangez directement sur [WhatsApp](https://wa.me/213000000000).",
     });
   }
 
@@ -919,41 +997,41 @@ export function generateDevSimulationResponse(
   if (effectiveLang === "ar") {
     if (query.includes("ويب") || query.includes("موقع") || query.includes("منصة")) {
       return new SimulationResultWrapper({
-        reply: "نبني منصات Next.js 15 فائقة الأداء (LCP < 0.8s) تدعم تعدد اللغات بأمان تام. صف لنا فكرة مشروعك أو تواصل عبر [واتساب](https://wa.me/213000000000).",
+        reply: "نصمم مواقع ومنصات ويب عصرية وسريعة ومخصصة لنشاطك التجاري (متاجر إلكترونية، مواقع تعريفية). صف لنا فكرة مشروعك أو تواصل عبر [واتساب](https://wa.me/213000000000).",
       });
     }
     if (query.includes("أتمتة") || query.includes("اتمتة") || query.includes("n8n") || query.includes("مسار")) {
       return new SimulationResultWrapper({
-        reply: "نصمم مسارات n8n مستضافة ذاتياً لربط قواعد البيانات ونقاط الدفع و CRM بدون رسوم وسيطة. ما العمليات التي ترغب في أتمتتها؟",
+        reply: "نؤتمت مسارات وأدوات عملك (واتساب، الجداول، الفواتير) لتسريع أعمالك وتوفير وقتك. ما هي المهام التي ترغب في أتمتتها؟",
       });
     }
     if (query.includes("تطبيق") || query.includes("موبايل") || query.includes("هاتف")) {
       return new SimulationResultWrapper({
-        reply: "نطور تطبيقات موحدة لأنظمة iOS و Android تعمل دون اتصال (Offline-First). هل ترغب في مناقشة تفاصيل التطبيق عبر [واتساب](https://wa.me/213000000000)؟",
+        reply: "نطور تطبيقات هواتف ذكية سلسة تعمل على آيفون وأندرويد. هل ترغب في مناقشة تفاصيل التطبيق عبر [واتساب](https://wa.me/213000000000)؟",
       });
     }
     return new SimulationResultWrapper({
-      reply: "أهلاً بك في Devyx! نبني منصات الويب الحديثة وتطبيقات الجوال ومسارات أتمتة n8n. كيف يمكننا مساعدتك اليوم؟ تواصل معنا عبر [واتساب](https://wa.me/213000000000).",
+      reply: "أهلاً بك في Devyx! نطور المواقع الاحترافية، تطبيقات الجوال، وحلول الأتمتة الذكية. كيف يمكننا مساعدتك اليوم؟ تواصل معنا عبر [واتساب](https://wa.me/213000000000).",
     });
   }
 
   // English Fallback
   if (query.includes("web") || query.includes("site") || query.includes("next")) {
     return new SimulationResultWrapper({
-      reply: "We engineer high-performance Next.js 15 platforms (sub-0.8s LCP) with trilingual RTL/LTR support. What web system are you planning? Let's discuss on [WhatsApp](https://wa.me/213000000000).",
+      reply: "We engineer high-performance custom web platforms with clean responsive design. What web system are you planning? Let's discuss on [WhatsApp](https://wa.me/213000000000).",
     });
   }
   if (query.includes("n8n") || query.includes("automation") || query.includes("workflow")) {
     return new SimulationResultWrapper({
-      reply: "We deploy autonomous, self-hosted n8n pipelines connecting CRMs, APIs, and payments with zero per-task SaaS fees. Which workflows do you want automated?",
+      reply: "We build custom workflow automations connecting your CRM, spreadsheets, and WhatsApp to save you hours every week. Which workflows do you want automated?",
     });
   }
-  if (query.includes("mobile") || query.includes("app") || query.includes("ios") || query.includes("android")) {
+  if (query.includes("mobile") || query.includes("ios") || query.includes("android") || /\b(app|apps|application|applications)\b/i.test(query)) {
     return new SimulationResultWrapper({
-      reply: "We build unified iOS & Android mobile apps with offline-first local caching. Ready to discuss specifications on [WhatsApp](https://wa.me/213000000000)?",
+      reply: "We build smooth mobile applications for both iPhone and Android. Ready to discuss specifications on [WhatsApp](https://wa.me/213000000000)?",
     });
   }
   return new SimulationResultWrapper({
-    reply: "Welcome to Devyx! We specialize in Next.js 15 web platforms, mobile apps, and self-hosted n8n automations. Tell me about your requirements or connect on [WhatsApp](https://wa.me/213000000000).",
+    reply: "Welcome to Devyx! We specialize in custom web platforms, mobile apps, and workflow automations. Tell me about your requirements or connect on [WhatsApp](https://wa.me/213000000000).",
   });
 }

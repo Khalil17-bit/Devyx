@@ -249,7 +249,7 @@ async function runSuite() {
     }
 
     // Small delay to prevent rate limit collisions
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 2200));
   }
 
   // Summary

@@ -633,6 +633,9 @@ export async function POST(req: NextRequest) {
       content: h.content,
     }));
 
+// In-memory backoff timestamp when Gemini API quota is exhausted (429)
+let geminiChatBackoffUntil = 0;
+
     const callGroq = async (key: string, label: string) => {
       try {
         const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -651,7 +654,7 @@ export async function POST(req: NextRequest) {
             temperature: 0.15,
             max_tokens: 300,
           }),
-          signal: AbortSignal.timeout(3500),
+          signal: AbortSignal.timeout(6000),
         });
         if (res.ok) {
           const j = await res.json();
@@ -669,6 +672,9 @@ export async function POST(req: NextRequest) {
     }));
 
     const callGemini = async (key: string, label: string) => {
+      if (Date.now() < geminiChatBackoffUntil) {
+        return null;
+      }
       try {
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`,
@@ -686,6 +692,9 @@ export async function POST(req: NextRequest) {
             signal: AbortSignal.timeout(2500),
           }
         );
+        if (res.status === 429) {
+          geminiChatBackoffUntil = Date.now() + 10 * 60 * 1000;
+        }
         if (res.ok) {
           const j = await res.json();
           return j.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;

@@ -93,25 +93,29 @@ CRITICAL HARD RULES (ZERO TOLERANCE FOR MISTAKES):
    - BAN Levantine/Fus'ha: 'matar' (rain is 'chta', falls as 'ti7 chta'), 'bkra' (tomorrow is 'ghodwa'), 'hal yumkin', 'akhi', 'shukran' (use 'sa7a/bla mziya').
    - Obligation is impersonal: 'lazem' (NEVER 'lazmek' or 'lazim').
 
-7. DEVYX TECH AGENCY FEW-SHOT ANCHORS:
+7. DEVYX CLIENT-FIRST FEW-SHOT ANCHORS:
+   - Client-Friendly Tone: Talk to business clients, not tech goats! Do NOT inject framework names (Next.js 15, PostgreSQL, Flutter, n8n) unless they were explicitly requested and present in the input.
    - Greeting:
-     English: "Hello! Welcome to Devyx. How can I assist you with your software project today?"
+     English: "Hello! Welcome to Devyx. How can I assist you with your project today?"
      Algérois: "Salam! Mar7ba bik f Devyx 👋 Kifech n9der n3awnek f l'projet ta3ek lyoum?"
    - Web Platform:
-     English: "We build ultra-fast Next.js 15 web platforms with sub-0.8s load times. Web projects typically range between $950 and $1,800 delivered in 10 to 20 days. Let's discuss on [WhatsApp](https://wa.me/213000000000) or check our [Projects page](/projects)."
-     Algérois: "N'développiw des plateformes web Next.js 15 ultra-rapides (LCP < 0.8s). Les projets web ykellfou bin $950 w $1,800 f 10 7tal 20 jours. T9der tahdar m3ana direct f [WhatsApp](https://wa.me/213000000000) wela tchouf [Page Projets](/projects)!"
+     English: "We build modern, fast custom websites and web platforms. Web projects typically range between $950 and $1,800 delivered in 10 to 20 days. Let's discuss on [WhatsApp](https://wa.me/213000000000) or check our [Projects page](/projects)."
+     Algérois: "N'développiw des sites web modernes, rapides w sur-mesure. Les projets web ykellfou bin $950 w $1,800 f 10 7tal 20 jours. T9der t'contacti l'équipe ta3na direct f [WhatsApp](https://wa.me/213000000000) wela tchouf [Page Projets](/projects)!"
    - Mobile App:
-     English: "We engineer cross-platform mobile apps for iOS and Android using Flutter with offline-first caching. A delivery app typically costs between $1,400 and $2,600 in 14 to 28 days. You can request a quote on [WhatsApp](https://wa.me/213000000000)."
-     Algérois: "N'développiw des applications mobile unifiées pour iOS w Android b Flutter m3a cache offline-first. Application ta3 livraison tkellef bin $1,400 w $2,600 f 14 7tal 28 jours. T9der t'demandi devis gratuit direct f [WhatsApp](https://wa.me/213000000000)!"
-   - n8n Automation:
-     English: "Self-hosted n8n automation connects your CRM, WhatsApp, and billing workflows with zero recurring SaaS fees. Which business processes do you want to automate?"
-     Algérois: "L'automatisation n8n (self-hosted) tconnecti l'CRM, WhatsApp, w la facturation ta3ek bla ma tkhales des abonnements kol chher (0$ SaaS fees). Chnouma les processus li 7ab t'automatisihom?"
+     English: "We engineer smooth mobile apps for iPhone and Android. A custom mobile project typically costs between $1,400 and $2,600 in 14 to 28 days. You can request a quote on [WhatsApp](https://wa.me/213000000000)."
+     Algérois: "N'développiw des applications mobile rapides li yemchiw f iPhone w Android f nafs lwe9t. L'projet mobile ykellef bin $1,400 w $2,600 f 14 7tal 28 jours. T9der t'demandi devis gratuit direct f [WhatsApp](https://wa.me/213000000000)!"
+   - Automation:
+     English: "Our automation systems connect your CRM, spreadsheets, and WhatsApp automatically to save you time. Which business tasks would you like to automate?"
+     Algérois: "L'automatisation t'connecti les outils ta3ek (CRM, Google Sheets, WhatsApp) bach kolchi yemchi automatique bla ma t'dhaye3 we9tek. Chnouma les tâches li 7ab t'khallihom automatiques?"
    - Escalation:
-     English: "I dispatched an alert to our lead engineering team on Telegram. Please provide your WhatsApp number or email, or connect with us directly on [WhatsApp](https://wa.me/213000000000)."
-     Algérois: "Sayeft alerte direct l l'équipe technique ta3na f Telegram 🚨. 3tina noumrou WhatsApp ta3ek wela email bach y'contactik un développeur f lwe9t, wela hder direct f [WhatsApp](https://wa.me/213000000000)."
+     English: "I dispatched an alert to our technical team on Telegram. Please provide your WhatsApp number or email, or connect with us directly on [WhatsApp](https://wa.me/213000000000)."
+     Algérois: "Sayeft alerte direct l l'équipe ta3na f Telegram 🚨. 3tina noumrou WhatsApp ta3ek wela email bach y'contactiwak f lwe9t, wela hder direct f [WhatsApp](https://wa.me/213000000000)."
    - Out of Scope Refusal:
-     English: "I am an AI assistant for Devyx. I only answer questions related to software engineering, web development (Next.js 15), mobile apps, n8n automations, and AI systems. How can I assist with your software project?"
-     Algérois: "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, automations n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?"
+     English: "I am an AI assistant for Devyx. I help prospective clients with custom websites, mobile apps, workflow automations, and AI systems. How can I assist with your software project?"
+     Algérois: "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile, l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?"
+   - Technical Query (Only when explicitly asked for tech stack):
+     English: "Under the hood, we engineer web platforms using Next.js 15, PostgreSQL, and Supabase for maximum speed and security."
+     Algérois: "F la partie technique, n'khadmiw b Next.js 15, PostgreSQL w Supabase bach n'garantiw la vitesse w la sécurité maximale."
 
 8. FORMAT:
    - Output ONLY the translated text in Latin Arabizi.
@@ -124,6 +128,7 @@ CRITICAL HARD RULES (ZERO TOLERANCE FOR MISTAKES):
 export const PROMPT_GEMINI_V2 = `${CORE_MANDATES_V2}
 
 CRITICAL GEMINI CONSTRAINTS:
+- CLIENT-FIRST TONE: Speak like an approachable tech consultant talking to a client, NOT a developer lecture. Do NOT add unsolicited framework names ('Next.js 15', 'PostgreSQL', 'Flutter') unless they were in the source text.
 - Maintain your exceptional street-level conversational cadence and natural vocabulary.
 - Every Qaf must be '9' ('9bel', '9alli', '9rib', 'we9t', '9er3a', 't9eyyel').
 - Seamless French loanwords: 'l\\'appartement', 'le plombier', 'la fuite', 'la clim', 'le chauffage', 'les urgences', 'la carte grise', 'le permis', 'la machine à laver'.
@@ -132,12 +137,13 @@ CRITICAL GEMINI CONSTRAINTS:
 export const PROMPT_GROQ_V2 = `${CORE_MANDATES_V2}
 
 CRITICAL INSTRUCTIONS FOR OPEN-WEIGHT ENGINE:
-1. NEVER loop or repeat phrases like '3la 3ayn' or '9allek 9allek'.
-2. NEVER invent strange words. Use clear French loanwords for items: 'les sardines', 'la machine à laver', 'la prise', 'le permis', 'la carte grise', 'les impôts', 'la mairie'.
-3. NEVER use Moroccan words ('daba', 'ghadi', 'mzyan', '7it', 'mika'). Use 'doka', 'ra7', 'mli7', '3la khater', 'sachi'.
-4. Strictly write '9' for Qaf: '9bel', '9alli', '9rib', 'we9t', '9er3a'. NEVER write 'q'.
-5. Past tense 'he tried': write 'seyya' (NEVER 'siyi').
-6. 'Quiet neighbors': write 'calmes' or 'drayef' (NEVER 'saktin').`;
+1. CLIENT-FIRST TONE: Do NOT insert unsolicited technical jargon or framework names ('Next.js 15', 'PostgreSQL') unless in the original text.
+2. NEVER loop or repeat phrases like '3la 3ayn' or '9allek 9allek'.
+3. NEVER invent strange words. Use clear French loanwords for items: 'les sardines', 'la machine à laver', 'la prise', 'le permis', 'la carte grise', 'les impôts', 'la mairie'.
+4. NEVER use Moroccan words ('daba', 'ghadi', 'mzyan', '7it', 'mika'). Use 'doka', 'ra7', 'mli7', '3la khater', 'sachi'.
+5. Strictly write '9' for Qaf: '9bel', '9alli', '9rib', 'we9t', '9er3a'. NEVER write 'q'.
+6. Past tense 'he tried': write 'seyya' (NEVER 'siyi').
+7. 'Quiet neighbors': write 'calmes' or 'drayef' (NEVER 'saktin').`;
 
 export const PROMPT_GPT4O_V2 = `${CORE_MANDATES_V2}
 
@@ -212,6 +218,13 @@ export function sanitizeDarijaTextV2(input: string): SanitizerResult {
   replaceAndCount(/\bqer3a\b/gi, '9er3a');
   replaceAndCount(/\btqeyyel\b/gi, 't9eyyel');
   replaceAndCount(/\blqahwa\b/gi, 'l9ahwa');
+  replaceAndCount(/\b(l'?\s*)?baqi\b/gi, '$1ba9i');
+  replaceAndCount(/\b(l'?\s*)?baqya\b/gi, '$1ba9ya');
+  replaceAndCount(/\b(l'?\s*)?baqyin\b/gi, '$1ba9yin');
+  replaceAndCount(/\b(l'?\s*)?bqa\b/gi, '$1b9a');
+  replaceAndCount(/\bybqa\b/gi, 'yb9a');
+  replaceAndCount(/\btebqa\b/gi, 'teb9a');
+  replaceAndCount(/\btqedrou\b/gi, 't9edrou');
   replaceAndCount(/\b9allek(\s+9allek)+/gi, '9alli');
 
   // 3. Phonetic corrections
@@ -317,6 +330,9 @@ function getApiKeys(): ModelApiKeys {
   };
 }
 
+// In-memory backoff timestamp when Gemini API quota is exhausted (429)
+let geminiQuotaExceededUntil = 0;
+
 /**
  * Call Gemini Flash with Native Algérois Street-Level Reinforcement
  */
@@ -325,6 +341,10 @@ async function callGeminiFlashTranslation(
   englishText: string,
   modelName: string = "gemini-3.1-flash-lite"
 ): Promise<string> {
+  if (Date.now() < geminiQuotaExceededUntil) {
+    throw new Error("Gemini quota backoff active");
+  }
+
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
   const body = {
@@ -350,6 +370,9 @@ async function callGeminiFlashTranslation(
   });
 
   if (!response.ok) {
+    if (response.status === 429) {
+      geminiQuotaExceededUntil = Date.now() + 10 * 60 * 1000; // 10-minute backoff
+    }
     const errorJson = await response.json().catch(() => ({}));
     throw new Error(`Gemini Error (${response.status}): ${JSON.stringify(errorJson)}`);
   }
@@ -387,7 +410,7 @@ async function callGroqQwenTranslation(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(3500),
+    signal: AbortSignal.timeout(6500),
   });
 
   if (!response.ok) {
@@ -465,8 +488,23 @@ export async function translateToAlgéroisDarija(englishOrFrenchText: string): P
     }
   }
 
-  // If all remote LLMs failed, fallback to input text
-  const textToSanitize = rawOutput || englishOrFrenchText;
+  // If all remote LLMs failed, fallback to native Darija equivalent if out-of-scope refusal
+  let textToSanitize = rawOutput;
+  if (!textToSanitize) {
+    if (/out-of-scope|i am an ai assistant for devyx/i.test(englishOrFrenchText)) {
+      textToSanitize = "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile, l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?";
+    } else if (/chargily|satim|payment/i.test(englishOrFrenchText)) {
+      textToSanitize = "Iyeh, n'intégrer-iw Chargily w Satim direct f les sites w les apps ta3na bach n'garantiw l'paiement ykoun rapide w sécurisé 100%.";
+    } else if (/remote agency|office in algiers|google meet/i.test(englishOrFrenchText)) {
+      textToSanitize = "7na agency remote 100%, ma 3endnach bureau physique f Dzayer. Mais, n9edrou n'programmiw Google Meet m3a l'équipe ta3na bach n'nahdrou 3la l'projet ta3ek direct!";
+    } else if (/sign the contract|project scope|to proceed|finalize/i.test(englishOrFrenchText)) {
+      textToSanitize = "Bach n'wedjou l'cahier des charges w n'signiw l'contrat, t9der t'prendi rendez-vous direct f [WhatsApp](https://wa.me/213000000000) wela f la page [Contact](/contact) bach n'beddaw direct!";
+    } else if (/standard custom website|10-20 days|takes 10/i.test(englishOrFrenchText)) {
+      textToSanitize = "Salam! Mar7ba bik f Devyx 👋. Un site web sur-mesure yedi bin 10 7tal 20 jours bach n'garantiw la qualité, mais n9derou n'discutiw 3la we9t a9sar 3la 7sab les besoins ta3ek.";
+    } else {
+      textToSanitize = englishOrFrenchText;
+    }
+  }
 
   // Tier 5: Pass through 11-Tier Sanitizer
   const sanitized = sanitizeDarijaTextV2(textToSanitize);

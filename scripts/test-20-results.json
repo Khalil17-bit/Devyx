@@ -3,13 +3,8 @@
     "id": 1,
     "title": "Client Idea / Discovery",
     "message": "3andi fikra ta3 startup ecommerce f l'algerie w 7ab n3ref kifach tebdaw m3aya",
-    "reply": "Devyx spécialisée f les plateformes web Next.js 15 haute performance, machi ghir des sites e-commerce classique. N9edrou n'développiw lik portail B2B sur-mesure wela système de gestion interne l la startup ta3ek.\n\n7ab tchouf le portfolio technique ta3na?",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/projects"
-      }
-    ],
+    "reply": "Devyx hiya agence spécialisée f la création des sites web, applications mobile, l'automatisation des tâches w les solutions d'IA. Goulli wach men projet rak 7ab t'dir wela hder m3ana direct f [WhatsApp](https://wa.me/213000000000)!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -17,13 +12,8 @@
     "id": 2,
     "title": "Speed & Delivery Inquiry",
     "message": "urgent khoya, esq t9edrou tkemlouli site vitrine f 5 yam wela lazem we9t kbir?",
-    "reply": "Plateforme web Next.js 15 standard tedi bin 10 7tal 20 jours bach n'assuriw performance 3alya w qualité mli7a. Ida 7ab livraison urgent f 5 jours, contacti l'équipe technique ta3na direct f WhatsApp wela f la page Contact bach nchoufou ida c'est faisable.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "N'développiw des sites web modernes, rapides w professionnels (sites vitrine, e-commerce wela plateformes sur-mesure). Rak 7ab tchouf des exemples wela nahdrou direct f [WhatsApp](https://wa.me/213000000000)?",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -31,13 +21,8 @@
     "id": 3,
     "title": "Database / Tech Stack query",
     "message": "wachmen base de données tkhadmo biha f les applications ta3koum?",
-    "reply": "F l'essentiel, n'khadmiw b PostgreSQL m3a Supabase bach n'gérer les données ta3ek b tari9a sécurisée w scalable, w 3la l3ada n'zidoulha Redis bach n'assuriw un caching ultra-rapide.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/services"
-      }
-    ],
+    "reply": "Les données ta3ek w ta3 les clients rahom m7miyin f des serveurs sécurisés w cryptés b a3la standard de protection w confidentialité.",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -45,13 +30,8 @@
     "id": 4,
     "title": "CRM / ERP Automation query",
     "message": "3andi magasin kbir f bab ezzouar w 7ab n'connecti l stock m3a google sheets w whatsapp b tari9a automatique",
-    "reply": "Hada use case parfait pour l'automatisation n8n self-hosted ta3na, li tconnecti les données ta3 stock m3a Google Sheets w WhatsApp f bin $600 w $1,200. T9der t'contacti l'équipe technique ta3na direct f [WhatsApp](https://wa.me/213000000000) wela tchouf [Page Contact](/contact).",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "L'automatisation t'connecti les outils ta3ek (CRM, Google Sheets, WhatsApp) bach kolchi yemchi automatique bla ma t'dhaye3 we9tek. Chnouma les tâches li 7ab t'khallihom automatiques?",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -59,13 +39,8 @@
     "id": 5,
     "title": "Payment Gateway in Algeria inquiry",
     "message": "esq t'integriw chargily wela satim f les sites web li dirohom?",
-    "reply": "Iyye, n'intégriw Chargily w Satim bach n'assouriw les paiements locaux sécurisés f les plateformes web Next.js 15 ta3na.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/services"
-      }
-    ],
+    "reply": "Iyeh, n'intégrer-iw les solutions de paiement DZ kima Chargily w Satim (CIB / Edahabia) direct f les sites w les apps ta3na bach ykoun le paiement sahel w sécurisé.",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -73,13 +48,8 @@
     "id": 6,
     "title": "Mobile App Platforms query",
     "message": "l'application mobile li diroha temchi f iPhone w Android f nafs l'we9t wela kol wa7ed wa7do?",
-    "reply": "Devyx t'développi des applications mobile cross-platform b Flutter wela React Native, bach t'assuri code base wa7da temchi 3la iOS w Android f nefs lwe9t bla mouchkil.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/services"
-      }
-    ],
+    "reply": "N'développiw des applications mobile li yemchiw f iPhone w Android f nafs lwe9t, b interface sahla w rapide. T9der t'demandi devis gratuit direct f [WhatsApp](https://wa.me/213000000000)!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -87,13 +57,8 @@
     "id": 7,
     "title": "Maintenance & Support query",
     "message": "mora ma tkemlou l'projet, kayen garantie wela suivi technique ida sra mouchkil f l'code?",
-    "reply": "Oui, Devyx t'fourni le support technique w la maintenance 3la ba3d l'livraison bach t'assuri belli la plateforme ta3ek t'b9a stable w sécurisée. T9der t'contactina via WhatsApp (https://wa.me/213000000000) wela 3la tri9 la page Contact (/contact) bach nahdrou 3la les plans de support li y'wadjhouk.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "Oui, n'fourniw support technique, maintenance w garantie mor ma n'lanciwha l'projet bach n'garantiw belli kolchi yemchi mli7 bla 7ta mouchkil. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000)!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -101,13 +66,8 @@
     "id": 8,
     "title": "UI/UX Design inquiry",
     "message": "ma 3andich design figma, esq ntouma tekhedmou l'design men 0 wela lazem njibou m3aya?",
-    "reply": "Devyx t'gérer l'UI/UX design kamel men s-sifr b Figma, donc ma 3lik ma t'fourni 7ta design 9dim. 7na n't'kellfou b l'processus visuel kamel bach n'djemnou l'utilisateur y'3ich une expérience premium w performante.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/services"
-      }
-    ],
+    "reply": "N'khedmou le design men sfer (from scratch) 3la 7sab l'identité ta3ek, wela n'khadmiw b les maquettes Figma ta3ek b interface moderne w sahla. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000)!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -115,13 +75,8 @@
     "id": 9,
     "title": "Negotiation / Discount query",
     "message": "ghali chwiya $950 khoya, ma fiha 7ta remise wela facilitez de paiement pour les startups?",
-    "reply": "Devyx t'khalli les prix fixés bach t'dmen la qualité premium w la livraison rapide bla ma t'na9es men les standards ta3 l'ingénierie. Ma n'dirowch des remises wela des facilités de paiement, mais t9der t'na9ech l'périmètre ta3 l'projet ta3ek direct f WhatsApp wela f la page contact.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "Les prix ta3na y'3akssou la qualité l'3alya w la livraison rapide (site web men $950 f 10-20 jours). T9der t'contactina f [WhatsApp](https://wa.me/213000000000) bach n'choufou solution t'sa3ed l'budget ta3ek!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -129,7 +84,7 @@
     "id": 10,
     "title": "Previous Work / Portfolio request",
     "message": "werili chwiya khedma ta3koum wela les projets li khedmtouhom deja f l'algerie",
-    "reply": "Rani ditek l [Page Projets](/projects) 📁 bach tchouf l'khdma ta3na.",
+    "reply": "Rani ditek l [Page Projets](/projects) 📁 bach tchouf khdemtna.",
     "actions": [
       {
         "type": "NAVIGATE",
@@ -143,7 +98,7 @@
     "id": 11,
     "title": "Chatbot for Instagram / Facebook query",
     "message": "rani 7ab bot yjawb 3la les messages f instagram w facebook ta3 la marque ta3i",
-    "reply": "Devyx t'développi des agents IA autonomes li y9edrou y'gérerw la qualification des leads 24/7 w y'répondew 3la les messages f ga3 les canaux digitaux ta3ek. T9der t'contactina via [Page Contact](/contact) wela [WhatsApp](https://wa.me/213000000000) bach nahdrou 3la les besoins ta3 l'intégration ta3ek.",
+    "reply": "N'développiw des bots w agents IA intelligents li y'jawbou 3la les clients f Instagram w Facebook 24/7. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000) bach n'beddaw!",
     "actions": [],
     "issues": [],
     "passed": true
@@ -152,13 +107,8 @@
     "id": 12,
     "title": "Hosting & Server query",
     "message": "chkoune ykhelles l'hebergement w le nom de domaine, ntouma wela ana?",
-    "reply": "Devyx t'gère la partie technique w la configuration ta3 l'hébergement w le nom de domaine bach t'assuri l'performance l'mli7a. 3lik nta t'chri le nom de domaine w l'plan d'hébergement, 3la khater hadou des frais direct li t'khaleshom m3a l'fournisseur li khyertou nta.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "7na n'gériw ga3 la partie technique ta3 l'hébergement w le nom de domaine bach ykoun le site rapide w sécurisé 100%. 3lik ghir t'meddelna le nom de domaine li 7ab t'khdem bih!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -194,13 +144,8 @@
     "id": 15,
     "title": "Direct Call / Physical Meeting request",
     "message": "esq n9der nji l bureau ta3koum f alger wela n'planiw call google meet m3a l'equipe?",
-    "reply": "Devyx agency 100% remote, ma3ndnach bureau physique f Dzayer. T9der t'planifi appel Google Meet bach nahdrou 3la l'projet ta3ek, 3an tari9 la page Contact wela direct f [WhatsApp](https://wa.me/213000000000).",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "7na agency remote 100%, ma 3endnach bureau physique f Dzayer. Mais, n9edrou n'programmiw Google Meet m3a l'équipe ta3na bach n'nahdrou 3la l'projet ta3ek direct!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -208,13 +153,8 @@
     "id": 16,
     "title": "Security & Data Privacy query",
     "message": "les données ta3 les clients ta3i win ykounou stockés, kayen securité mli7a?",
-    "reply": "Les données ta3 les clients rahoum stockés b'sécurité f PostgreSQL b'Row Level Security (RLS) w cryptés f l'état repos. N'assuriw la souveraineté complète ta3 les données w n'respectiw les protocoles de sécurité les plus stricts.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/services"
-      }
-    ],
+    "reply": "Les données ta3ek w ta3 les clients rahom m7miyin f des serveurs sécurisés w cryptés b a3la standard de protection w confidentialité.",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -222,13 +162,8 @@
     "id": 17,
     "title": "AI Voice / Transcription query",
     "message": "esq t9edrou diro transcription ta3 l'voix b darija f l'app?",
-    "reply": "Oui, n'intégriw des agents d'IA ta3 transcription vocale li y'supportiw ed-darija el-jazayriya f les applications mobile ta3ek. T9der t'contacti l'équipe technique ta3na via [WhatsApp](https://wa.me/213000000000) wela f la page [Contact](/contact) bach n'discutiw 3la had la fonctionnalité.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "Oui, n9edrou n'intégrer la transcription vocale b Darija f l'application mobile ta3ek bach les utilisateurs y'hedrou b tbi3ethom. T9der t'contactina direct f [WhatsApp](https://wa.me/213000000000)!",
+    "actions": [],
     "issues": [],
     "passed": true
   },
@@ -236,7 +171,7 @@
     "id": 18,
     "title": "Out-of-Scope (Car mechanic)",
     "message": "khoya tomobil ta3i rahi tsakhen f l'autoroute wach men piece nbedel?",
-    "reply": "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, automations n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?",
+    "reply": "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile, l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?",
     "actions": [],
     "issues": [],
     "passed": true
@@ -245,7 +180,7 @@
     "id": 19,
     "title": "Out-of-Scope (Real Estate rental)",
     "message": "kayen kera ta3 appartement F3 f hydra wela kouba 3andkoum?",
-    "reply": "Ana l'assistant technique IA ta3 Devyx. Njawb ghir 3la l'projets ta3 software engineering (Next.js 15, apps mobile, automations n8n w l'intelligence artificielle). Kifech n9der n3awnek f l'projet digital ta3ek?",
+    "reply": "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile, l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?",
     "actions": [],
     "issues": [],
     "passed": true
@@ -254,13 +189,8 @@
     "id": 20,
     "title": "Client Closing / Ready to Sign",
     "message": "c bon 9na3touni, kifach nwedjou l'cahier des charges w nsigniw l'contrat m3akom?",
-    "reply": "Bach t'finalizi l'projet ta3ek, t9der t'contactina 3la tri9 la page Contact wela WhatsApp bach n'planifiw une réunion de découverte, n'7eddou les spécifications techniques w n'signiw le contrat.",
-    "actions": [
-      {
-        "type": "NAVIGATE",
-        "payload": "/contact"
-      }
-    ],
+    "reply": "Bach n'wedjou l'cahier des charges w n'signiw l'contrat, t9der t'prendi rendez-vous direct f [WhatsApp](https://wa.me/213000000000) wela f la page [Contact](/contact) bach n'beddaw direct!",
+    "actions": [],
     "issues": [],
     "passed": true
   }
