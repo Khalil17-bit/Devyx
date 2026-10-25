@@ -1282,7 +1282,7 @@ export function ChatWidget() {
                       <div className="space-y-2">
                         {/* Image preview in user bubble with click-to-expand and fallback */}
                         {msg.attachmentPreview?.previewUrl && (
-                          <div className="relative group overflow-hidden rounded border border-bg-primary/30 shadow-md">
+                          <div className="relative group overflow-hidden rounded border border-bg-primary/30 shadow-md w-fit max-w-full">
                             <img
                               src={msg.attachmentPreview.previewUrl}
                               alt={msg.attachmentPreview.name}
@@ -1299,7 +1299,7 @@ export function ChatWidget() {
                                 const fallbackEl = document.getElementById(`fallback-${msg.id}`);
                                 if (fallbackEl) fallbackEl.style.display = "flex";
                               }}
-                              className="max-w-[220px] max-h-[160px] object-cover rounded cursor-pointer hover:opacity-90 transition-opacity"
+                              className="w-auto max-w-full max-h-[220px] object-contain rounded cursor-pointer hover:opacity-90 transition-opacity block"
                             />
                             <div
                               id={`fallback-${msg.id}`}

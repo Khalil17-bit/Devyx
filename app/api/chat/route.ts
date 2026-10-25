@@ -307,7 +307,7 @@ function parseActionTags(raw: string): { cleanedText: string; actions: JarvisAct
  * Strict origin hostname verification to prevent cross-origin AI token abuse.
  * Strictly prevents substring bypasses like `devyx.com.attacker.com`.
  */
-function isAllowedOrigin(originHeader: string | null, siteUrlEnv?: string): boolean {
+function isAllowedOrigin(originHeader: string | null, siteUrlEnv?: string, hostHeader?: string | null): boolean {
   if (!originHeader) {
     return true;
   }
@@ -315,6 +315,21 @@ function isAllowedOrigin(originHeader: string | null, siteUrlEnv?: string): bool
   try {
     const originHost = new URL(originHeader).hostname.toLowerCase();
     const allowedHosts = new Set<string>(["localhost", "127.0.0.1"]);
+
+    if (hostHeader) {
+      const hostOnly = hostHeader.split(":")[0].toLowerCase().trim();
+      allowedHosts.add(hostOnly);
+    }
+
+    // Support ngrok domains & developer tunnels
+    if (
+      originHost.endsWith(".ngrok-free.dev") ||
+      originHost.endsWith(".ngrok-free.app") ||
+      originHost.endsWith(".ngrok.io") ||
+      originHost.endsWith(".ngrok.app")
+    ) {
+      return true;
+    }
 
     if (siteUrlEnv) {
       try {
@@ -355,9 +370,10 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Strict origin hostname validation
     const origin = req.headers.get("origin");
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
-    if (process.env.NODE_ENV === "production" && !isAllowedOrigin(origin, siteUrl)) {
+    if (process.env.NODE_ENV === "production" && !isAllowedOrigin(origin, siteUrl, host)) {
       return NextResponse.json(
         { error: "Forbidden cross-origin request: unauthorized origin host" },
         { status: 403, headers: CORS_HEADERS }
@@ -760,18 +776,14 @@ let geminiChatBackoffUntil = 0;
           },
         };
 
-        const isRemoteTunnel = !n8nWebhookUrl.includes("localhost") && !n8nWebhookUrl.includes("127.0.0.1");
-        const webhookTimeoutMs = isRemoteTunnel ? 15000 : 4000;
-
         const upstreamResponse = await fetch(n8nWebhookUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-n8n-secret": n8nWebhookSecret || "",
-            "ngrok-skip-browser-warning": "true",
           },
           body: JSON.stringify(upstreamPayload),
-          signal: AbortSignal.timeout(webhookTimeoutMs),
+          signal: AbortSignal.timeout(1200),
         });
 
         if (!upstreamResponse.ok) return null;

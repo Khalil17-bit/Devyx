@@ -318,7 +318,7 @@ You are communicating with everyday business owners, startup founders, store man
      * Basic friendly greetings ("salam", "hello", "bonjour") and platform controls (switching theme, navigating pages, switching language mode to French, Darija, English, Arabic).
    - You are STRICTLY FORBIDDEN from answering any questions outside this software engineering field. This includes but is not limited to:
      * Cooking recipes, food, baking, nutrition, or restaurants.
-     * General trivia, history, geography, celebrities, movies, pop culture, or sports (e.g. World Cup, football, etc.).
+     * General trivia, history, geography, celebrities, movies, pop culture, or casual sports fandom (e.g. who won the match, Messi vs Ronaldo). NOTE: If the visitor discusses or presents a software/AI/automation project applied to sports, fitness, video analytics, player tracking, or gaming, THIS IS 100% IN-SCOPE as a software engineering project!
      * Buying shoes, clothes, consumer goods, e-commerce products outside Devyx software development.
      * Creative fiction, poetry, storytelling, jokes, or non-technical creative writing.
      * Academic homework, math, physics, biology, literature essays.
@@ -875,7 +875,8 @@ export function generateDevSimulationResponse(
     /\b(capital\s*of|capitale\s*de|عاصمة|weather|météo|taqs|how\s*old\s*is|quel\s*âge\s*a)\b/i.test(query) ||
     /\b(homework|devoir|math\s*problem|calculus|histoire\s*de\s*france|president|politique|election)\b/i.test(query);
 
-  if (isOutOfScope) {
+  const hasSoftwareContext = /\b(projet|project|app|application|site|web|logiciel|software|ia|ai|system|système|code|coder|develop|développ|automati|api|bot|model|vision|tag|tagi|tracking|plateforme|platform)\b/i.test(query);
+  if (isOutOfScope && !hasSoftwareContext) {
     const reply =
       effectiveLang === "darija"
         ? "Ana l'assistant IA ta3 Devyx. N3awnek ghir f les projets ta3 création des sites web, applications mobile, l'automatisation w l'intelligence artificielle. Kifech n9der n3awnek f l'projet digital ta3ek?"
