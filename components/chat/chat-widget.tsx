@@ -1270,9 +1270,10 @@ export function ChatWidget() {
                   className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
                 >
                   <div
+                    data-user-bubble={isUser ? "true" : undefined}
                     className={`max-w-[92%] p-3.5 clip-chamfer text-xs ${
                       isUser
-                        ? "bg-accent-primary text-bg-primary font-medium"
+                        ? "bg-accent-primary text-bg-primary font-medium selection:bg-bg-primary selection:text-accent-primary"
                         : msg.queued
                         ? "bg-bg-elevated border border-amber-500/40 text-text-secondary space-y-2.5"
                         : "bg-bg-elevated border border-border-grid text-text-primary space-y-2.5"

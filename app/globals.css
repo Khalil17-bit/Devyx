@@ -89,10 +89,19 @@
     outline-offset: 2px;
   }
 
-  /* Selection styling */
+  /* Global Selection styling */
   ::selection {
     background-color: var(--accent-primary);
     color: var(--bg-primary);
+  }
+
+  /* Inverted selection inside elements with accent background (e.g. User Chat Bubble) to ensure high visibility */
+  .bg-accent-primary ::selection,
+  .bg-accent-primary::selection,
+  [data-user-bubble] ::selection,
+  [data-user-bubble]::selection {
+    background-color: var(--bg-primary) !important;
+    color: var(--accent-primary) !important;
   }
 }
 

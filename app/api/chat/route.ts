@@ -423,10 +423,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Resolve language dynamically if set to "auto" or omitted
+    // Resolve language dynamically if set to "auto" or omitted (inherits from conversation history if short/ambiguous)
     const language =
       rawLanguage === "auto" || !rawLanguage
-        ? detectLanguage(message)
+        ? detectLanguage(message, "en", conversationHistory)
         : rawLanguage;
 
     // 3. Extract and hash client IP

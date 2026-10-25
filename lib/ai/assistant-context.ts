@@ -327,12 +327,21 @@ You are communicating with everyday business owners, startup founders, store man
 ${refusalTemplate}
 
 2. **CONCISENESS (1-3 SENTENCES MAX)**: Keep answers punchy, helpful, and conversational. NEVER lecture the visitor with huge technical manuals, internal agent protocols, or developer handover guides.
-3. **GREETINGS & COMBINED QUESTIONS**:
+3. **CONVERSATIONAL CONTINUITY & FOLLOW-UPS (MANDATORY)**:
+   - When the visitor responds to an offer or question you just asked (e.g. you suggested scheduling a discovery meeting, visiting WhatsApp, or checking a page, and they reply "non", "no", "lala", "pas maintenant", "not now", "plus tard", "oui", "yes", "d'accord", "ok", "merci"):
+     * THIS IS 100% IN-SCOPE CONVERSATIONAL FLOW. NEVER trigger an out-of-scope refusal on simple conversational answers, affirmations, or declines.
+     * If they decline ("non", "no", "lala", "pas maintenant", "plus tard"):
+       - Graciously accept in 1-2 friendly sentences in the active language.
+       - Ask what other questions they have about their software project or how else you can assist them.
+       - French example: "Pas de souci ! Y a-t-il d'autres questions sur votre projet de site web ou sur nos services auxquelles je peux répondre ?"
+       - Darija example: "Makach mochkil khoya! Ila 3endek ay sou'al akhor 3la l'projet ta3ek wela les services ta3na, rani hna bach n'3awnek."
+       - English example: "No problem at all! Feel free to ask any other questions about your software project or our services whenever you're ready."
+4. **GREETINGS & COMBINED QUESTIONS**:
    - If the visitor sends ONLY a greeting (like "salam", "hello", "hi", "bonjour", "salut"), reply with a warm 1-2 sentence greeting:
 ${greetingTemplate}
    - If the visitor combines a greeting with a question (e.g. "salam khoya ch7al ykellef site web", "bonjour combien coûte une application mobile"), warmly greet them in one phrase AND directly answer their question!
-4. **DEVYX AGENCY SCOPE**: Devyx builds modern custom websites & web platforms, mobile apps (iOS & Android), business workflow automations, and intelligent AI agents. (Only name specific frameworks like Next.js 15 or Flutter when the user explicitly asks for technical architecture).
-5. **AUTONOMOUS PLATFORM ACTIONS, LANGUAGE SWITCHING & MEMORY (MANDATORY)**:
+5. **DEVYX AGENCY SCOPE**: Devyx builds modern custom websites & web platforms, mobile apps (iOS & Android), business workflow automations, and intelligent AI agents. (Only name specific frameworks like Next.js 15 or Flutter when the user explicitly asks for technical architecture).
+6. **AUTONOMOUS PLATFORM ACTIONS, LANGUAGE SWITCHING & MEMORY (MANDATORY)**:
    You have executive platform control to navigate pages, change themes, or SWITCH THE CHAT LANGUAGE MODE.
    - **Language Switching Requests**: When the visitor asks to switch language, speak in a specific language, or switch language mode (e.g. "switch language mode in this chat to french", "speak in french", "parle en français", "ahdar bel darija", "speak in arabic", "switch to english"):
      * THIS IS ALWAYS 100% IN-SCOPE. NEVER REFUSE A LANGUAGE SWITCH REQUEST.
@@ -391,48 +400,84 @@ export class SimulationResultWrapper implements DevSimulationResult {
  * - "fr": French (accents, common pronouns, interrogatives)
  * - "en": English (common keywords, pronouns, interrogatives)
  */
-export function detectLanguage(text: string, fallback: string = "en"): "darija" | "ar" | "fr" | "en" {
+export function detectLanguage(
+  text: string,
+  fallback: string = "en",
+  history?: Array<{ role: string; content: string }>
+): "darija" | "ar" | "fr" | "en" {
   const query = (text || "").toLowerCase().trim();
   if (!query) {
     if (fallback === "fr" || fallback === "ar" || fallback === "darija") return fallback as any;
     return "en";
   }
 
-  // 1. Darija keywords in Arabic script
-  if (/(ديال|باش|بغيت|شنو|واش|شحال|فين|عافاك|زوين|بزاف|مزيان|دابا|كاين|كنديرو|كنقدرو|نقدر|راك|واخا|ساهل|خدمة|دارجة|حنا|نتوما|هاد|هادي|هادو|دير|نديرو|عاود|شوف|كاينين|عطيني|شكون|كاش|واش كاين)/.test(query)) {
-    return "darija";
+  const testString = (str: string): "darija" | "ar" | "fr" | "en" | null => {
+    const q = (str || "").toLowerCase().trim();
+    if (!q) return null;
+
+    // 1. Darija keywords in Arabic script
+    if (/(ديال|باش|بغيت|شنو|واش|شحال|فين|عافاك|زوين|بزاف|مزيان|دابا|كاين|كنديرو|كنقدرو|نقدر|راك|واخا|ساهل|خدمة|دارجة|حنا|نتوما|هاد|هادي|هادو|دير|نديرو|عاود|شوف|كاينين|عطيني|شكون|كاش|واش كاين)/.test(q)) {
+      return "darija";
+    }
+
+    // 2. Darija Arabizi (Latin script with dialect vocabulary or digit substitutions)
+    const isDarijaArabizi =
+      /\b(salam|bghit|khoya|kidayr|chhal|ch7al|fin|3afak|dyal|doka|dorka|lazem|saguem|khedma|wach|chno|fash|krite|tomobil|sachi|trisiti|bezzaf|kayen|chta|we9t|9bel|9alli|chouf|hada|hadi|mzyan|mli7|chwiya|t3ich|choufi|khdma|rak|ntaya|ntina|hder|kalam|walo|walou|rani|rakom|choufou|sa7a|m3ak|n9der|kifech|kifach|3la|fih|fiha|nta|nti|hadak|hadik|lala|makach|machi|khatini|saha|aya)\b/i.test(q) ||
+      /\b[a-zA-Z]*[23579][a-zA-Z]*\b/.test(q);
+
+    if (isDarijaArabizi) {
+      return "darija";
+    }
+
+    // 3. Arabic script (Modern Standard Arabic)
+    if (/[\u0600-\u06FF]/.test(q)) {
+      return "ar";
+    }
+
+    // 4. French (common French terms, pronouns, questions, or accents)
+    if (
+      /[éèêëàâôûùçîï]/i.test(q) ||
+      /\b(bonjour|salut|merci|non|oui|ouais|si|d'accord|daccord|combien|coute|coûte|prix|projet|site|application|devis|pouvez|vous|nous|pour|avec|dans|faire|créer|je|veux|est|sont|mon|une|les|des|cette|notre|votre|tarif|contacter|qui|qu'est|comment|aide|besoin|plateforme|développement|fonctionne|parfait|super|aussi|très|bien|autre|soumettre|manuelle|manuel|pas|rien|voilà|voila)\b/i.test(q)
+    ) {
+      return "fr";
+    }
+
+    // 5. English (common English words)
+    if (
+      /\b(hello|hey|hi|how|much|cost|price|website|app|build|can|you|what|is|the|we|need|want|help|project|estimate|dark|mode|service|stack|who|are|tell|me|about|work|features|pricing|platform|why|working|start|nope|nah|yes|yeah|sure)\b/i.test(q)
+    ) {
+      return "en";
+    }
+
+    return null;
+  };
+
+  const directMatch = testString(query);
+
+  // If we have an unambiguous direct match on a longer query, return it
+  const isShortOrAmbiguous = query.split(/\s+/).length <= 2 && query.length <= 15;
+  if (directMatch && !isShortOrAmbiguous) {
+    return directMatch;
   }
 
-  // 2. Darija Arabizi (Latin script with dialect vocabulary or digit substitutions)
-  const isDarijaArabizi =
-    /\b(salam|bghit|khoya|kidayr|chhal|ch7al|fin|3afak|dyal|doka|dorka|lazem|saguem|khedma|wach|chno|fash|krite|tomobil|sachi|trisiti|bezzaf|kayen|chta|we9t|9bel|9alli|chouf|hada|hadi|mzyan|mli7|chwiya|t3ich|choufi|khdma|rak|ntaya|ntina|hder|kalam|walo|walou|rani|rakom|choufou|sa7a|m3ak|n9der|kifech|kifach|3la|fih|fiha|nta|nti|hadak|hadik)\b/i.test(query) ||
-    /\b[a-zA-Z]*[23579][a-zA-Z]*\b/.test(query);
-
-  if (isDarijaArabizi) {
-    return "darija";
+  // If short/ambiguous (e.g. "non", "oui", "ok", "merci") or no direct match, check recent conversation history
+  if (history && history.length > 0) {
+    for (let i = history.length - 1; i >= 0; i--) {
+      const turn = history[i];
+      if (turn && turn.content) {
+        const histMatch = testString(turn.content);
+        if (histMatch) {
+          return histMatch;
+        }
+      }
+    }
   }
 
-  // 3. Arabic script (Modern Standard Arabic)
-  if (/[\u0600-\u06FF]/.test(query)) {
-    return "ar";
+  if (directMatch) {
+    return directMatch;
   }
 
-  // 4. French (common French terms, pronouns, questions, or accents)
-  if (
-    /[éèêëàâôûùçîï]/i.test(query) ||
-    /\b(bonjour|salut|merci|combien|coute|coûte|prix|projet|site|application|devis|pouvez|vous|nous|pour|avec|dans|faire|créer|je|veux|est|sont|mon|une|les|des|cette|notre|votre|tarif|contacter|qui|qu'est|comment|aide|besoin|plateforme|développement|fonctionne)\b/i.test(query)
-  ) {
-    return "fr";
-  }
-
-  // 5. English (common English words)
-  if (
-    /\b(hello|hey|hi|how|much|cost|price|website|app|build|can|you|what|is|the|we|need|want|help|project|estimate|dark|mode|service|stack|who|are|tell|me|about|work|features|pricing|platform|why|working|start)\b/i.test(query)
-  ) {
-    return "en";
-  }
-
-  // 6. Fallback based on locale if set
+  // Fallback based on locale if set
   if (fallback === "fr" || fallback === "ar" || fallback === "darija") {
     return fallback as any;
   }
@@ -452,7 +497,7 @@ export function generateDevSimulationResponse(
   const query = message.toLowerCase().trim();
   const effectiveLang: "darija" | "ar" | "fr" | "en" =
     language === "auto" || !language
-      ? detectLanguage(message, "en")
+      ? detectLanguage(message, "en", history)
       : language === "ar-MA"
       ? "darija"
       : (language as any);
@@ -463,6 +508,22 @@ export function generateDevSimulationResponse(
   // 1. Detect Phone Number / Contact Information in message
   const phoneMatch = message.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{2,4}[-.\s]?\d{2,6}/);
   const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+
+  // 1.5 Conversational Follow-up (Decline or Acknowledgement)
+  const isConversationalDecline =
+    /^(non|no|nan|lala|la|pas maintenant|plus tard|not now|not yet|later|nope|nah|pas de souci|c'est bon|c bon|makach)\b/i.test(query);
+
+  if (isConversationalDecline && query.split(/\s+/).length <= 4) {
+    const reply =
+      effectiveLang === "darija"
+        ? "Makach mochkil khoya! Ila 3endek ay sou'al akhor 3la l'projet ta3ek wela les services ta3na, rani hna bach n'3awnek."
+        : effectiveLang === "fr"
+        ? "Pas de souci ! Y a-t-il d'autres questions sur votre projet de site web ou sur nos services auxquelles je peux répondre ?"
+        : effectiveLang === "ar"
+        ? "لا مشكلة على الإطلاق! هل لديك أي استفسار آخر بخصوص مشروعك البرمجي أو خدماتنا يمكنني المساعدة به؟"
+        : "No problem at all! Is there anything else about your software project or our development process I can help answer?";
+    return new SimulationResultWrapper({ reply: effectiveLang === "darija" ? sanitizeDarijaText(reply) : reply });
+  }
 
   // 2. Action Detection: Theme Switching (Seamless Autonomous Control)
   const hasThemeContext =
