@@ -2,7 +2,7 @@
 
 > **Deterministic Architecture. Autonomous Workflows. Zero Fluff.**
 
-Devyx is a production-grade digital agency platform engineering mission-critical web platforms, cross-platform mobile apps, and self-hosted n8n automation pipelines. Built strictly in adherence with the **Anti-AI Blueprint Design System** ([`Design.md`](file:///e:/Devyx/Design.md)) and the comprehensive technical specification ([`PRD.md`](file:///e:/Devyx/PRD.md)).
+Devyx is a production-grade digital agency platform engineering mission-critical web platforms, cross-platform mobile apps, and self-hosted n8n automation pipelines. Built strictly in adherence with the **Anti-AI Blueprint Design System** ([`Design.md`](Design.md)) and the comprehensive technical specification ([`PRD.md`](PRD.md)).
 
 ---
 
@@ -33,7 +33,7 @@ Devyx is a production-grade digital agency platform engineering mission-critical
    - Resilient fallback returning direct WhatsApp and Telegram links on upstream outage or timeout.
 
 5. **Supabase Free-Tier Inactivity Keep-Alive Cron:**
-   - Scheduled via [`vercel.json`](file:///e:/Devyx/vercel.json) to trigger daily at midnight UTC (`0 0 * * *`).
+   - Scheduled via [`vercel.json`](vercel.json) to trigger daily at midnight UTC (`0 0 * * *`).
    - Authorizes requests via `CRON_SECRET` and executes a lightweight single-row read on `site_settings` to maintain database activity and prevent Supabase's 7-day auto-pause.
 
 6. **Custom Headless CMS (`/admin`):**
@@ -94,7 +94,7 @@ NEXT_PUBLIC_SITE_URL=https://devyx.com
 ```
 
 ### 3. Database Deployment
-Follow the step-by-step instructions in [`docs/supabase-setup.md`](file:///e:/Devyx/docs/supabase-setup.md) to apply the database migrations, RLS policies, storage bucket, and trilingual seed data.
+Follow the step-by-step instructions in [`docs/supabase-setup.md`](docs/supabase-setup.md) to apply the database migrations, RLS policies, storage bucket, and trilingual seed data.
 
 ### 4. Install Dependencies & Run Locally
 
@@ -166,3 +166,4 @@ Devyx/
 - **GDPR-Compliant IP Anonymization:** Client IP addresses are never stored in raw form; all rate-limiting entries use SHA-256 hashes combined with a server-side salt.
 - **Strict Row-Level Security:** Anonymous visitors have zero `SELECT`, `UPDATE`, or `DELETE` access to the `leads` table. Insertion is dynamically restricted by the `site_settings.enable_contact_form` database flag.
 - **Zero Client Credential Leakage:** Upstream n8n webhook URLs, secrets, and Supabase service role keys reside strictly in serverless runtime environments and are never bundled into client JavaScript.
+
